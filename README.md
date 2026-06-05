@@ -3,7 +3,7 @@
 > A production-grade, full-stack AI fraud detection platform. Five interconnected systems. One unified command center. A closed feedback loop that gets smarter with every fraud event.
 
 ![REDWING Platform](https://img.shields.io/badge/REDWING-AI%20Fraud%20Platform-818cf8?style=for-the-badge)
-![Stack](https://img.shields.io/badge/Stack-React%20%7C%20FastAPI%20%7C%20XGBoost%20%7C%20Claude-0ea5e9?style=for-the-badge)
+![Stack](https://img.shields.io/badge/Stack-React%20%7C%20FastAPI%20%7C%20XGBoost%20%7C%20LLM-0ea5e9?style=for-the-badge)
 ![AUC](https://img.shields.io/badge/Ensemble%20AUC-0.979-22c55e?style=for-the-badge)
 ![Transactions](https://img.shields.io/badge/Training%20Data-880K%20transactions-f59e0b?style=for-the-badge)
 
@@ -233,14 +233,6 @@ npm run dev
 | Shared devices detected | 39 |
 | Mule accounts detected | 285 |
 | Microservices | 5 (ports 5175, 5177, 5179, 8000, 8001) |
-
----
-
-## About
-
-Built by **Shriraj Tomar** — AI Product Manager with a background in fraud strategy, risk operations, and financial crime. REDWING was built to demonstrate that a solo PM can architect and ship a production-grade ML + LLM fraud platform end-to-end.
-
-[LinkedIn](https://linkedin.com/in/shrirajsingtomar) · [GitHub](https://github.com/tshriraj-del)
 
 ---
 

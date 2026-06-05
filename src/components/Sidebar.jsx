@@ -12,7 +12,7 @@ const NAV = [
   { to: '/operator', icon: Radar, label: 'Operator', badge: 'LIVE' },
   { to: '/rules', icon: Sparkles, label: 'Rule Factory', badge: 'AI' },
   { to: '/network', icon: GitFork, label: 'Network Intel', badge: 'NEW' },
-  { to: '/systems', icon: Network, label: 'Systems Hub' },
+  { to: '/systems', icon: Network, label: 'API Reference' },
 ];
 
 export default function Sidebar() {

@@ -6,7 +6,7 @@ const TITLES = {
   '/org': 'RedWing Intelligence',
   '/ml': 'ML Detection Lab',
   '/operator': 'Monitor',
-  '/systems': 'Systems Hub',
+  '/systems': 'API Reference',
 };
 
 const SYSTEMS = [

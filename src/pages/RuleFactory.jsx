@@ -442,7 +442,7 @@ export default function RuleFactory() {
               Generated Rules
             </div>
             <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>
-              Claude-generated rules — each backtested before deploy. Shadow mode monitors without blocking.
+              AI-generated rules — each backtested before deploy. Shadow mode monitors without blocking.
             </div>
           </div>
 

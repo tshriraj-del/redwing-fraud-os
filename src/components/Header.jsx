@@ -3,7 +3,7 @@ import { Circle } from 'lucide-react';
 
 const TITLES = {
   '/': 'Command Dashboard',
-  '/org': 'AI Organization',
+  '/org': 'RedWing Intelligence',
   '/ml': 'ML Detection Lab',
   '/operator': 'Operator — Real-time Monitor',
   '/systems': 'Systems Hub',

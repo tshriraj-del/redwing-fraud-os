@@ -1,7 +1,30 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { Send, X, Download, RotateCcw, ChevronDown } from 'lucide-react';
-import { WORKERS, WORKER_LIST, detectWorker } from '../workers.js';
+import { Send, X, Download, RotateCcw } from 'lucide-react';
+import { WORKERS, WORKER_LIST, detectWorker, setLiveContext } from '../workers.js';
 import { streamMessage } from '../api.js';
+
+const BACKEND = 'http://localhost:8000';
+
+async function fetchLiveContext() {
+  try {
+    const [health, gaps] = await Promise.all([
+      fetch(`${BACKEND}/health`, { signal: AbortSignal.timeout(2000) }).then(r => r.json()).catch(() => null),
+      fetch(`${BACKEND}/rule-factory/gaps`, { signal: AbortSignal.timeout(2000) }).then(r => r.json()).catch(() => null),
+    ]);
+    const lines = ['Current RedWing system state (injected at session start):'];
+    if (health) {
+      lines.push(`- Model AUC: ${health.model_metrics?.auc_ensemble ?? '—'} | Fraud rate: ${health.model_metrics?.fraud_rate ? (health.model_metrics.fraud_rate * 100).toFixed(2) + '%' : '—'}`);
+      lines.push(`- Transactions in dataset: ${health.model_metrics?.n_transactions?.toLocaleString() ?? '—'}`);
+      lines.push(`- Active features: ${health.features?.length ?? '—'}`);
+    }
+    if (gaps) {
+      lines.push(`- Rule gaps detected: ${gaps.count ?? 0} (ML catches, rules miss)`);
+    }
+    return lines.join('\n');
+  } catch {
+    return '';
+  }
+}
 
 // Convert markdown-style text to HTML for display
 function renderMarkdown(text) {
@@ -114,12 +137,12 @@ function Message({ msg }) {
 }
 
 const STARTERS = [
-  { label: 'Review FraudSense product strategy', worker: 'product' },
-  { label: 'Evaluate ML model drift risk', worker: 'ml' },
-  { label: 'Security audit of SyntheticID agent', worker: 'security' },
-  { label: 'Research competing fraud platforms', worker: 'research' },
-  { label: 'Write PRD for rule explanation feature', worker: 'product' },
-  { label: 'Analyze ATO attack patterns in RuleBreaker', worker: 'fraud' },
+  { label: 'Why are there rule gaps and what should I do about them?', worker: 'rule_engineer' },
+  { label: 'What attack patterns is SyntheticID Lab exposing that rules aren\'t catching?', worker: 'threat' },
+  { label: 'Should I tighten the velocity_1h threshold given current false positive rate?', worker: 'risk_strategist' },
+  { label: 'Explain the AUC and what could cause it to drift', worker: 'ml_monitor' },
+  { label: 'Walk me through how to investigate a pig butchering case in FraudSense', worker: 'case_analyst' },
+  { label: 'How do I interpret a fraud ring cluster in Network Intel?', worker: 'network_analyst' },
 ];
 
 export default function AgentChat() {
@@ -131,6 +154,13 @@ export default function AgentChat() {
   const abortRef = useRef(null);
   const bottomRef = useRef(null);
   const inputRef = useRef(null);
+
+  // Fetch live system context on mount and inject into workers
+  useEffect(() => {
+    fetchLiveContext().then(ctx => {
+      if (ctx) setLiveContext(ctx);
+    });
+  }, []);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -145,6 +175,10 @@ export default function AgentChat() {
 
     const workerId = selectedWorker === 'auto' ? detectWorker(content) : selectedWorker;
     const worker = WORKERS[workerId];
+    const liveCtx = await fetchLiveContext();
+    const systemPromptWithContext = liveCtx
+      ? `${worker.systemPrompt}\n\n${liveCtx}`
+      : worker.systemPrompt;
 
     const userMsg = { id: Date.now(), role: 'user', content };
     const asstMsg = { id: Date.now() + 1, role: 'assistant', worker: workerId, content: '', streaming: true };
@@ -164,7 +198,7 @@ export default function AgentChat() {
 
     try {
       await streamMessage({
-        systemPrompt: worker.systemPrompt,
+        systemPrompt: systemPromptWithContext,
         messages: history,
         signal: ctrl.signal,
         onToken: (token) => {
@@ -213,7 +247,7 @@ export default function AgentChat() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `ai-org-report-${Date.now()}.md`;
+    a.download = `redwing-intelligence-${Date.now()}.md`;
     a.click();
     URL.revokeObjectURL(url);
   }
@@ -283,9 +317,9 @@ export default function AgentChat() {
         {isEmpty ? (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: 60 }}>
             <div style={{ fontSize: 28, marginBottom: 12 }}>⚡</div>
-            <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--text)', marginBottom: 6 }}>AI Organization</div>
+            <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--text)', marginBottom: 6 }}>RedWing Intelligence</div>
             <div style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 28, textAlign: 'center', maxWidth: 380 }}>
-              Seven specialized workers ready. Ask anything about your products, ML models, fraud patterns, or security posture.
+              Six specialist workers with live system context. Ask about rule gaps, attack patterns, model health, cases, thresholds, or fraud rings.
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8, width: '100%', maxWidth: 540 }}>
               {STARTERS.map(s => (
@@ -353,7 +387,7 @@ export default function AgentChat() {
             onKeyDown={e => {
               if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
             }}
-            placeholder="Ask your AI Organization… (Shift+Enter for new line)"
+            placeholder="Ask RedWing Intelligence… (Shift+Enter for new line)"
             rows={1}
             style={{
               flex: 1,

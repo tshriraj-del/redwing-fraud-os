@@ -7,7 +7,7 @@ import { useState } from 'react';
 
 const NAV = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
-  { to: '/org', icon: MessageSquare, label: 'AI Organization' },
+  { to: '/org', icon: MessageSquare, label: 'RedWing Intel' },
   { to: '/ml', icon: FlaskConical, label: 'ML Detection Lab' },
   { to: '/operator', icon: Radar, label: 'Operator', badge: 'LIVE' },
   { to: '/rules', icon: Sparkles, label: 'Rule Factory', badge: 'AI' },

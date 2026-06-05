@@ -12,21 +12,21 @@ const SYSTEMS = [
     port: 5175,
     link: 'http://localhost:5175',
     features: ['4-stage investigation pipeline', 'Risk scoring 0–100', 'Evidence classification', 'File + image attachment support', 'Exportable reports'],
-    stack: 'React + Vite · Claude Sonnet 4.6 · Tailwind',
+    stack: 'React + Vite · LLM API · Tailwind',
     status: 'live',
     external: true,
   },
   {
     name: 'Rule Factory',
     version: 'v2.0.0',
-    desc: 'Self-improving rule engine powered by Claude. Detects fraud vectors that ML catches but rules miss, generates candidate rules, backtests them, and auto-deploys rules that pass the quality gate.',
+    desc: 'Self-improving rule engine. Detects fraud vectors that ML catches but rules miss, generates candidate rules, backtests them, and auto-deploys rules that pass the quality gate.',
     icon: Sparkles,
     color: '#4ade80',
     colorDim: 'rgba(74,222,128,0.1)',
     port: 8000,
     link: '/rules',
-    features: ['Gap detection (ML vs rules)', 'Claude rule generation', 'Automated backtesting', 'Shadow → auto-deploy pipeline', 'Precision monitoring + retire'],
-    stack: 'React + FastAPI · Claude Sonnet 4.6 · XGBoost',
+    features: ['Gap detection (ML vs rules)', 'AI rule generation', 'Automated backtesting', 'Shadow → auto-deploy pipeline', 'Precision monitoring + retire'],
+    stack: 'React + FastAPI · LLM API · XGBoost',
     status: 'live',
     external: false,
   },
@@ -40,7 +40,7 @@ const SYSTEMS = [
     port: 5177,
     link: 'http://localhost:5177',
     features: ['8-step attack lifecycle simulation', 'Detection gap mapping', 'Exposure scoring (5 dimensions)', 'One-click feed to Rule Factory', 'Adversarial training signal generation'],
-    stack: 'React + Vite · Claude Sonnet 4.6 · Tailwind',
+    stack: 'React + Vite · LLM API · Tailwind',
     status: 'live',
   },
   {
@@ -54,7 +54,7 @@ const SYSTEMS = [
     link: '/ml',
     internal: true,
     features: ['AUC/Precision/Recall/F1 tracking', '30-day drift monitoring', 'SHAP feature importance', 'LLM transaction scorer', 'Real-time risk scoring'],
-    stack: 'React + Vite · Recharts · Claude Sonnet 4.6',
+    stack: 'React + Vite · Recharts · LLM API',
     status: 'live',
   },
 ];
@@ -180,7 +180,7 @@ export default function Systems() {
   return (
     <div style={{ height: '100%', overflowY: 'auto', padding: '24px 28px' }}>
       <div style={{ marginBottom: 20 }}>
-        <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 4 }}>4 core systems · REDWING suite</div>
+        <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 4 }}>4 core systems · RedWing suite</div>
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 16 }}>
         {SYSTEMS.map(s => <SystemCard key={s.name} sys={s} />)}

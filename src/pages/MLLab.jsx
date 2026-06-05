@@ -112,7 +112,7 @@ export default function MLLab() {
   const [scoreError, setScoreError] = useState(null);
   const [useMLEngine, setUseMLEngine] = useState(true);
 
-  // Live data from REDWING ML server
+  // Live data from RedWing ML server
   const [metrics, setMetrics]     = useState(null);
   const [features, setFeatures]   = useState([]);
   const [driftData, setDriftData] = useState([]);
@@ -179,7 +179,7 @@ export default function MLLab() {
           score: mlResult.redwing_score,
           severity: sev,
           key_signals: mlResult.top_signals,
-          reasoning: `REDWING score ${mlResult.redwing_score}/100 — XGBoost: ${mlResult.xgb_score}, IsoForest: ${mlResult.iso_score}. Latency: ${mlResult.latency_ms}ms.`,
+          reasoning: `RedWing score ${mlResult.redwing_score}/100 — XGBoost: ${mlResult.xgb_score}, IsoForest: ${mlResult.iso_score}. Latency: ${mlResult.latency_ms}ms.`,
           recommended_action: decision === 'DECLINE' ? 'Decline' : decision === 'APPROVE' ? 'Approve' : 'Review',
           model_version: mlResult.model_version,
           source: 'ml-engine',
@@ -225,7 +225,7 @@ export default function MLLab() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <div style={{ width: 8, height: 8, borderRadius: '50%', background: serverOk ? 'var(--green)' : serverOk === false ? 'var(--red)' : 'var(--yellow)', animation: serverOk ? 'pulse 2s infinite' : 'none' }} />
           <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)' }}>
-            REDWING ML Engine &nbsp;
+            RedWing ML Engine &nbsp;
             <span style={{ fontSize: 10, fontWeight: 500, color: 'var(--text-muted)' }}>
               {metrics ? metrics.model_version : '—'}
             </span>
@@ -361,8 +361,8 @@ export default function MLLab() {
           </div>
           <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 14 }}>
             {useMLEngine
-              ? 'Parsed → REDWING model inference (real XGBoost + IsoForest, sub-ms)'
-              : 'Describe a transaction — Claude scores it using ML signal patterns'}
+              ? 'Parsed → RedWing model inference (real XGBoost + IsoForest, sub-ms)'
+              : 'Describe a transaction — AI scores it using ML signal patterns'}
           </div>
 
           <textarea
@@ -453,7 +453,7 @@ export default function MLLab() {
 
         {/* Server info panel */}
         <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 10, padding: '16px 18px' }}>
-          <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text)', marginBottom: 14 }}>REDWING Stack</div>
+          <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text)', marginBottom: 14 }}>RedWing Stack</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {[
               { label: 'Layer 1 — Rule Engine', value: '41 rules · 6 typologies', color: 'var(--accent)' },

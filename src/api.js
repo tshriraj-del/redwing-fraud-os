@@ -1,4 +1,4 @@
-// Anthropic API — streaming messages for the AI Organization OS.
+// LLM API — streaming messages for RedWing Intelligence.
 
 const MODEL = 'claude-sonnet-4-6';
 const MAX_TOKENS = 8192;
@@ -63,7 +63,7 @@ export async function streamMessage({ systemPrompt, messages, onToken, onDone, s
   onDone?.();
 }
 
-// REDWING ML Server — real model inference (port 8001)
+// RedWing ML Server — real model inference (port 8001)
 const ML_SERVER = 'http://localhost:8001';
 
 export async function fetchMLMetrics() {

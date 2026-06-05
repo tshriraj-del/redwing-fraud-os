@@ -47,7 +47,7 @@ const SYSTEM_DEFS = [
   {
     id: 'rulefactory',
     name: 'Rule Factory',
-    desc: 'Self-improving rule engine · Claude-powered',
+    desc: 'Self-improving rule engine · AI-powered',
     icon: Sparkles,
     color: '#4ade80',
     colorDim: 'rgba(74,222,128,0.1)',
@@ -207,7 +207,7 @@ export default function Dashboard() {
         </div>
         <div style={{ display: 'flex', gap: 10 }}>
           {[
-            { label: 'Ask AI Organization', path: '/org', icon: Zap, color: 'var(--accent)' },
+            { label: 'RedWing Intelligence', path: '/org', icon: Zap, color: 'var(--accent)' },
             { label: 'ML Model Health', path: '/ml', icon: TrendingUp, color: 'var(--yellow)' },
             { label: 'Rule Factory', path: '/rules', icon: Sparkles, color: 'var(--green)' },
           ].map(a => (

@@ -131,6 +131,13 @@ Real-time fraud ring detection graph. Visualises users, devices, and recipients 
 
 ---
 
+### 📄 SAR Writer → [repo](https://github.com/tshriraj-del/sar-writer)
+FinCEN Form 111 SAR narrative generator for BSA/AML compliance. Input a fraud case and get back a compliant SAR narrative, Form 111 structured field mapping, a five-W compliance checker (WHO/WHAT/WHEN/WHERE/WHY/HOW), and pre-filing examiner notes. Supports 13 fraud typologies, initial/continuing/corrected filing types.
+
+**Tech:** React · Vite · Tailwind
+
+---
+
 ### 📋 RuleBreaker → [repo](https://github.com/tshriraj-del/rulebreaker)
 Standalone adversarial rule stress-tester. Tests existing fraud rules against edge cases and adversarial inputs to find detection gaps before they reach production.
 

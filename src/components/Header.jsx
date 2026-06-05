@@ -5,7 +5,7 @@ const TITLES = {
   '/': 'Command Dashboard',
   '/org': 'RedWing Intelligence',
   '/ml': 'ML Detection Lab',
-  '/operator': 'Operator — Real-time Monitor',
+  '/operator': 'Monitor',
   '/systems': 'Systems Hub',
 };
 

@@ -13,6 +13,7 @@ const Network       = lazy(() => import('./pages/Network.jsx'));
 const SARWriter     = lazy(() => import('./pages/SARWriter.jsx'));
 const FraudSensePage  = lazy(() => import('./pages/FraudSense.jsx'));
 const RuleBreakerPage = lazy(() => import('./pages/RuleBreaker.jsx'));
+const XAILab          = lazy(() => import('./pages/XAILab.jsx'));
 
 function PageLoader() {
   return (
@@ -41,6 +42,7 @@ export default function App() {
               <Route path="/sar"         element={<SARWriter />} />
               <Route path="/fraudsense"  element={<FraudSensePage />} />
               <Route path="/rulebreaker" element={<RuleBreakerPage />} />
+              <Route path="/xai"        element={<XAILab />} />
             </Routes>
           </Suspense>
         </main>

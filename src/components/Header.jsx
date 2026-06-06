@@ -11,6 +11,7 @@ const TITLES = {
   '/sar':          'SAR Writer',
   '/fraudsense':   'FraudSense',
   '/rulebreaker':  'RuleBreaker',
+  '/xai':          'XAI Lab',
   '/systems':      'API Reference',
 };
 

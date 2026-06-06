@@ -3,17 +3,18 @@ import { Routes, Route } from 'react-router-dom';
 import Sidebar from './components/Sidebar.jsx';
 import Header from './components/Header.jsx';
 
-const Dashboard     = lazy(() => import('./pages/Dashboard.jsx'));
-const AgentChat     = lazy(() => import('./pages/AgentChat.jsx'));
-const MLLab         = lazy(() => import('./pages/MLLab.jsx'));
-const Operator      = lazy(() => import('./pages/Operator.jsx'));
-const Systems       = lazy(() => import('./pages/Systems.jsx'));
-const RuleFactory   = lazy(() => import('./pages/RuleFactory.jsx'));
-const Network       = lazy(() => import('./pages/Network.jsx'));
-const SARWriter     = lazy(() => import('./pages/SARWriter.jsx'));
+const Dashboard       = lazy(() => import('./pages/Dashboard.jsx'));
+const AgentChat       = lazy(() => import('./pages/AgentChat.jsx'));
+const MLLab           = lazy(() => import('./pages/MLLab.jsx'));
+const Operator        = lazy(() => import('./pages/Operator.jsx'));
+const Systems         = lazy(() => import('./pages/Systems.jsx'));
+const RuleFactory     = lazy(() => import('./pages/RuleFactory.jsx'));
+const Network         = lazy(() => import('./pages/Network.jsx'));
+const SARWriter       = lazy(() => import('./pages/SARWriter.jsx'));
 const FraudSensePage  = lazy(() => import('./pages/FraudSense.jsx'));
 const RuleBreakerPage = lazy(() => import('./pages/RuleBreaker.jsx'));
 const XAILab          = lazy(() => import('./pages/XAILab.jsx'));
+const SyntheticID     = lazy(() => import('./pages/SyntheticID.jsx'));
 
 function PageLoader() {
   return (
@@ -33,7 +34,7 @@ export default function App() {
           <Suspense fallback={<PageLoader />}>
             <Routes>
               <Route path="/"            element={<Dashboard />} />
-              <Route path="/org"         element={<AgentChat />} />
+              <Route path="/intel"       element={<AgentChat />} />
               <Route path="/ml"          element={<MLLab />} />
               <Route path="/operator"    element={<Operator />} />
               <Route path="/systems"     element={<Systems />} />
@@ -42,7 +43,8 @@ export default function App() {
               <Route path="/sar"         element={<SARWriter />} />
               <Route path="/fraudsense"  element={<FraudSensePage />} />
               <Route path="/rulebreaker" element={<RuleBreakerPage />} />
-              <Route path="/xai"        element={<XAILab />} />
+              <Route path="/xai"         element={<XAILab />} />
+              <Route path="/syntheticid" element={<SyntheticID />} />
             </Routes>
           </Suspense>
         </main>

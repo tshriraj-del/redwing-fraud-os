@@ -38,7 +38,7 @@ const SYSTEM_DEFS = [
     icon: FlaskConical,
     color: '#f59e0b',
     colorDim: 'rgba(245,158,11,0.1)',
-    port: 8001,
+    port: 8000,
     link: '/ml',
     internal: true,
     stat: null,

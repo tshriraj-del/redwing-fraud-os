@@ -214,3 +214,27 @@ html, body, #root {
   50% { opacity: 0.5; transform: scale(0.8); }
 }
 .pulse-dot { animation: pulse-dot 2s ease-in-out infinite; }
+
+/* SyntheticID Lab — alias vars so its components resolve against Fraud OS tokens */
+:root {
+  --bg:           var(--bg-base);
+  --surface:      var(--bg-surface);
+  --surface-raised: var(--bg-elevated);
+  --surface-high: #1f2a3f;
+  --border-muted: var(--border-subtle);
+  --text-subtle:  var(--text-muted);
+}
+
+@keyframes shimmer-sid { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+.skeleton {
+  background: linear-gradient(90deg, var(--bg-elevated) 25%, #1f2937 50%, var(--bg-elevated) 75%);
+  background-size: 200% 100%;
+  animation: shimmer-sid 1.5s infinite linear;
+  border-radius: 6px;
+}
+
+@keyframes stepIn {
+  from { opacity: 0; transform: translateX(-8px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.step-card { animation: stepIn 0.3s ease forwards; }

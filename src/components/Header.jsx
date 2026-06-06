@@ -6,6 +6,9 @@ const TITLES = {
   '/org': 'RedWing Intelligence',
   '/ml': 'ML Detection Lab',
   '/operator': 'Monitor',
+  '/rules':    'Rule Factory',
+  '/network':  'Network Intel',
+  '/sar':      'SAR Writer',
   '/systems': 'API Reference',
 };
 

@@ -8,6 +8,7 @@ import Operator from './pages/Operator.jsx';
 import Systems from './pages/Systems.jsx';
 import RuleFactory from './pages/RuleFactory.jsx';
 import Network from './pages/Network.jsx';
+import SARWriter from './pages/SARWriter.jsx';
 
 export default function App() {
   return (
@@ -24,6 +25,7 @@ export default function App() {
             <Route path="/systems" element={<Systems />} />
             <Route path="/rules" element={<RuleFactory />} />
             <Route path="/network" element={<Network />} />
+            <Route path="/sar" element={<SARWriter />} />
           </Routes>
         </main>
       </div>

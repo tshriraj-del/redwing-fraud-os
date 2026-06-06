@@ -310,7 +310,7 @@ export default function MLLab() {
             {features.map(f => (
               <div key={f.name}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>
-                  <span style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: 'JetBrains Mono, monospace', fontSize: 10 }}>{f.name}</span>
+                  <span style={{ fontSize: 10, color: 'var(--text-muted)', fontFamily: 'JetBrains Mono, monospace' }}>{f.name}</span>
                   <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text)', fontFamily: 'JetBrains Mono, monospace' }}>
                     {(f.importance * 100).toFixed(1)}%
                   </span>

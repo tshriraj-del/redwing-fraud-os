@@ -8,8 +8,10 @@ const TITLES = {
   '/operator': 'Monitor',
   '/rules':    'Rule Factory',
   '/network':  'Network Intel',
-  '/sar':      'SAR Writer',
-  '/systems': 'API Reference',
+  '/sar':          'SAR Writer',
+  '/fraudsense':   'FraudSense',
+  '/rulebreaker':  'RuleBreaker',
+  '/systems':      'API Reference',
 };
 
 const SYSTEMS = [

@@ -2,6 +2,7 @@ import { NavLink } from 'react-router-dom';
 import {
   LayoutDashboard, MessageSquare, FlaskConical,
   Network, ChevronLeft, ChevronRight, Zap, Radar, Sparkles, GitFork, FileText,
+  ShieldAlert, Swords,
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -13,6 +14,8 @@ const NAV = [
   { to: '/rules', icon: Sparkles, label: 'Rule Factory', badge: 'AI' },
   { to: '/network', icon: GitFork, label: 'Network Intel', badge: 'NEW' },
   { to: '/sar', icon: FileText, label: 'SAR Writer' },
+  { to: '/fraudsense', icon: ShieldAlert, label: 'FraudSense' },
+  { to: '/rulebreaker', icon: Swords, label: 'RuleBreaker' },
   { to: '/systems', icon: Network, label: 'API Reference' },
 ];
 

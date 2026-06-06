@@ -1,23 +1,17 @@
 import { NavLink } from 'react-router-dom';
 import {
   LayoutDashboard, MessageSquare, FlaskConical,
-  ChevronLeft, ChevronRight, Zap, Radar, Sparkles, GitFork, FileText,
-  ShieldAlert, Swords, BrainCircuit, Bot, Code2,
+  ChevronLeft, ChevronRight, Zap, Radar, Sparkles, GitFork, Code2,
 } from 'lucide-react';
 import { useState } from 'react';
 
 const NAV = [
-  { to: '/',           icon: LayoutDashboard, label: 'Dashboard' },
-  { to: '/intel',      icon: MessageSquare,   label: 'Fraud Intelligence' },
-  { to: '/ml',         icon: FlaskConical,    label: 'ML Detection Lab' },
-  { to: '/operator',   icon: Radar,           label: 'Operator',    badge: 'LIVE' },
-  { to: '/rules',      icon: Sparkles,        label: 'Rule Factory', badge: 'AI' },
-  { to: '/network',    icon: GitFork,         label: 'Network Intel' },
-  { to: '/sar',        icon: FileText,        label: 'SAR Writer' },
-  { to: '/fraudsense', icon: ShieldAlert,     label: 'FraudSense' },
-  { to: '/rulebreaker',icon: Swords,          label: 'RuleBreaker' },
-  { to: '/syntheticid',icon: Bot,             label: 'SyntheticID Lab' },
-  { to: '/xai',        icon: BrainCircuit,    label: 'XAI Lab',     badge: 'NEW' },
+  { to: '/',         icon: LayoutDashboard, label: 'Dashboard' },
+  { to: '/intel',    icon: MessageSquare,   label: 'Fraud Intelligence' },
+  { to: '/ml',       icon: FlaskConical,    label: 'ML Detection Lab' },
+  { to: '/operator', icon: Radar,           label: 'Operator',     badge: 'LIVE' },
+  { to: '/rules',    icon: Sparkles,        label: 'Rule Factory', badge: 'AI' },
+  { to: '/network',  icon: GitFork,         label: 'Network Intel' },
 ];
 
 export default function Sidebar() {

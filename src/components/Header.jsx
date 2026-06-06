@@ -17,9 +17,6 @@ const TITLES = {
 
 const SYSTEMS = [
   { label: 'Operator', ok: true },
-  { label: 'FraudSense', ok: true },
-  { label: 'RuleBreaker', ok: true },
-  { label: 'SyntheticID', ok: true },
 ];
 
 export default function Header() {

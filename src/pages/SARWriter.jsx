@@ -16,13 +16,16 @@ const TYPOLOGIES = [
   'Darknet / Crypto Mixing',
   'Deepfake Social Engineering',
   'Mule Account Activity',
+  'OFAC SDN / Sanctions Match',
+  'PEP (Politically Exposed Person)',
+  'Terrorist Financing',
   'Other',
 ]
 
 const ACTIVITY_TYPES = [
   'BSA/Structuring', 'Fraud — ACH', 'Fraud — Card', 'Fraud — Check',
   'Fraud — Wire', 'Identity Theft', 'Money Laundering', 'Mortgage Loan Fraud',
-  'Securities Fraud', 'Terrorist Financing', 'Other',
+  'OFAC / Sanctions Violation', 'Securities Fraud', 'Terrorist Financing', 'Other',
 ]
 
 const FILING_TYPES = ['Initial SAR', 'Continuing Activity SAR', 'Corrected SAR']
@@ -37,6 +40,15 @@ Your narratives are:
 - Appropriately technical: use correct typology terminology (structuring, layering, smurfing, beneficial ownership, KYC, CDD, EDD, etc.)
 - Free of PII beyond what is necessary for law enforcement identification
 - Clear about which transactions are suspicious and why they deviate from expected activity
+
+OFAC / SANCTIONS CASES: When the typology is "OFAC SDN / Sanctions Match" or activity type is "OFAC / Sanctions Violation":
+- Identify the specific OFAC list hit (SDN, OFAC Consolidated, sectoral sanctions, etc.)
+- Note the match score and matched entity name from the screening result
+- State the blocked or rejected transaction details (amount, counterparty, date)
+- Reference 31 CFR Part 501 and applicable Executive Orders
+- Note that blocked funds have been frozen pending OFAC guidance
+- Flag that a OFAC report (not just a SAR) may also be required within 10 business days
+- Recommend escalation to Legal / Chief Compliance Officer immediately
 
 CRITICAL: Respond ONLY with a valid JSON object. No markdown fences, no preamble, no trailing text.`
 

@@ -1,17 +1,18 @@
 import { NavLink } from 'react-router-dom';
 import {
   LayoutDashboard, MessageSquare, FlaskConical,
-  ChevronLeft, ChevronRight, Zap, Radar, Sparkles, GitFork, Code2,
+  ChevronLeft, ChevronRight, Zap, Radar, Sparkles, GitFork, Code2, Bot,
 } from 'lucide-react';
 import { useState } from 'react';
 
 const NAV = [
-  { to: '/',         icon: LayoutDashboard, label: 'Dashboard' },
-  { to: '/intel',    icon: MessageSquare,   label: 'Fraud Intelligence' },
-  { to: '/ml',       icon: FlaskConical,    label: 'ML Detection Lab' },
-  { to: '/operator', icon: Radar,           label: 'Operator',     badge: 'LIVE' },
-  { to: '/rules',    icon: Sparkles,        label: 'Rule Factory', badge: 'AI' },
-  { to: '/network',  icon: GitFork,         label: 'Network Intel' },
+  { to: '/',          icon: LayoutDashboard, label: 'Dashboard' },
+  { to: '/intel',     icon: MessageSquare,   label: 'Fraud Intelligence' },
+  { to: '/ml',        icon: FlaskConical,    label: 'ML Detection Lab' },
+  { to: '/operator',  icon: Radar,           label: 'Operator',          badge: 'LIVE' },
+  { to: '/rules',     icon: Sparkles,        label: 'Rule Factory',      badge: 'AI' },
+  { to: '/network',   icon: GitFork,         label: 'Network Intel' },
+  { to: '/syntheticid',icon: Bot,            label: 'SyntheticID Agent', badge: 'AI' },
 ];
 
 export default function Sidebar() {

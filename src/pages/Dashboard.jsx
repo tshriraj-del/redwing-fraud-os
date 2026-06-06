@@ -28,7 +28,7 @@ const TOOLS = [
   {
     id: 'syntheticid',
     name: 'SyntheticID Lab',
-    desc: 'AI fraud agent attack simulation',
+    desc: 'Autonomous AI fraud agent · real-time blocking · self-learning',
     icon: Brain,
     color: '#c084fc',
     colorDim: 'rgba(192,132,252,0.1)',

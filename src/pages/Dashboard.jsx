@@ -27,7 +27,7 @@ const TOOLS = [
   },
   {
     id: 'syntheticid',
-    name: 'SyntheticID Lab',
+    name: 'SyntheticID Agent',
     desc: 'Autonomous AI fraud agent · real-time blocking · self-learning',
     icon: Brain,
     color: '#c084fc',
@@ -58,7 +58,7 @@ const TOOLS = [
 const FEED = [
   { time: '2m ago',  msg: 'FraudSense flagged 3 high-risk ATO cases — escalation recommended',            color: 'var(--red)' },
   { time: '11m ago', msg: 'RuleBreaker: velocity_abuse_v3 bypassed under low-balance condition',           color: 'var(--yellow)' },
-  { time: '34m ago', msg: 'SyntheticID Lab: card_testing_bot triggered 5 new rule gap signals',           color: 'var(--yellow)' },
+  { time: '34m ago', msg: 'SyntheticID Agent: card_testing_bot triggered 5 new rule gap signals',           color: 'var(--yellow)' },
   { time: '1h ago',  msg: 'Rule Factory: 3 candidates generated from SyntheticID stress-test',             color: 'var(--green)' },
   { time: '2h ago',  msg: 'SAR Writer: OFAC SDN match auto-detected — draft generated for review',         color: 'var(--red)' },
   { time: '3h ago',  msg: 'ML Detection Lab: XGBoost retrained on 23 features — AUC 0.979',               color: 'var(--green)' },

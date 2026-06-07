@@ -10,7 +10,7 @@ const TITLES = {
   '/sar':         'SAR Writer',
   '/fraudsense':  'FraudSense',
   '/rulebreaker': 'RuleBreaker',
-  '/syntheticid': 'SyntheticID Lab',
+  '/syntheticid': 'SyntheticID Agent',
   '/xai':         'XAI Lab',
   '/systems':     'API Reference',
 };

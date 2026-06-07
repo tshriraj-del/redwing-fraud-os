@@ -11,7 +11,7 @@ async function fetchLiveContext() {
       fetch(`${BACKEND}/health`, { signal: AbortSignal.timeout(2000) }).then(r => r.json()).catch(() => null),
       fetch(`${BACKEND}/rule-factory/gaps`, { signal: AbortSignal.timeout(2000) }).then(r => r.json()).catch(() => null),
     ]);
-    const lines = ['Current RedWing system state (injected at session start):'];
+    const lines = ['Current Riposte system state (injected at session start):'];
     if (health) {
       lines.push(`- Model AUC: ${health.model_metrics?.auc_ensemble ?? '—'} | Fraud rate: ${health.model_metrics?.fraud_rate ? (health.model_metrics.fraud_rate * 100).toFixed(2) + '%' : '—'}`);
       lines.push(`- Transactions in dataset: ${health.model_metrics?.n_transactions?.toLocaleString() ?? '—'}`);
@@ -247,7 +247,7 @@ export default function AgentChat() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `redwing-intelligence-${Date.now()}.md`;
+    a.download = `riposte-intelligence-${Date.now()}.md`;
     a.click();
     URL.revokeObjectURL(url);
   }
@@ -317,7 +317,7 @@ export default function AgentChat() {
         {isEmpty ? (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: 60 }}>
             <div style={{ fontSize: 28, marginBottom: 12 }}>⚡</div>
-            <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--text)', marginBottom: 6 }}>RedWing Intelligence</div>
+            <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--text)', marginBottom: 6 }}>Riposte Intelligence</div>
             <div style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 28, textAlign: 'center', maxWidth: 380 }}>
               Six specialist workers with live system context. Ask about rule gaps, attack patterns, model health, cases, thresholds, or fraud rings.
             </div>
@@ -387,7 +387,7 @@ export default function AgentChat() {
             onKeyDown={e => {
               if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
             }}
-            placeholder="Ask RedWing Intelligence… (Shift+Enter for new line)"
+            placeholder="Ask Riposte Intelligence… (Shift+Enter for new line)"
             rows={1}
             style={{
               flex: 1,

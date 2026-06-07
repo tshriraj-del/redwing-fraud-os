@@ -21,7 +21,7 @@ const SYSTEMS = [
 
 export default function Header() {
   const { pathname } = useLocation();
-  const title = TITLES[pathname] ?? 'Fraud OS';
+  const title = TITLES[pathname] ?? 'Riposte';
 
   return (
     <header style={{

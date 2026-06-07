@@ -239,7 +239,7 @@ export default function Systems() {
           </div>
         </div>
         <div style={{ fontSize: 10, color: 'var(--text-muted)', fontFamily: 'JetBrains Mono, monospace' }}>
-          RedWing Platform API Reference
+          Riposte API Reference
         </div>
       </div>
 

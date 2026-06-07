@@ -1,17 +1,17 @@
-# RedWing — AI Fraud Prevention Platform
+# Riposte — AI Fraud Prevention Platform
 
 > A production-grade, full-stack AI fraud prevention platform. Five integrated analyst tools. One unified command center. A closed feedback loop that gets smarter with every fraud event.
 
-![RedWing Platform](https://img.shields.io/badge/RedWing-AI%20Fraud%20Platform-818cf8?style=for-the-badge)
+![Riposte Platform](https://img.shields.io/badge/Riposte-AI%20Fraud%20Platform-818cf8?style=for-the-badge)
 ![Stack](https://img.shields.io/badge/Stack-React%20%7C%20FastAPI%20%7C%20XGBoost%20%7C%20LLM-0ea5e9?style=for-the-badge)
 ![AUC](https://img.shields.io/badge/Ensemble%20AUC-0.979-22c55e?style=for-the-badge)
 ![Transactions](https://img.shields.io/badge/Training%20Data-880K%20transactions-f59e0b?style=for-the-badge)
 
 ---
 
-## What Is RedWing?
+## What Is Riposte?
 
-Most fraud platforms react to fraud that already happened. **RedWing learns from fraud that hasn't happened yet** — running an autonomous AI agent that detects and blocks AI-driven fraud in real time, retraining on novel patterns nightly, and self-generating rules before fraudsters reach production.
+Most fraud platforms react to fraud that already happened. **Riposte learns from fraud that hasn't happened yet** — running an autonomous AI agent that detects and blocks AI-driven fraud in real time, retraining on novel patterns nightly, and self-generating rules before fraudsters reach production.
 
 It combines:
 - **Supervised + unsupervised ML** for transaction scoring (XGBoost + IsolationForest, AUC 0.979)
@@ -37,7 +37,7 @@ All five analyst tools are wired together in a single command center with a shar
                            │ HTTP + SSE
                            ▼
           ┌────────────────────────────────┐
-          │   RedWing Operator  (port 8000) │
+          │   Riposte Operator  (port 8000) │
           │  XGBoost scoring · Rule Factory │
           │  Autonomous Agent · LLM proxy   │
           │  Network graph · XAI engine     │
@@ -73,7 +73,7 @@ Quality gate: precision > 78% → auto-deploy | > 55% → shadow | else → reje
 Agent encounters narrowed attack surface → repeat
 ```
 
-Every other platform trains on historical confirmed fraud. RedWing generates rules for fraud that hasn't happened yet.
+Every other platform trains on historical confirmed fraud. Riposte generates rules for fraud that hasn't happened yet.
 
 ---
 

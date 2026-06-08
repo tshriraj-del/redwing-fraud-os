@@ -712,22 +712,115 @@ function AgentSettingsTab({ config, setConfig, onSave, saving }) {
   );
 }
 
+// ── Demo mode ─────────────────────────────────────────────────────────────────
+
+const DEMO_SCENARIOS = [
+  { threat: 'card_testing_bot',        action: 'block', minAmt: 0.50,  maxAmt: 1.99,  rails: ['p2p','zelle'],       signals: ['micro_amount_sequence','timing_regularity'], conf: [0.88,0.96], reason: 'Card testing bot confirmed — micro-amount sequence + sub-second timing regularity' },
+  { threat: 'card_testing_bot',        action: 'block', minAmt: 0.01,  maxAmt: 1.50,  rails: ['zelle'],             signals: ['timing_regularity','headless_device'],       conf: [0.84,0.93], reason: 'Automated card probing — headless browser signature detected on sub-$2 transaction' },
+  { threat: 'ato_bot',                 action: 'block', minAmt: 2500,  maxAmt: 9500,  rails: ['wire','ACH'],        signals: ['headless_device','ip_reputation'],            conf: [0.79,0.88], reason: 'ATO bot confirmed — headless device + high-risk IP on large outbound wire' },
+  { threat: 'ato_bot',                 action: 'flag',  minAmt: 600,   maxAmt: 3500,  rails: ['ACH','p2p'],         signals: ['timing_regularity'],                         conf: [0.61,0.72], reason: 'ATO bot probable — timing regularity on first-time recipient' },
+  { threat: 'credential_stuffing',     action: 'flag',  minAmt: 50,    maxAmt: 800,   rails: ['p2p','zelle'],       signals: ['ip_reputation','timing_regularity'],         conf: [0.65,0.74], reason: 'Credential stuffing detected — known breach IP cluster + velocity spike' },
+  { threat: 'synthetic_identity_farm', action: 'flag',  minAmt: 800,   maxAmt: 6000,  rails: ['ACH','wire'],        signals: ['identity_clone'],                            conf: [0.64,0.73], reason: 'Synthetic identity signal — SSN linked to 3 other flagged accounts' },
+  { threat: 'deepfake_bypass',         action: 'block', minAmt: 7500,  maxAmt: 28000, rails: ['wire','crypto'],     signals: ['ip_reputation'],                             conf: [0.81,0.89], reason: 'Deepfake bypass attempt — high-value wire immediately after synthetic voice auth' },
+  { threat: 'adversarial_ml',          action: 'flag',  minAmt: 150,   maxAmt: 2500,  rails: ['crypto','zelle'],    signals: ['timing_regularity'],                         conf: [0.72,0.79], reason: 'Adversarial ML input — features crafted to sit just below block threshold' },
+  { threat: 'clean',                   action: 'allow', minAmt: 15,    maxAmt: 800,   rails: ['zelle','p2p'],       signals: [],                                            conf: [0.04,0.18], reason: 'No threat signals — within behavioural baseline' },
+  { threat: 'clean',                   action: 'allow', minAmt: 200,   maxAmt: 8000,  rails: ['ACH','wire'],        signals: [],                                            conf: [0.06,0.22], reason: 'Legitimate transfer — familiar recipient and normal velocity' },
+  { threat: 'clean',                   action: 'allow', minAmt: 5,     maxAmt: 200,   rails: ['p2p','zelle'],       signals: [],                                            conf: [0.03,0.12], reason: 'Low-risk P2P — known contact, within 30-day spending profile' },
+];
+
+const DEMO_WEIGHTS = [2, 2, 1.5, 1, 1, 1, 1, 1, 3, 2.5, 2];
+
+let _demoCtr = 1000;
+function generateDemoEvent(fixedIdx = null) {
+  let idx = fixedIdx ?? (() => {
+    const total = DEMO_WEIGHTS.reduce((a, b) => a + b, 0);
+    let r = Math.random() * total;
+    for (let i = 0; i < DEMO_WEIGHTS.length; i++) { r -= DEMO_WEIGHTS[i]; if (r <= 0) return i; }
+    return DEMO_WEIGHTS.length - 1;
+  })();
+  idx = idx % DEMO_SCENARIOS.length;
+  const s = DEMO_SCENARIOS[idx];
+  const amount = s.minAmt + Math.random() * (s.maxAmt - s.minAmt);
+  const rail = s.rails[Math.floor(Math.random() * s.rails.length)];
+  const conf = s.conf[0] + Math.random() * (s.conf[1] - s.conf[0]);
+  return {
+    transaction_id: `txn_${(++_demoCtr).toString(16).padStart(6, '0')}`,
+    timestamp: new Date().toISOString(),
+    action: s.action, threat_type: s.threat, amount, rail,
+    ai_signals: s.signals, action_confidence: conf,
+    ml_score: s.action === 'allow' ? 0.05 + Math.random() * 0.25 : 0.55 + Math.random() * 0.35,
+    combined_score: s.action === 'allow' ? 0.08 + Math.random() * 0.20 : 0.58 + Math.random() * 0.32,
+    reason: s.reason,
+  };
+}
+
+const DEMO_LEARNED_RULES = [
+  { id: 'dr1', name: 'CARD_TEST_MICRO_VELOCITY', typology: 'card_testing_bot', status: 'deployed',
+    reason: 'Catches bots executing 3+ sub-$2 transactions within 60s across P2P rails.',
+    backtest: { precision: 0.84, recall: 0.031 } },
+  { id: 'dr2', name: 'ATO_HEADLESS_WIRE_SPIKE', typology: 'ato_bot', status: 'shadow',
+    reason: 'Flags ATO bots initiating wires >$2,500 from headless sessions with no prior wire history.',
+    backtest: { precision: 0.71, recall: 0.018 } },
+];
+
+const DEMO_CONFIG = {
+  block_threshold: 0.65, flag_threshold: 0.45,
+  per_threat: {
+    card_testing_bot:        { block: 0.60, flag: 0.40, enabled: true },
+    credential_stuffing:     { block: 0.65, flag: 0.45, enabled: true },
+    ato_bot:                 { block: 0.70, flag: 0.50, enabled: true },
+    synthetic_identity_farm: { block: 0.70, flag: 0.50, enabled: true },
+    deepfake_bypass:         { block: 0.80, flag: 0.60, enabled: true },
+    adversarial_ml:          { block: 0.75, flag: 0.55, enabled: true },
+  },
+  toggles: { self_learning: true, auto_deploy_rules: false, high_alert_mode: false, zero_tolerance_bot: false, human_review_required: false },
+  speed: 0.25,
+};
+
+const DEMO_CASES = [
+  {
+    case_id: 'demo_c1', transaction_id: 'txn_0003e8',
+    created_at: new Date(Date.now() - 180000).toISOString(),
+    status: 'pending', agent_action: 'flag', threat_type: 'ato_bot', threat_label: 'ATO Bot',
+    combined_score: 0.74, ml_score: 0.71, ai_confidence: 0.68,
+    reason: 'ATO bot probable — timing regularity on new recipient, no prior wire history at this amount.',
+    ai_signals: ['timing_regularity', 'headless_device'], amount: 2850, rail: 'ACH',
+    escalate_human: false, analyst_action: null, analyst_id: null, analyst_note: '', resolved_at: null,
+  },
+  {
+    case_id: 'demo_c2', transaction_id: 'txn_0004a2',
+    created_at: new Date(Date.now() - 420000).toISOString(),
+    status: 'pending', agent_action: 'block', threat_type: 'deepfake_bypass', threat_label: 'Deepfake Bypass',
+    combined_score: 0.87, ml_score: 0.83, ai_confidence: 0.79,
+    reason: 'Deepfake bypass — large wire initiated immediately after voice auth on new device. Escalated for human review.',
+    ai_signals: ['ip_reputation'], amount: 14500, rail: 'wire',
+    escalate_human: true, analyst_action: null, analyst_id: null, analyst_note: '', resolved_at: null,
+  },
+];
+
 // ── Root component ────────────────────────────────────────────────────────────
 
 export default function SyntheticID() {
-  const [activeTab,   setActiveTab]   = useState('live');
-  const [status,      setStatus]      = useState(null);
-  const [events,      setEvents]      = useState([]);
-  const [threatCounts,setThreatCounts]= useState({});
-  const [learnedRules,setLearnedRules]= useState([]);
-  const [cases,       setCases]       = useState([]);
-  const [config,      setConfig]      = useState(null);
-  const [saving,      setSaving]      = useState(false);
-  const esRef = useRef(null);
+  const [activeTab,    setActiveTab]    = useState('live');
+  const [status,       setStatus]       = useState(null);
+  const [isDemoMode,   setIsDemoMode]   = useState(false);
+  const [demoStatus,   setDemoStatus]   = useState({
+    running: true, blocked_count: 47, flagged_count: 23,
+    allowed_count: 312, patterns_learned: 2, uptime_seconds: 14427,
+  });
+  const [events,       setEvents]       = useState([]);
+  const [threatCounts, setThreatCounts] = useState({});
+  const [learnedRules, setLearnedRules] = useState([]);
+  const [cases,        setCases]        = useState([]);
+  const [config,       setConfig]       = useState(null);
+  const [saving,       setSaving]       = useState(false);
+  const esRef          = useRef(null);
+  const backendOkRef   = useRef(false);
 
   const pendingCount = cases.filter(c => c.status === 'pending').length;
+  const displayStatus = isDemoMode ? demoStatus : status;
 
-  // Fetch learned rules
+  // Fetch learned rules (live only)
   const fetchRules = useCallback(async () => {
     try {
       const res = await fetch(`${BACKEND}/rule-factory/rules`);
@@ -740,30 +833,64 @@ export default function SyntheticID() {
     } catch {}
   }, []);
 
-  // Poll agent status every 5s
+  // Status poll — first failure → demo mode
   useEffect(() => {
     const poll = async () => {
       try {
-        const res = await fetch(`${BACKEND}/agent/status`);
-        if (res.ok) setStatus(await res.json());
+        const res = await fetch(`${BACKEND}/agent/status`, { signal: AbortSignal.timeout(2500) });
+        if (res.ok) { backendOkRef.current = true; setStatus(await res.json()); return; }
       } catch {}
+      if (!backendOkRef.current) setIsDemoMode(true);
     };
     poll();
-    const interval = setInterval(poll, 5000);
-    return () => clearInterval(interval);
+    const id = setInterval(poll, 5000);
+    return () => clearInterval(id);
   }, []);
 
-  // Load config once on mount
+  // Demo mode — seed + stream fake events
   useEffect(() => {
+    if (!isDemoMode) return;
+    // Seed initial state
+    const seed = Array.from({ length: 20 }, (_, i) => generateDemoEvent(i));
+    setEvents(seed);
+    const seedCounts = {};
+    seed.forEach(e => { if (e.threat_type !== 'clean') seedCounts[e.threat_type] = (seedCounts[e.threat_type] || 0) + 1; });
+    setThreatCounts(seedCounts);
+    setLearnedRules(DEMO_LEARNED_RULES);
+    setCases(DEMO_CASES);
+    if (!config) setConfig(DEMO_CONFIG);
+
+    // Streaming events
+    let timeoutId;
+    const tick = () => {
+      const ev = generateDemoEvent();
+      setEvents(prev => [ev, ...prev].slice(0, 150));
+      if (ev.threat_type !== 'clean') setThreatCounts(prev => ({ ...prev, [ev.threat_type]: (prev[ev.threat_type] || 0) + 1 }));
+      setDemoStatus(prev => ({
+        ...prev,
+        blocked_count:  prev.blocked_count  + (ev.action === 'block' ? 1 : 0),
+        flagged_count:  prev.flagged_count   + (ev.action === 'flag'  ? 1 : 0),
+        allowed_count:  prev.allowed_count   + (ev.action === 'allow' ? 1 : 0),
+        uptime_seconds: prev.uptime_seconds  + 1,
+      }));
+      timeoutId = setTimeout(tick, 700 + Math.random() * 900);
+    };
+    timeoutId = setTimeout(tick, 400);
+    return () => clearTimeout(timeoutId);
+  }, [isDemoMode]); // eslint-disable-line
+
+  // Live mode — load config + SSE
+  useEffect(() => {
+    if (isDemoMode) return;
     fetch(`${BACKEND}/agent/config`)
       .then(r => r.ok ? r.json() : null)
       .then(d => { if (d) setConfig(d); })
       .catch(() => {});
     fetchRules();
-  }, [fetchRules]);
+  }, [isDemoMode, fetchRules]);
 
-  // SSE connection
   useEffect(() => {
+    if (isDemoMode) return;
     const es = new EventSource(`${BACKEND}/agent/events`);
     esRef.current = es;
     es.onmessage = (e) => {
@@ -774,77 +901,87 @@ export default function SyntheticID() {
         if (data.type === 'case_resolved') {
           setCases(prev => prev.map(c => c.case_id === data.case_id
             ? { ...c, status: data.analyst_action === 'approve' ? 'approved' : 'declined', analyst_action: data.analyst_action, resolved_at: data.timestamp }
-            : c
-          ));
+            : c));
           return;
         }
         setEvents(prev => [data, ...prev].slice(0, 150));
-        if (data.threat_type && data.threat_type !== 'clean') {
+        if (data.threat_type && data.threat_type !== 'clean')
           setThreatCounts(prev => ({ ...prev, [data.threat_type]: (prev[data.threat_type] || 0) + 1 }));
-        }
       } catch {}
     };
     return () => es.close();
-  }, [fetchRules]);
+  }, [isDemoMode, fetchRules]);
 
-  // Poll cases when Case Review tab is active
+  // Poll cases (live mode only)
   useEffect(() => {
-    if (activeTab !== 'cases') return;
+    if (isDemoMode || activeTab !== 'cases') return;
     const poll = async () => {
-      try {
-        const res = await fetch(`${BACKEND}/agent/cases`);
-        if (res.ok) setCases(await res.json());
-      } catch {}
+      try { const res = await fetch(`${BACKEND}/agent/cases`); if (res.ok) setCases(await res.json()); } catch {}
     };
     poll();
-    const interval = setInterval(poll, 3000);
-    return () => clearInterval(interval);
-  }, [activeTab]);
+    const id = setInterval(poll, 3000);
+    return () => clearInterval(id);
+  }, [isDemoMode, activeTab]);
 
-  // Start agent on mount if not running
+  // Auto-start if live and idle
   useEffect(() => {
-    if (status !== null && !status.running) {
+    if (!isDemoMode && status !== null && !status.running)
       fetch(`${BACKEND}/agent/start`, { method: 'POST' }).catch(() => {});
-    }
-  }, [status?.running]);
+  }, [isDemoMode, status?.running]); // eslint-disable-line
 
   async function handleStart() {
-    try {
-      await fetch(`${BACKEND}/agent/start`, { method: 'POST' });
-    } catch {}
+    if (isDemoMode) return;
+    try { await fetch(`${BACKEND}/agent/start`, { method: 'POST' }); } catch {}
   }
 
   async function handleResolve(caseId, action, note) {
+    if (isDemoMode) {
+      setCases(prev => prev.map(c => c.case_id === caseId
+        ? { ...c, status: action === 'approve' ? 'approved' : 'declined', analyst_action: action, analyst_id: 'analyst_1', analyst_note: note, resolved_at: new Date().toISOString() }
+        : c));
+      return;
+    }
     try {
       const res = await fetch(`${BACKEND}/agent/cases/${caseId}/resolve`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action, analyst_id: 'analyst_1', note }),
       });
-      if (res.ok) {
-        const resolved = await res.json();
-        setCases(prev => prev.map(c => c.case_id === caseId ? resolved : c));
-      }
+      if (res.ok) { const resolved = await res.json(); setCases(prev => prev.map(c => c.case_id === caseId ? resolved : c)); }
     } catch {}
   }
 
   async function handleSaveConfig() {
     if (!config) return;
     setSaving(true);
-    try {
-      const res = await fetch(`${BACKEND}/agent/config`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(config),
-      });
-      if (res.ok) setConfig(await res.json());
-    } catch {}
+    if (!isDemoMode) {
+      try {
+        const res = await fetch(`${BACKEND}/agent/config`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(config) });
+        if (res.ok) setConfig(await res.json());
+      } catch {}
+    }
     setTimeout(() => setSaving(false), 1800);
   }
 
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-      <AgentStatusBar status={status} onStart={handleStart} />
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+        <div style={{ flex: 1 }}>
+          <AgentStatusBar status={displayStatus} onStart={handleStart} />
+        </div>
+        {isDemoMode && (
+          <div style={{
+            padding: '0 14px', height: 56, display: 'flex', alignItems: 'center', flexShrink: 0,
+            borderBottom: '1px solid var(--border)', background: 'var(--bg-surface)',
+          }}>
+            <span style={{
+              fontSize: 9, fontWeight: 700, letterSpacing: '0.06em',
+              padding: '2px 7px', borderRadius: 4,
+              background: 'rgba(129,140,248,0.12)', border: '1px solid rgba(129,140,248,0.3)',
+              color: 'var(--accent)',
+            }}>DEMO</span>
+          </div>
+        )}
+      </div>
       <TabBar activeTab={activeTab} setActiveTab={setActiveTab} pendingCount={pendingCount} />
 
       {activeTab === 'live' && (

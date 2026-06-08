@@ -3,52 +3,121 @@ import ForceGraph2D from 'react-force-graph-2d';
 
 const OPERATOR = 'http://localhost:8000';
 
-// ── Demo data (shown when backend is offline) ─────────────────────────────────
+// ── Demo graph generator (shown when backend is offline) ──────────────────────
+// Seeded PRNG so the graph is deterministic across reloads
 
-const DEMO_NODES = [
-  // Mule hub accounts
-  { id: 'u001', type: 'user', label: 'acc_u001', fraud_count: 8, tx_count: 24, typology: 'pig_butchering', fraud_score: 0.91 },
-  { id: 'u002', type: 'user', label: 'acc_u002', fraud_count: 5, tx_count: 18, typology: 'pig_butchering', fraud_score: 0.82 },
-  { id: 'u003', type: 'user', label: 'acc_u003', fraud_count: 0, tx_count: 6,  typology: 'none',           fraud_score: 0.12 },
-  { id: 'u004', type: 'user', label: 'acc_u004', fraud_count: 3, tx_count: 14, typology: 'card_testing_bot',fraud_score: 0.74 },
-  { id: 'u005', type: 'user', label: 'acc_u005', fraud_count: 0, tx_count: 4,  typology: 'none',           fraud_score: 0.08 },
-  { id: 'u006', type: 'user', label: 'acc_u006', fraud_count: 7, tx_count: 22, typology: 'ai_powered_ato', fraud_score: 0.88 },
-  { id: 'u007', type: 'user', label: 'acc_u007', fraud_count: 4, tx_count: 12, typology: 'synthetic_identity', fraud_score: 0.79 },
-  { id: 'u008', type: 'user', label: 'acc_u008', fraud_count: 0, tx_count: 3,  typology: 'none',           fraud_score: 0.05 },
-  { id: 'u009', type: 'user', label: 'acc_u009', fraud_count: 2, tx_count: 9,  typology: 'app_scam',       fraud_score: 0.61 },
-  { id: 'u010', type: 'user', label: 'acc_u010', fraud_count: 6, tx_count: 19, typology: 'deepfake_social_engineering', fraud_score: 0.85 },
-  // Shared device (fraud ring hub)
-  { id: 'd001', type: 'device', label: 'dev_ios_4f2a', fraud_count: 11, shared_device: true, shared_users: 6, tx_count: 38 },
-  { id: 'd002', type: 'device', label: 'dev_android_9b1c', fraud_count: 4, shared_device: true, shared_users: 3, tx_count: 17 },
-  { id: 'd003', type: 'device', label: 'dev_chrome_7e3d', fraud_count: 0, shared_device: false, shared_users: 1, tx_count: 5 },
-  // Mule recipients
-  { id: 'r001', type: 'recipient', label: 'recv_overseas_1', fraud_count: 9, mule_flag: true, tx_count: 27 },
-  { id: 'r002', type: 'recipient', label: 'recv_crypto_mx', fraud_count: 5, mule_flag: true, tx_count: 14 },
-  { id: 'r003', type: 'recipient', label: 'recv_normal_biz', fraud_count: 0, mule_flag: false, tx_count: 6 },
-];
+function mulberry32(seed) {
+  return function () {
+    seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+    let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
 
-const DEMO_LINKS = [
-  { source: 'u001', target: 'd001', amount: 14800, count: 8 },
-  { source: 'u002', target: 'd001', amount: 9200,  count: 5 },
-  { source: 'u006', target: 'd001', amount: 22100, count: 11 },
-  { source: 'u007', target: 'd001', amount: 7400,  count: 4 },
-  { source: 'u004', target: 'd002', amount: 3200,  count: 6 },
-  { source: 'u009', target: 'd002', amount: 1800,  count: 3 },
-  { source: 'u010', target: 'd001', amount: 18900, count: 9 },
-  { source: 'u003', target: 'd003', amount: 420,   count: 2 },
-  { source: 'u001', target: 'r001', amount: 11200, count: 6 },
-  { source: 'u002', target: 'r001', amount: 8700,  count: 4 },
-  { source: 'u006', target: 'r002', amount: 15600, count: 7 },
-  { source: 'u010', target: 'r001', amount: 14200, count: 7 },
-  { source: 'u007', target: 'r002', amount: 5900,  count: 3 },
-  { source: 'u004', target: 'r003', amount: 890,   count: 2 },
-  { source: 'u005', target: 'r003', amount: 340,   count: 1 },
-  { source: 'u001', target: 'u002', amount: 2100,  count: 2 },
-  { source: 'u006', target: 'u007', amount: 3800,  count: 3 },
-];
+function buildDemoGraph() {
+  const rng = mulberry32(0xDEADBEEF);
+  const typologies = ['pig_butchering', 'ai_powered_ato', 'deepfake_social_engineering', 'card_testing_bot', 'synthetic_identity', 'app_scam'];
 
-const DEMO_STATS = { nodes: 16, edges: 17, fraud_nodes: 10, typology_count: 6 };
-const DEMO_TYPOLOGIES = ['pig_butchering', 'ai_powered_ato', 'deepfake_social_engineering', 'card_testing_bot', 'synthetic_identity', 'app_scam'];
+  const nodes = [];
+  const links = [];
+  const seen = new Set();
+
+  function addLink(s, t, amount, count) {
+    const key = `${s}|${t}`;
+    if (s === t || seen.has(key)) return;
+    seen.add(key);
+    links.push({ source: s, target: t, amount, count });
+  }
+
+  // ── Devices (42 total: 32 shared, 10 private) ─────────────────────────────
+  const deviceIds = [];
+  for (let i = 0; i < 42; i++) {
+    const shared = i < 32;
+    const fc = shared ? Math.floor(rng() * 18) + 4 : Math.floor(rng() * 2);
+    const id = `d${String(i).padStart(3, '0')}`;
+    deviceIds.push(id);
+    nodes.push({ id, type: 'device', label: `dev_${['ios','android','chrome','firefox','headless'][i % 5]}_${id.slice(1)}`, fraud_count: fc, shared_device: shared, shared_users: shared ? Math.floor(rng() * 12) + 3 : 1, tx_count: Math.floor(rng() * 60) + (shared ? 20 : 3) });
+  }
+
+  // ── Mule recipients (48 total: 38 mule, 10 clean) ─────────────────────────
+  const recipientIds = [];
+  for (let i = 0; i < 48; i++) {
+    const mule = i < 38;
+    const fc = mule ? Math.floor(rng() * 22) + 5 : 0;
+    const id = `r${String(i).padStart(3, '0')}`;
+    recipientIds.push(id);
+    nodes.push({ id, type: 'recipient', label: `recv_${['overseas','crypto','shell','wire','exchange'][i % 5]}_${id.slice(1)}`, fraud_count: fc, mule_flag: mule, tx_count: Math.floor(rng() * 40) + (mule ? 15 : 2) });
+  }
+
+  // ── User accounts (270 total: 160 fraud, 110 clean) ───────────────────────
+  const userIds = [];
+  for (let i = 0; i < 270; i++) {
+    const isFraud = i < 160;
+    const typo = isFraud ? typologies[Math.floor(rng() * typologies.length)] : 'none';
+    const fc = isFraud ? Math.floor(rng() * 14) + 1 : 0;
+    const id = `u${String(i).padStart(4, '0')}`;
+    userIds.push(id);
+    nodes.push({ id, type: 'user', label: `acc_${id}`, fraud_count: fc, tx_count: Math.floor(rng() * 30) + (isFraud ? 8 : 2), typology: typo, fraud_score: isFraud ? +(0.55 + rng() * 0.44).toFixed(3) : +(rng() * 0.25).toFixed(3) });
+  }
+
+  // ── Edges: each fraud user → 1-3 devices ──────────────────────────────────
+  for (let i = 0; i < 160; i++) {
+    const uid = userIds[i];
+    const numDev = Math.floor(rng() * 3) + 1;
+    for (let k = 0; k < numDev; k++) {
+      const did = deviceIds[Math.floor(rng() * 32)]; // shared devices only
+      addLink(uid, did, Math.floor(rng() * 8000) + 200, Math.floor(rng() * 10) + 1);
+    }
+  }
+  // Clean users → private devices
+  for (let i = 160; i < 270; i++) {
+    const uid = userIds[i];
+    const did = deviceIds[32 + Math.floor(rng() * 10)];
+    addLink(uid, did, Math.floor(rng() * 500) + 20, Math.floor(rng() * 3) + 1);
+  }
+
+  // ── Edges: fraud users → mule recipients ─────────────────────────────────
+  for (let i = 0; i < 160; i++) {
+    const uid = userIds[i];
+    const numRecip = Math.floor(rng() * 4) + 1;
+    for (let k = 0; k < numRecip; k++) {
+      const rid = recipientIds[Math.floor(rng() * 38)];
+      addLink(uid, rid, Math.floor(rng() * 20000) + 500, Math.floor(rng() * 8) + 1);
+    }
+  }
+
+  // ── Edges: user→user transfers within fraud rings ─────────────────────────
+  for (let i = 0; i < 120; i++) {
+    const a = userIds[Math.floor(rng() * 160)];
+    const b = userIds[Math.floor(rng() * 160)];
+    addLink(a, b, Math.floor(rng() * 3000) + 100, Math.floor(rng() * 4) + 1);
+  }
+
+  // ── Edges: shared devices → mule recipients (ring hub pattern) ────────────
+  for (let i = 0; i < 32; i++) {
+    const numR = Math.floor(rng() * 3) + 1;
+    for (let k = 0; k < numR; k++) {
+      const rid = recipientIds[Math.floor(rng() * 38)];
+      addLink(deviceIds[i], rid, Math.floor(rng() * 15000) + 1000, Math.floor(rng() * 12) + 2);
+    }
+  }
+
+  const fraudNodes = nodes.filter(n => n.fraud_count > 0).length;
+  const muleCount = nodes.filter(n => n.mule_flag).length;
+  const sharedCount = nodes.filter(n => n.shared_device).length;
+
+  return {
+    nodes, links,
+    stats: { total_nodes: nodes.length, total_edges: links.length, fraud_edges: links.filter(l => {
+      const src = nodes.find(n => n.id === l.source);
+      return src && src.fraud_count > 0;
+    }).length, mule_accounts: muleCount, shared_devices: sharedCount, typology_count: typologies.length },
+    typologies,
+  };
+}
+
+const { nodes: _DN, links: _DL, stats: DEMO_STATS, typologies: DEMO_TYPOLOGIES } = buildDemoGraph();
 
 const NODE_COLORS = {
   user:      { base: '#38bdf8', fraud: '#f87171', muted: '#1e4060' },
@@ -157,9 +226,9 @@ export default function Network() {
       setStats(gData.stats);
       setTypologies(tData || []);
     } catch (e) {
-      // Backend offline — use demo data
-      let nodes = DEMO_NODES;
-      let links = DEMO_LINKS;
+      // Backend offline — use generated demo graph
+      let nodes = _DN;
+      let links = _DL;
       if (!showDevices) {
         const deviceIds = new Set(nodes.filter(n => n.type === 'device').map(n => n.id));
         nodes = nodes.filter(n => n.type !== 'device');

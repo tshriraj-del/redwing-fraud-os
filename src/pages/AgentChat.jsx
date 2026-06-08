@@ -155,11 +155,20 @@ export default function AgentChat() {
   const bottomRef = useRef(null);
   const inputRef = useRef(null);
 
-  // Fetch live system context on mount and inject into workers
+  // Fetch live system context on mount and inject into workers; seed demo conversation when offline
   useEffect(() => {
     fetchLiveContext().then(ctx => {
       if (ctx) setLiveContext(ctx);
     });
+    fetch('http://localhost:8000/health', { signal: AbortSignal.timeout(2500) })
+      .catch(() => {
+        setMessages([
+          { id: 1, role: 'user', content: 'Why are there 14 rule gaps and what patterns is SyntheticID Agent exposing?' },
+          { id: 2, role: 'assistant', worker: 'rule_engineer', streaming: false, content: `## Rule Gap Analysis — 14 Open Gaps\n\nThe 14 gaps reflect ML catching fraud that the rule engine hasn't codified yet. Here's what's happening:\n\n**Highest-priority gaps:**\n\n- **Card testing bot on P2P rails** (gap score 0.84) — Micro-amounts ($0.50–$1.99) on Zelle/Venmo slip through velocity rules because most rules trigger at $2.00+. SyntheticID Agent has been capturing 28 micro-transactions per hour from the same device; rules see nothing.\n\n- **Headless ATO on wire** (gap score 0.71) — Bot-driven account takeovers initiating wire transfers pass device checks because the device fingerprint is consistent — it's a headless browser reusing stolen session tokens.\n\n- **Deepfake KYC bypass** (gap score 0.67) — No rule exists for the pattern: high-value wire + new recipient + ML score > 0.80 + no headless signal. These are deepfake social engineering cases (victim-authorized) that rules can't fingerprint.\n\n**What Rule Factory should do next:**\n\nRun the pipeline — it will synthesize rules from SyntheticID's novel buffer. The \`CARD_TEST_MICRO_VELOCITY_P2P\` candidate is already in shadow mode with 84% precision. Deploy it.\n\nThe closed feedback loop: **SyntheticID detects → Rule Factory codifies → Agent's operating surface tightens → Agent finds the next gap**. That's how the system self-improves.` },
+          { id: 3, role: 'user', content: 'What should I do about the deepfake bypass gap specifically?' },
+          { id: 4, role: 'assistant', worker: 'threat', streaming: false, content: `## Deepfake Bypass — Threat Deep-Dive\n\nThis is the hardest gap to close because deepfake cases are **victim-authorized** — the customer genuinely believes they're sending to a legitimate payee. Rules struggle because there's no bot signal.\n\n**Attack playbook:**\n1. Adversary creates a convincing deepfake video call posing as bank/investment advisor\n2. Victim authorizes a large wire to a mule account ("investment opportunity")\n3. Transaction looks legitimate: real customer, known device, correct biometrics\n4. ML catches it: amount + new recipient + no headless signal + score > 0.70\n\n**Rule Factory candidate (\`DEEPFAKE_HIGH_VALUE_NEW_RECIP\`):**\n\`\`\`python\ndef rule(tx):\n    return (\n        tx["amount"] > 5000 and\n        tx["new_recipient"] and\n        not tx["is_headless_browser"] and\n        tx["ml_score"] > 0.70\n    )\n\`\`\`\n\nThis is in shadow mode — 78% precision. **Don't auto-deploy yet.** The 22% false positive rate will hit legitimate large transfers to new payees (real estate, major purchases).\n\n**Recommended action:** Deploy with a **step-up friction** trigger (callback confirmation for transactions > $5K to new recipients) rather than a hard block. This catches deepfake cases without blocking legitimate transfers.` },
+        ]);
+      });
   }, []);
 
   useEffect(() => {

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import TabBar from '../rulebreaker/components/TabBar.jsx';
 import InputSection from '../rulebreaker/components/InputSection.jsx';
 import VectorInputSection from '../rulebreaker/components/VectorInputSection.jsx';
@@ -26,10 +26,25 @@ function ErrorBanner({ message, onRetry }) {
   );
 }
 
+const DEMO_RULE = 'Block transaction if amount > $500 AND first-time recipient AND account age < 30 days';
+const DEMO_RESULTS = {
+  evasion_patterns: [
+    { name: 'Amount fragmentation', description: 'Split $1,200 into three $399 transactions to stay under the $500 threshold. Each individual transfer passes the rule but the aggregate constitutes the same fraud.', difficulty: 'Easy', detectability: 'Low' },
+    { name: 'Aged mule account seeding', description: 'Pre-age a mule account with low-value legitimate transactions for 31 days before executing the fraud. Account age check passes; recipient is still fraudulent.', difficulty: 'Medium', detectability: 'Medium' },
+    { name: 'Recipient rotation with delay', description: 'Establish a new "recipient" with a small $5 transfer 7 days prior. On day 8, the large transfer goes to an established (non-first-time) recipient that is actually a mule.', difficulty: 'Hard', detectability: 'Low' },
+  ],
+  resilience_score: 28,
+  hardening_recommendations: [
+    { title: 'Add velocity window', description: 'Track cumulative transfers to any recipient cluster over a 72-hour window. Flag when aggregate > $500 even if individual transfers are below threshold.', priority: 'High' },
+    { title: 'Recipient trust score', description: 'Replace binary new/known recipient with a trust score based on transaction history, age of relationship, and shared device fingerprints with known bad actors.', priority: 'High' },
+    { title: 'Network graph check', description: 'Before approving, check if the recipient is connected within 2 hops to any blocked or flagged account in the fraud ring graph.', priority: 'Medium' },
+  ],
+};
+
 export default function RuleBreaker() {
   const [activeTab, setActiveTab] = useState('stress-test');
 
-  const [rule, setRule]                     = useState('');
+  const [rule, setRule]                     = useState(DEMO_RULE);
   const [category, setCategory]             = useState('Account Abuse');
   const [isLoading, setIsLoading]           = useState(false);
   const [results, setResults]               = useState(null);
@@ -42,6 +57,11 @@ export default function RuleBreaker() {
   const [learnError, setLearnError]         = useState(null);
   const [patternData, setPatternData]       = useState(null);
   const [ruleResults, setRuleResults]       = useState([]);
+
+  useEffect(() => {
+    fetch('http://localhost:8000/health', { signal: AbortSignal.timeout(2500) })
+      .catch(() => setResults(DEMO_RESULTS));
+  }, []);
 
   const handleSubmit = async () => {
     if (rule.trim().length < 15) {

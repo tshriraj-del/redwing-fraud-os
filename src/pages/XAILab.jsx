@@ -496,6 +496,121 @@ function GovernancePanel({ metrics, loading }) {
   );
 }
 
+// ── Demo data ─────────────────────────────────────────────────────────────────
+
+const DEMO_RECORDS = [
+  {
+    explanation_id: 'xai_demo_001', transaction_id: 'txn_4f2a9b', verdict: 'CRITICAL',
+    combined_score: 0.91, ml_score: 0.88, narrative: 'High-confidence card testing bot pattern — micro-amount burst on P2P rails with extreme velocity.',
+    explanation_method: 'SHAP TreeExplainer', model_id: 'riposte-fraud-xgb-v1', model_version: '2',
+    human_review_required: true,
+    pattern_match: { pattern_name: 'Card Testing Bot', confidence: 0.93 },
+    top_factors: [
+      { label: 'velocity_24h_raw', value: 28, contribution: 0.3142, direction: 'risk' },
+      { label: 'amount_log',       value: 0.69, contribution: 0.2891, direction: 'risk' },
+      { label: 'is_p2p',          value: 1.0, contribution: 0.1734, direction: 'risk' },
+      { label: 'new_recipient',   value: 1.0, contribution: 0.1102, direction: 'risk' },
+      { label: 'account_age_days', value: 12, contribution: 0.0881, direction: 'risk' },
+    ],
+  },
+  {
+    explanation_id: 'xai_demo_002', transaction_id: 'txn_b81e3c', verdict: 'HIGH',
+    combined_score: 0.76, ml_score: 0.74, narrative: 'ATO bot pattern detected — headless browser accessing wire transfer at unusual hour.',
+    explanation_method: 'SHAP TreeExplainer', model_id: 'riposte-fraud-xgb-v1', model_version: '2',
+    human_review_required: false,
+    pattern_match: { pattern_name: 'AI-Powered ATO', confidence: 0.81 },
+    top_factors: [
+      { label: 'is_instant_rail', value: 1.0, contribution: 0.2203, direction: 'risk' },
+      { label: 'amount_log',      value: 8.52, contribution: 0.1994, direction: 'risk' },
+      { label: 'hour',            value: 3,   contribution: 0.1671, direction: 'risk' },
+      { label: 'new_recipient',   value: 1.0, contribution: 0.1344, direction: 'risk' },
+      { label: 'account_age_days', value: 320, contribution: -0.0482, direction: 'safe' },
+    ],
+  },
+  {
+    explanation_id: 'xai_demo_003', transaction_id: 'txn_c93d17', verdict: 'MEDIUM',
+    combined_score: 0.52, ml_score: 0.49, narrative: 'Moderate risk — round amount to new crypto recipient. Below block threshold but flagged for review.',
+    explanation_method: 'SHAP TreeExplainer', model_id: 'riposte-fraud-xgb-v1', model_version: '2',
+    human_review_required: false,
+    pattern_match: null,
+    top_factors: [
+      { label: 'is_crypto',       value: 1.0, contribution: 0.1882, direction: 'risk' },
+      { label: 'is_round_amount', value: 1.0, contribution: 0.1541, direction: 'risk' },
+      { label: 'new_recipient',   value: 1.0, contribution: 0.1203, direction: 'risk' },
+      { label: 'amount_log',      value: 7.82, contribution: 0.0891, direction: 'risk' },
+      { label: 'account_age_days', value: 620, contribution: -0.0714, direction: 'safe' },
+    ],
+  },
+  {
+    explanation_id: 'xai_demo_004', transaction_id: 'txn_a27f58', verdict: 'LOW',
+    combined_score: 0.08, ml_score: 0.07, narrative: 'Low risk — established account, known recipient, modest amount on standard rail.',
+    explanation_method: 'SHAP TreeExplainer', model_id: 'riposte-fraud-xgb-v1', model_version: '2',
+    human_review_required: false,
+    pattern_match: null,
+    top_factors: [
+      { label: 'account_age_days', value: 1840, contribution: -0.1822, direction: 'safe' },
+      { label: 'new_recipient',    value: 0.0,  contribution: -0.1543, direction: 'safe' },
+      { label: 'velocity_24h_raw', value: 1,    contribution: -0.0921, direction: 'safe' },
+      { label: 'amount_log',       value: 5.12, contribution: 0.0301, direction: 'risk' },
+      { label: 'is_instant_rail',  value: 0.0,  contribution: -0.0284, direction: 'safe' },
+    ],
+  },
+];
+
+const DEMO_MODEL_CARD = {
+  model_id: 'riposte-fraud-xgb-v1',
+  model_type: 'XGBoost (GBT) + Isolation Forest ensemble',
+  version: '2',
+  task: 'Binary fraud classification',
+  output: 'Fraud probability 0.0–1.0 + decision',
+  performance_metrics: {
+    'AUC-ROC': 0.9791, 'Precision (fraud=1)': 0.8840, 'Recall (fraud=1)': 0.8120,
+    'F1 Score': 0.8465, 'Brier Score': 0.0412,
+  },
+  eu_ai_act_compliance: {
+    risk_tier: 'High-risk (Annex III — AI in creditworthiness)',
+    explainability_method: 'SHAP TreeExplainer (per-prediction)',
+    human_oversight_policy: 'Mandatory review for CRITICAL verdicts',
+    conformity_assessment: 'pending',
+    registration_required: true,
+  },
+  sr_26_02_governance: {
+    model_owner: 'Risk Technology — Fraud Models',
+    board_accountability: true,
+    challenger_model: 'LightGBM v1 (shadow)',
+    last_validation: '2026-05-14',
+  },
+  features: [
+    { name: 'amount_log', label: 'Log-transformed transaction amount' },
+    { name: 'hour', label: 'Hour of day (0–23)' },
+    { name: 'velocity_24h_raw', label: 'Transactions in last 24h' },
+    { name: 'is_p2p', label: 'P2P rail indicator' },
+    { name: 'is_crypto', label: 'Crypto payment indicator' },
+    { name: 'is_instant_rail', label: 'Instant payment rail (FedNow/RTP)' },
+    { name: 'is_round_amount', label: 'Round-number amount flag' },
+    { name: 'new_recipient', label: 'First-time recipient flag' },
+    { name: 'account_age_days', label: 'Days since account opened' },
+    { name: 'velocity_7d', label: 'Transactions in last 7 days' },
+    { name: 'credit_inquiries_90d', label: 'Credit inquiries (90-day window)' },
+    { name: 'is_headless_browser', label: 'Headless/bot browser detected' },
+    { name: 'ml_score_iso', label: 'Isolation Forest anomaly score' },
+  ],
+};
+
+const DEMO_GOVERNANCE = {
+  total_explanations: 14827,
+  verdict_distribution: { CRITICAL: 312, HIGH: 1841, MEDIUM: 3920, LOW: 8754 },
+  verdict_pct: { CRITICAL: 2.1, HIGH: 12.4, MEDIUM: 26.4, LOW: 59.0 },
+  score_histogram: [3200, 2100, 1400, 980, 720, 1100, 1600, 1980, 1100, 647],
+  top_risk_drivers: [
+    { label: 'velocity_24h_raw — high transaction velocity', count: 4821 },
+    { label: 'is_instant_rail — instant payment rail', count: 3744 },
+    { label: 'new_recipient — first-time recipient', count: 3291 },
+    { label: 'amount_log — unusually large amount', count: 2887 },
+    { label: 'is_crypto — cryptocurrency payment', count: 1943 },
+  ],
+};
+
 // ── Main page ─────────────────────────────────────────────────────────────────
 
 export default function XAILab() {
@@ -513,9 +628,20 @@ export default function XAILab() {
         fetch(`${API}/xai/model-card`).then(r => r.ok ? r.json() : null),
         fetch(`${API}/xai/governance`).then(r => r.ok ? r.json() : null),
       ]);
-      if (expRes.status  === 'fulfilled') setRecords(expRes.value);
-      if (cardRes.status === 'fulfilled') setModelCard(cardRes.value);
-      if (govRes.status  === 'fulfilled') setGovernance(govRes.value);
+      const allFailed = [expRes, cardRes, govRes].every(r => r.status === 'rejected');
+      if (allFailed) {
+        setRecords(DEMO_RECORDS);
+        setModelCard(DEMO_MODEL_CARD);
+        setGovernance(DEMO_GOVERNANCE);
+      } else {
+        if (expRes.status  === 'fulfilled') setRecords(expRes.value);
+        if (cardRes.status === 'fulfilled') setModelCard(cardRes.value);
+        if (govRes.status  === 'fulfilled') setGovernance(govRes.value);
+      }
+    } catch {
+      setRecords(DEMO_RECORDS);
+      setModelCard(DEMO_MODEL_CARD);
+      setGovernance(DEMO_GOVERNANCE);
     } finally {
       setLoading(false);
     }

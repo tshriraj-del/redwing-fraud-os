@@ -7,6 +7,64 @@ import {
 
 const BACKEND = 'http://localhost:8000';
 
+// ── Demo data (shown when backend is offline) ─────────────────────────────────
+
+const DEMO_GAP_DATA = {
+  count: 14,
+  coverage_gaps: [
+    { typology: 'card_testing_bot',        gap_score: 0.84, description: 'Micro-amount burst on P2P rails escapes velocity rules' },
+    { typology: 'ai_powered_ato',          gap_score: 0.71, description: 'Headless-browser ATO bypasses device fingerprint checks' },
+    { typology: 'deepfake_bypass',         gap_score: 0.67, description: 'Deepfake KYC bypass not covered by existing identity rules' },
+    { typology: 'synthetic_identity_farm', gap_score: 0.59, description: 'Thin-file synthetics with slow velocity stay under threshold' },
+  ],
+};
+
+const DEMO_RULES = {
+  total: 4,
+  rules: [
+    {
+      id: 'rf001',
+      name: 'CARD_TEST_MICRO_VELOCITY_P2P',
+      typology: 'card_testing_bot',
+      status: 'deployed',
+      recommendation: 'AUTO_DEPLOY',
+      created_at: '2026-06-05T14:22:00Z',
+      fn_code: `def rule(tx):\n    return (\n        tx["amount"] < 2.00 and\n        tx["velocity_24h"] > 8 and\n        tx["payment_rail"] in {"p2p", "zelle"}\n    )`,
+      backtest: { precision: 0.84, recall: 0.031, f1: 0.059, overlap_with_existing: 0.12, TP: 2841, FP: 539, FN: 88714 },
+    },
+    {
+      id: 'rf002',
+      name: 'ATO_HEADLESS_WIRE_SPIKE',
+      typology: 'ai_powered_ato',
+      status: 'shadow',
+      recommendation: 'SHADOW',
+      created_at: '2026-06-06T09:11:00Z',
+      fn_code: `def rule(tx):\n    return (\n        tx["is_headless_browser"] and\n        tx["payment_rail"] == "wire" and\n        tx["amount"] > 1000 and\n        tx["new_recipient"]\n    )`,
+      backtest: { precision: 0.71, recall: 0.018, f1: 0.034, overlap_with_existing: 0.08, TP: 1524, FP: 620, FN: 82108 },
+    },
+    {
+      id: 'rf003',
+      name: 'SYNTH_ID_THIN_FILE_SLOW_BURN',
+      typology: 'synthetic_identity_farm',
+      status: 'shadow',
+      recommendation: 'SHADOW',
+      created_at: '2026-06-06T16:45:00Z',
+      fn_code: `def rule(tx):\n    return (\n        tx["account_age_days"] < 90 and\n        tx["credit_inquiries_90d"] > 5 and\n        tx["velocity_7d"] < 2\n    )`,
+      backtest: { precision: 0.63, recall: 0.009, f1: 0.018, overlap_with_existing: 0.22, TP: 763, FP: 448, FN: 84592 },
+    },
+    {
+      id: 'rf004',
+      name: 'DEEPFAKE_HIGH_VALUE_NEW_RECIP',
+      typology: 'deepfake_bypass',
+      status: 'shadow',
+      recommendation: 'SHADOW',
+      created_at: '2026-06-07T08:03:00Z',
+      fn_code: `def rule(tx):\n    return (\n        tx["amount"] > 5000 and\n        tx["new_recipient"] and\n        not tx["is_headless_browser"] and\n        tx["ml_score"] > 0.70\n    )`,
+      backtest: { precision: 0.78, recall: 0.006, f1: 0.012, overlap_with_existing: 0.05, TP: 509, FP: 143, FN: 84836 },
+    },
+  ],
+};
+
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 function pct(v) { return v != null ? `${(v * 100).toFixed(1)}%` : '—'; }
@@ -271,7 +329,7 @@ export default function RuleFactory() {
     fetch(`${BACKEND}/health`, { signal: AbortSignal.timeout(2500) })
       .then(r => r.json())
       .then(() => { setBackendOnline(true); fetchAll(); })
-      .catch(() => setBackendOnline(false));
+      .catch(() => { setBackendOnline(false); setGapData(DEMO_GAP_DATA); setRules(DEMO_RULES); });
   }, []);
 
   const fetchAll = useCallback(async () => {

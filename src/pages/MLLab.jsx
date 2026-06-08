@@ -133,6 +133,34 @@ export default function MLLab() {
         setServerOk(true);
       } catch {
         setServerOk(false);
+        // Demo data when server offline
+        setMetrics({ auc_redwing: 0.9791, auc_ensemble: 0.9791, precision: 0.8840, recall: 0.8120, f1: 0.8465, fraud_rate: 0.0184, n_transactions: 880719, feature_count: 23 });
+        setFeatures([
+          { name: 'velocity_24h_raw', importance: 0.182 },
+          { name: 'amount_log',       importance: 0.164 },
+          { name: 'is_instant_rail',  importance: 0.141 },
+          { name: 'new_recipient',    importance: 0.128 },
+          { name: 'is_crypto',        importance: 0.097 },
+          { name: 'hour',             importance: 0.081 },
+          { name: 'is_p2p',           importance: 0.074 },
+          { name: 'account_age_days', importance: 0.068 },
+          { name: 'is_round_amount',  importance: 0.042 },
+          { name: 'velocity_7d',      importance: 0.023 },
+        ]);
+        setDriftData(Array.from({ length: 30 }, (_, i) => ({
+          date: new Date(Date.now() - (29 - i) * 86400000).toISOString().slice(0, 10),
+          auc: +(0.975 + Math.sin(i * 0.4) * 0.004 + Math.random() * 0.002).toFixed(4),
+          fraud_rate: +(0.018 + Math.cos(i * 0.3) * 0.002 + Math.random() * 0.001).toFixed(4),
+        })));
+        setScoreResult({
+          score: 87, severity: 'Critical',
+          key_signals: ['extreme velocity burst', 'micro-amount P2P pattern', 'new recipient', 'bot timing regularity'],
+          reasoning: 'Riposte score 87/100 — XGBoost: 0.88, IsoForest: 0.79. Card testing bot pattern confirmed across 28 transactions in 24h.',
+          recommended_action: 'Decline',
+          model_version: 'riposte-fraud-xgb-v1-v2',
+          source: 'ml-engine',
+        });
+        setTxInput('$0.97 P2P Zelle to new recipient — 28th transaction this hour, each under $1.00');
       } finally {
         setLoading(false);
       }

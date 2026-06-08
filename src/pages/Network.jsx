@@ -3,6 +3,53 @@ import ForceGraph2D from 'react-force-graph-2d';
 
 const OPERATOR = 'http://localhost:8000';
 
+// ── Demo data (shown when backend is offline) ─────────────────────────────────
+
+const DEMO_NODES = [
+  // Mule hub accounts
+  { id: 'u001', type: 'user', label: 'acc_u001', fraud_count: 8, tx_count: 24, typology: 'pig_butchering', fraud_score: 0.91 },
+  { id: 'u002', type: 'user', label: 'acc_u002', fraud_count: 5, tx_count: 18, typology: 'pig_butchering', fraud_score: 0.82 },
+  { id: 'u003', type: 'user', label: 'acc_u003', fraud_count: 0, tx_count: 6,  typology: 'none',           fraud_score: 0.12 },
+  { id: 'u004', type: 'user', label: 'acc_u004', fraud_count: 3, tx_count: 14, typology: 'card_testing_bot',fraud_score: 0.74 },
+  { id: 'u005', type: 'user', label: 'acc_u005', fraud_count: 0, tx_count: 4,  typology: 'none',           fraud_score: 0.08 },
+  { id: 'u006', type: 'user', label: 'acc_u006', fraud_count: 7, tx_count: 22, typology: 'ai_powered_ato', fraud_score: 0.88 },
+  { id: 'u007', type: 'user', label: 'acc_u007', fraud_count: 4, tx_count: 12, typology: 'synthetic_identity', fraud_score: 0.79 },
+  { id: 'u008', type: 'user', label: 'acc_u008', fraud_count: 0, tx_count: 3,  typology: 'none',           fraud_score: 0.05 },
+  { id: 'u009', type: 'user', label: 'acc_u009', fraud_count: 2, tx_count: 9,  typology: 'app_scam',       fraud_score: 0.61 },
+  { id: 'u010', type: 'user', label: 'acc_u010', fraud_count: 6, tx_count: 19, typology: 'deepfake_social_engineering', fraud_score: 0.85 },
+  // Shared device (fraud ring hub)
+  { id: 'd001', type: 'device', label: 'dev_ios_4f2a', fraud_count: 11, shared_device: true, shared_users: 6, tx_count: 38 },
+  { id: 'd002', type: 'device', label: 'dev_android_9b1c', fraud_count: 4, shared_device: true, shared_users: 3, tx_count: 17 },
+  { id: 'd003', type: 'device', label: 'dev_chrome_7e3d', fraud_count: 0, shared_device: false, shared_users: 1, tx_count: 5 },
+  // Mule recipients
+  { id: 'r001', type: 'recipient', label: 'recv_overseas_1', fraud_count: 9, mule_flag: true, tx_count: 27 },
+  { id: 'r002', type: 'recipient', label: 'recv_crypto_mx', fraud_count: 5, mule_flag: true, tx_count: 14 },
+  { id: 'r003', type: 'recipient', label: 'recv_normal_biz', fraud_count: 0, mule_flag: false, tx_count: 6 },
+];
+
+const DEMO_LINKS = [
+  { source: 'u001', target: 'd001', amount: 14800, count: 8 },
+  { source: 'u002', target: 'd001', amount: 9200,  count: 5 },
+  { source: 'u006', target: 'd001', amount: 22100, count: 11 },
+  { source: 'u007', target: 'd001', amount: 7400,  count: 4 },
+  { source: 'u004', target: 'd002', amount: 3200,  count: 6 },
+  { source: 'u009', target: 'd002', amount: 1800,  count: 3 },
+  { source: 'u010', target: 'd001', amount: 18900, count: 9 },
+  { source: 'u003', target: 'd003', amount: 420,   count: 2 },
+  { source: 'u001', target: 'r001', amount: 11200, count: 6 },
+  { source: 'u002', target: 'r001', amount: 8700,  count: 4 },
+  { source: 'u006', target: 'r002', amount: 15600, count: 7 },
+  { source: 'u010', target: 'r001', amount: 14200, count: 7 },
+  { source: 'u007', target: 'r002', amount: 5900,  count: 3 },
+  { source: 'u004', target: 'r003', amount: 890,   count: 2 },
+  { source: 'u005', target: 'r003', amount: 340,   count: 1 },
+  { source: 'u001', target: 'u002', amount: 2100,  count: 2 },
+  { source: 'u006', target: 'u007', amount: 3800,  count: 3 },
+];
+
+const DEMO_STATS = { nodes: 16, edges: 17, fraud_nodes: 10, typology_count: 6 };
+const DEMO_TYPOLOGIES = ['pig_butchering', 'ai_powered_ato', 'deepfake_social_engineering', 'card_testing_bot', 'synthetic_identity', 'app_scam'];
+
 const NODE_COLORS = {
   user:      { base: '#38bdf8', fraud: '#f87171', muted: '#1e4060' },
   device:    { base: '#4ade80', fraud: '#fb923c', shared: '#f59e0b', muted: '#1a3a2a' },
@@ -110,7 +157,18 @@ export default function Network() {
       setStats(gData.stats);
       setTypologies(tData || []);
     } catch (e) {
-      setError('Operator offline — start it on port 8000');
+      // Backend offline — use demo data
+      let nodes = DEMO_NODES;
+      let links = DEMO_LINKS;
+      if (!showDevices) {
+        const deviceIds = new Set(nodes.filter(n => n.type === 'device').map(n => n.id));
+        nodes = nodes.filter(n => n.type !== 'device');
+        links = links.filter(l => !deviceIds.has(l.source) && !deviceIds.has(l.target));
+      }
+      setGraphData({ nodes, links });
+      setStats(DEMO_STATS);
+      setTypologies(DEMO_TYPOLOGIES);
+      setError(null);
     } finally {
       setLoading(false);
     }

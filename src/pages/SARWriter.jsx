@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { FileText, ShieldAlert, CheckCircle, Copy, Check, RefreshCw, ChevronDown } from 'lucide-react'
 import { callLLM } from '../llm-provider.js'
 
@@ -94,6 +94,49 @@ Return this exact JSON structure:
 }`
 }
 
+const DEMO_SAR_RESULT = {
+  narrative: `On or about March 14, 2026, the subject, John R. Mercer (DOB: 1988-07-22), initiated a series of wire transfers totaling $47,500 from account ending in 4821 held at First Federal Bank, NA. The subject's account, opened in January 2026, exhibited no prior wire transfer activity. The institution's transaction monitoring system generated alerts on March 14, 15, and 16, 2026 for structuring and unusual wire activity.\n\nThe suspicious activity consists of seven wire transfers ranging from $5,200 to $8,900, each executed within a 72-hour window to four separate overseas beneficiary accounts located in Cyprus (×2), Singapore (×1), and the United Arab Emirates (×1). None of the beneficiary accounts had any prior relationship with the subject or with First Federal Bank, NA. Enhanced due diligence (EDD) conducted on March 17, 2026 revealed that the subject had received three ACH credits totaling $51,400 from a U.S.-based LLC incorporated 11 days prior to the credits, whose beneficial ownership could not be verified through standard KYC procedures.\n\nThe transaction pattern — rapid layering through multiple jurisdictions with a newly-incorporated domestic source entity and first-time overseas beneficiaries — is consistent with money laundering typologies described in FinCEN SAR Activity Review Issue 22. The subject declined to provide documentation supporting the business purpose of the transfers when contacted by the institution's fraud operations team on March 17, 2026.\n\nFirst Federal Bank, NA has placed a hold on the subject's account pending further review. All wire transfer capabilities have been suspended. The matter has been escalated to the institution's Chief Compliance Officer and external legal counsel. No prior SARs have been filed on this subject. This SAR is filed within the 30-day reporting requirement (activity detected March 14, 2026; SAR filed March 31, 2026).`,
+  form_fields: {
+    activity_type: 'Money Laundering',
+    instrument_type: 'Wire Transfer',
+    amount: '47500',
+    date_range_from: '2026-03-14',
+    date_range_to: '2026-03-16',
+    filing_type: 'Initial SAR',
+    law_enforcement_contacted: 'No',
+    subject_role: 'Initiator',
+  },
+  compliance_check: {
+    who:   { present: true, note: 'Subject identified with full name, DOB, and account number' },
+    what:  { present: true, note: 'Seven wire transfers totaling $47,500 described with amounts and dates' },
+    when:  { present: true, note: 'Activity dates March 14–16, 2026 explicitly stated' },
+    where: { present: true, note: 'Overseas jurisdictions (Cyprus, Singapore, UAE) identified' },
+    why:   { present: true, note: 'Layering pattern and unverifiable source entity noted' },
+    how:   { present: true, note: 'Wire transfer mechanism with newly-incorporated source entity described' },
+  },
+  examiner_notes: [
+    'Verify whether subject has a FinCEN 314(b) information-sharing agreement with any correspondent banks involved.',
+    'Consider cross-referencing subject name and the four beneficiary account numbers against OFAC SDN list prior to filing.',
+    'If subject is a U.S. person and transfers involved blocked countries, a separate OFAC report may be required within 10 business days.',
+  ],
+};
+
+const DEMO_FORM = {
+  filingType: 'Initial SAR',
+  subjectName: 'John R. Mercer',
+  subjectAccounts: '****4821',
+  subjectOccupation: 'Self-employed consultant',
+  relationship: 'Customer since January 2026',
+  typology: 'Layering / Integration',
+  dateFrom: '2026-03-14',
+  dateTo: '2026-03-16',
+  totalAmount: '47500',
+  priorSAR: '',
+  actionsTaken: 'Account hold placed. Wire capabilities suspended. Escalated to CCO.',
+  caseNotes: 'Seven wire transfers to 4 overseas accounts in 72h. Source: unverifiable LLC incorporated 11 days before credits. Subject declined to explain business purpose.',
+  transactions: '',
+};
+
 const EMPTY_FORM = {
   filingType: 'Initial SAR',
   subjectName: '',
@@ -117,6 +160,11 @@ export default function SARWriter() {
   const [error, setError]             = useState(null)
   const [copied, setCopied]           = useState(false)
   const [activeSection, setActiveSection] = useState('narrative')
+
+  useEffect(() => {
+    fetch('http://localhost:8000/health', { signal: AbortSignal.timeout(2500) })
+      .catch(() => { setForm(DEMO_FORM); setResult(DEMO_SAR_RESULT); });
+  }, []);
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
 

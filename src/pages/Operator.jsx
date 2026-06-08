@@ -55,6 +55,51 @@ ${signals || '  (none above threshold)'}
 Triage this transaction.`;
 }
 
+// ── Demo mode data & generator ───────────────────────────────────────────────
+
+const DEMO_TX_SCENARIOS = [
+  { pattern: 'Card Testing Bot',        color: '#4ade80', rail: 'Zelle',  minAmt: 0.50, maxAmt: 1.99, mlBase: 0.86, signals: [{ label: 'micro_amount_sequence', strength: 0.91 }, { label: 'velocity_burst_24h', strength: 0.88 }] },
+  { pattern: 'AI-Powered ATO',          color: '#f59e0b', rail: 'wire',   minAmt: 1200, maxAmt: 4500, mlBase: 0.79, signals: [{ label: 'headless_browser_flag',  strength: 0.84 }, { label: 'new_recipient',         strength: 0.77 }] },
+  { pattern: 'Pig Butchering Scam',     color: '#fb923c', rail: 'crypto', minAmt: 3500, maxAmt: 18000,mlBase: 0.72, signals: [{ label: 'crypto_exchange_mule',   strength: 0.79 }, { label: 'social_engineering_flag', strength: 0.68 }] },
+  { pattern: 'APP Scam',                color: '#38bdf8', rail: 'wire',   minAmt: 800,  maxAmt: 6000, mlBase: 0.68, signals: [{ label: 'authorized_push_pattern', strength: 0.73 }, { label: 'new_payee',             strength: 0.61 }] },
+  { pattern: 'Synthetic Identity Farm', color: '#c084fc', rail: 'ACH',    minAmt: 200,  maxAmt: 1200, mlBase: 0.61, signals: [{ label: 'thin_file_mismatch',      strength: 0.69 }, { label: 'address_velocity',      strength: 0.55 }] },
+  { pattern: null, color: '#64748b', rail: 'card', minAmt: 20, maxAmt: 380, mlBase: 0.08, signals: [] },
+  { pattern: null, color: '#64748b', rail: 'ACH',  minAmt: 50, maxAmt: 900, mlBase: 0.11, signals: [] },
+];
+const DEMO_WEIGHTS_OP = [1.5, 1.5, 1, 1, 1, 4, 4];
+let _demoCtrOp = 4000;
+
+function genDemoTx() {
+  const total = DEMO_WEIGHTS_OP.reduce((a, b) => a + b, 0);
+  let r = Math.random() * total, idx = 0;
+  for (let i = 0; i < DEMO_WEIGHTS_OP.length; i++) { r -= DEMO_WEIGHTS_OP[i]; if (r <= 0) { idx = i; break; } }
+  const s = DEMO_TX_SCENARIOS[idx];
+  const amt = +(s.minAmt + Math.random() * (s.maxAmt - s.minAmt)).toFixed(2);
+  const ml = Math.max(0.01, Math.min(0.99, s.mlBase + (Math.random() - 0.5) * 0.12));
+  const combined = +(ml * 0.7 + (s.signals.length > 0 ? 0.15 : 0)).toFixed(3);
+  return {
+    transaction_id: `TX${++_demoCtrOp}`,
+    amount: amt, rail: s.rail,
+    ml_score: +ml.toFixed(3), combined_score: combined,
+    is_alert: combined >= 0.55,
+    top_pattern: s.pattern, pattern_color: s.color, confidence: s.signals.length ? +(0.68 + Math.random() * 0.25).toFixed(2) : 0,
+    matched_signals: s.signals,
+  };
+}
+
+const DEMO_INVESTIGATIONS = {
+  'TX4001': {
+    status: 'done',
+    alertData: { transaction_id: 'TX4001', amount: 0.97, rail: 'Zelle', ml_score: 0.88, combined_score: 0.89, is_alert: true, top_pattern: 'Card Testing Bot', pattern_color: '#4ade80', confidence: 0.92, matched_signals: [{ label: 'micro_amount_sequence', strength: 0.91 }, { label: 'velocity_burst_24h', strength: 0.88 }] },
+    result: { verdict: 'Decline', severity: 'Critical', summary: 'Card testing bot confirmed — 28 micro-transactions under $1.00 on Zelle in a 3-hour window. Velocity and timing regularity are machine-driven.', top_finding: 'velocity_burst_24h = 28 transactions with timing regularity < 40ms variance', recommended_action: 'Block all outbound Zelle transactions from this account. Escalate to fraud ops for device ban and rule synthesis.', fraud_type_confirmed: 'Card Testing Bot', confidence: 'High' },
+  },
+  'TX4002': {
+    status: 'done',
+    alertData: { transaction_id: 'TX4002', amount: 3850.00, rail: 'wire', ml_score: 0.81, combined_score: 0.87, is_alert: true, top_pattern: 'AI-Powered ATO', pattern_color: '#f59e0b', confidence: 0.84, matched_signals: [{ label: 'headless_browser_flag', strength: 0.84 }, { label: 'new_recipient', strength: 0.77 }] },
+    result: { verdict: 'Escalate', severity: 'High', summary: 'ATO bot pattern — headless browser session initiated wire to first-time overseas recipient. Behavioral biometrics absent. Consistent with automated credential replay.', top_finding: 'headless_browser_flag + new_recipient + wire to overseas account — ATO playbook match', recommended_action: 'Place account on step-up auth hold. Call customer to verify intent. Block wire pending confirmation.', fraud_type_confirmed: 'AI-Powered ATO', confidence: 'High' },
+  },
+};
+
 // ── Inline pattern library (no backend required) ─────────────────────────────
 
 const PATTERNS = [
@@ -425,15 +470,54 @@ export default function Operator() {
   const [alerts, setAlerts] = useState([]);
   const [stats, setStats] = useState({ processed: 0, alerts: 0 });
   const [investigations, setInvestigations] = useState({}); // txnId → { status, result, error }
+  const [isDemoMode, setIsDemoMode] = useState(false);
   const esRef = useRef(null);
   const autoInvCountRef = useRef(0);
+  const demoTimerRef = useRef(null);
+  const demoStreamingRef = useRef(false);
 
   useEffect(() => {
     fetch(`${BACKEND}/health`, { signal: AbortSignal.timeout(2500) })
       .then(r => r.json())
       .then(d => setBackendOnline(d.status === 'ok' || d.status === 'degraded'))
-      .catch(() => setBackendOnline(false));
+      .catch(() => {
+        setBackendOnline(false);
+        setIsDemoMode(true);
+      });
   }, []);
+
+  // ── Demo mode streaming ───────────────────────────────────────────────────
+
+  useEffect(() => {
+    if (!isDemoMode) return;
+    // Seed initial events
+    const initial = Array.from({ length: 12 }, genDemoTx);
+    const initialAlerts = initial.filter(e => e.is_alert);
+    setFeed(initial);
+    setAlerts(initialAlerts.slice(0, 5));
+    setStats({ processed: 12, alerts: initialAlerts.length });
+    setInvestigations(DEMO_INVESTIGATIONS);
+    setStreaming(true);
+    demoStreamingRef.current = true;
+
+    let processed = 12, alertCount = initialAlerts.length;
+    function tick() {
+      if (!demoStreamingRef.current) return;
+      const event = genDemoTx();
+      processed++;
+      if (event.is_alert) alertCount++;
+      setFeed(prev => [event, ...prev].slice(0, 60));
+      if (event.is_alert) setAlerts(prev => [event, ...prev].slice(0, 25));
+      setStats({ processed, alerts: alertCount });
+      demoTimerRef.current = setTimeout(tick, 800 + Math.random() * 1200);
+    }
+    demoTimerRef.current = setTimeout(tick, 900);
+
+    return () => {
+      demoStreamingRef.current = false;
+      clearTimeout(demoTimerRef.current);
+    };
+  }, [isDemoMode]);
 
   // ── Investigation trigger ──────────────────────────────────────────────────
 
@@ -500,6 +584,8 @@ export default function Operator() {
 
   const stopStream = useCallback(() => {
     esRef.current?.close();
+    demoStreamingRef.current = false;
+    clearTimeout(demoTimerRef.current);
     setStreaming(false);
   }, []);
 
@@ -539,14 +625,14 @@ export default function Operator() {
 
         <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
           {!streaming ? (
-            <button onClick={startStream} disabled={!backendOnline} style={{
+            <button onClick={isDemoMode ? () => { demoStreamingRef.current = true; setStreaming(true); const tick = () => { if (!demoStreamingRef.current) return; const e = genDemoTx(); setFeed(prev => [e, ...prev].slice(0, 60)); if (e.is_alert) setAlerts(prev => [e, ...prev].slice(0, 25)); setStats(prev => ({ processed: prev.processed + 1, alerts: e.is_alert ? prev.alerts + 1 : prev.alerts })); demoTimerRef.current = setTimeout(tick, 800 + Math.random() * 1200); }; demoTimerRef.current = setTimeout(tick, 900); } : startStream} disabled={!backendOnline && !isDemoMode} style={{
               display: 'flex', alignItems: 'center', gap: 6,
               padding: '6px 14px', borderRadius: 7,
-              background: backendOnline ? 'var(--green)' : 'var(--bg-elevated)',
+              background: (backendOnline || isDemoMode) ? 'var(--green)' : 'var(--bg-elevated)',
               border: 'none',
-              color: backendOnline ? '#fff' : 'var(--text-muted)',
+              color: (backendOnline || isDemoMode) ? '#fff' : 'var(--text-muted)',
               fontSize: 12, fontWeight: 600,
-              cursor: backendOnline ? 'pointer' : 'default',
+              cursor: (backendOnline || isDemoMode) ? 'pointer' : 'default',
             }}>
               <Play size={12} /> Start Monitoring
             </button>

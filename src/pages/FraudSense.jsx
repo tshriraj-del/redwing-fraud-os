@@ -1,10 +1,37 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import InputSection from '../fraudsense/components/InputSection.jsx';
 import ResultsSection from '../fraudsense/components/ResultsSection.jsx';
 import SkeletonLoader from '../fraudsense/components/SkeletonLoader.jsx';
 import { investigateCase } from '../fraudsense/api.js';
 import { processFile, MAX_FILES } from '../fraudsense/files.js';
 import { CASE_TYPES, MIN_INPUT_LENGTH } from '../fraudsense/constants.js';
+
+const DEMO_ANALYSIS = {
+  risk_score: { score: 87, tier: 'HIGH', confidence: 'High', score_basis: 'Multiple strong behavioural signals consistent with card testing bot. Extreme velocity, micro-amounts, and machine-timing regularity.' },
+  loss_estimate: { direct: 0, indirect: 4200, total: 4200, currency: 'USD', recovery_likelihood: 'High', recovery_basis: 'No successful large-value transaction completed — testing phase intercepted.' },
+  signals: [
+    { label: 'Micro-amount velocity burst', strength: 'Strong', basis: 'Observed', direction: 'Increases risk' },
+    { label: 'Machine-like timing regularity (< 40ms variance)', strength: 'Strong', basis: 'Observed', direction: 'Increases risk' },
+    { label: '28 P2P transactions in 3 hours', strength: 'Strong', basis: 'Observed', direction: 'Increases risk' },
+    { label: 'All transactions to new recipients', strength: 'Strong', basis: 'Observed', direction: 'Increases risk' },
+    { label: 'No manual input lag detected', strength: 'Medium', basis: 'Inferred', direction: 'Increases risk' },
+  ],
+  classification: { primary_type: 'Card Testing / Carding', secondary_type: null, confidence: 'High', typology_basis: 'Micro-amount burst on P2P rails is the canonical card testing pattern. Velocity and timing confirm automated execution.' },
+  root_cause_analysis: { trigger: 'Compromised card data purchased from darknet marketplace', method: 'Automated bot script submitting $0.50–$1.99 P2P transfers to test card validity before high-value cashout', timeline: 'Pattern started at 02:14 UTC; 28 transactions over 3h 12m', entry_point: 'Mobile P2P API with insufficient rate limiting below $2.00 threshold' },
+  fact_assessment: {
+    facts: ['28 transactions in 3h 12m window', 'All amounts between $0.50 and $1.99', 'All recipients are first-time payees', 'Timing variance < 40ms between transactions'],
+    inferences: ['Bot-driven automation (no human can maintain <40ms timing consistency)', 'Card testing preparatory to high-value cashout attempt'],
+    hypotheses: ['Compromised card data from recent darknet market breach'],
+  },
+  recommendation: {
+    action: 'Decline',
+    rationale: 'Card testing bot confirmed with high confidence. Block all further transactions and initiate rule synthesis.',
+    steps: ['Immediately block all outbound Zelle from this account', 'Quarantine device fingerprint — block same device on all accounts', 'Escalate to fraud operations for rule synthesis via Rule Factory', 'Notify card issuer of potential compromised card data'],
+    escalation_required: true, law_enforcement: false,
+  },
+};
+
+const DEMO_CASE_TEXT = 'Account opened 3 weeks ago. In the past 3 hours, 28 Zelle transfers ranging from $0.50 to $1.97 were sent to 28 different first-time recipients. Timing between transactions averages 410 seconds with < 40ms variance. No manual delay patterns detected. Device fingerprint is consistent across all transactions but flagged as a headless browser environment.';
 
 export default function FraudSense() {
   const [caseText, setCaseText]       = useState('');
@@ -15,6 +42,15 @@ export default function FraudSense() {
   const [error, setError]             = useState('');
   const [analysis, setAnalysis]       = useState(null);
   const [caseMeta, setCaseMeta]       = useState(null);
+
+  useEffect(() => {
+    fetch('http://localhost:8000/health', { signal: AbortSignal.timeout(2500) })
+      .catch(() => {
+        setCaseText(DEMO_CASE_TEXT);
+        setAnalysis(DEMO_ANALYSIS);
+        setCaseMeta({ caseText: DEMO_CASE_TEXT, caseType: CASE_TYPES[0], contextFlags: [], attachments: [] });
+      });
+  }, []);
 
   function toggleFlag(flag) {
     setContextFlags(prev =>

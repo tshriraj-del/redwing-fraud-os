@@ -2,6 +2,8 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import ForceGraph2D from 'react-force-graph-2d';
 
 const OPERATOR = 'http://localhost:8000';
+const IS_LOCAL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
 
 // ── Demo graph generator (shown when backend is offline) ──────────────────────
 // Seeded PRNG so the graph is deterministic across reloads
@@ -200,6 +202,7 @@ export default function Network() {
     setLoading(true);
     setError(null);
     try {
+      if (!IS_LOCAL) throw new Error('demo');
       const params = new URLSearchParams({
         fraud_only:  fraudOnly,
         min_score:   minScore,
@@ -207,8 +210,8 @@ export default function Network() {
         ...(selectedTypology ? { typology: selectedTypology } : {}),
       });
       const [gRes, tRes] = await Promise.all([
-        fetch(`${OPERATOR}/network/graph?${params}`),
-        fetch(`${OPERATOR}/network/typologies`),
+        fetch(`${OPERATOR}/network/graph?${params}`, { signal: AbortSignal.timeout(2000) }),
+        fetch(`${OPERATOR}/network/typologies`, { signal: AbortSignal.timeout(2000) }),
       ]);
       const gData = await gRes.json();
       const tData = await tRes.json();

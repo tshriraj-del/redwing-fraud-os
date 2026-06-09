@@ -148,9 +148,9 @@ export default function MLLab() {
           { name: 'velocity_7d',      importance: 0.023 },
         ]);
         setDriftData(Array.from({ length: 30 }, (_, i) => ({
-          date: new Date(Date.now() - (29 - i) * 86400000).toISOString().slice(0, 10),
-          auc: +(0.975 + Math.sin(i * 0.4) * 0.004 + Math.random() * 0.002).toFixed(4),
-          fraud_rate: +(0.018 + Math.cos(i * 0.3) * 0.002 + Math.random() * 0.001).toFixed(4),
+          day: `D-${29 - i}`,
+          AUC: +(0.975 + Math.sin(i * 0.4) * 0.004 + (i * 0.00015)).toFixed(4),
+          Precision: +(0.862 + Math.cos(i * 0.3) * 0.008).toFixed(4),
         })));
         setScoreResult({
           score: 87, severity: 'Critical',

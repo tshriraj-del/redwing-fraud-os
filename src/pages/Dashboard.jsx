@@ -124,11 +124,15 @@ export default function Dashboard() {
   const [ruleGaps, setRuleGaps] = useState(null);
 
   useEffect(() => {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 2000);
+
     fetchMLMetrics()
       .then(m => setMetrics(m))
-      .catch(() => setMetrics(DEMO_METRICS));
+      .catch(() => setMetrics(DEMO_METRICS))
+      .finally(() => clearTimeout(timer));
 
-    fetch('http://localhost:8000/rule-factory/gaps')
+    fetch('http://localhost:8000/rule-factory/gaps', { signal: AbortSignal.timeout(2000) })
       .then(r => r.json())
       .then(d => setRuleGaps(d.count ?? null))
       .catch(() => setRuleGaps(14));

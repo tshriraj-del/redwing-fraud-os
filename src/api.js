@@ -19,14 +19,14 @@ export async function callOnce({ systemPrompt, userMessage, maxTokens = 1024 }) 
 
 // ML metrics — sourced from Operator /health (port 8000)
 export async function fetchMLMetrics() {
-  const res = await fetch(`${OPERATOR}/health`);
+  const res = await fetch(`${OPERATOR}/health`, { signal: AbortSignal.timeout(2000) });
   if (!res.ok) throw new Error('Operator unreachable');
   const data = await res.json();
   return data.model_metrics ?? {};
 }
 
 export async function fetchMLFeatures() {
-  const res = await fetch(`${OPERATOR}/health`);
+  const res = await fetch(`${OPERATOR}/health`, { signal: AbortSignal.timeout(2000) });
   if (!res.ok) throw new Error('Operator unreachable');
   const data = await res.json();
   return { features: data.features ?? [] };
@@ -34,7 +34,7 @@ export async function fetchMLFeatures() {
 
 export async function fetchMLDrift() {
   // Drift metrics are returned by /xai/governance
-  const res = await fetch(`${OPERATOR}/xai/governance`);
+  const res = await fetch(`${OPERATOR}/xai/governance`, { signal: AbortSignal.timeout(2000) });
   if (!res.ok) return { drift: null };
   return res.json();
 }

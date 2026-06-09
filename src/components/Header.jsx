@@ -21,7 +21,7 @@ const SYSTEMS = [
 
 export default function Header() {
   const { pathname } = useLocation();
-  const title = TITLES[pathname] ?? 'Riposte';
+  const title = TITLES[pathname] ?? 'RedWing';
 
   return (
     <header style={{

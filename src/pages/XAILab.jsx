@@ -502,7 +502,7 @@ const DEMO_RECORDS = [
   {
     explanation_id: 'xai_demo_001', transaction_id: 'txn_4f2a9b', verdict: 'CRITICAL',
     combined_score: 0.91, ml_score: 0.88, narrative: 'High-confidence card testing bot pattern — micro-amount burst on P2P rails with extreme velocity.',
-    explanation_method: 'SHAP TreeExplainer', model_id: 'riposte-fraud-xgb-v1', model_version: '2',
+    explanation_method: 'SHAP TreeExplainer', model_id: 'redwing-fraud-xgb-v1', model_version: '2',
     human_review_required: true,
     pattern_match: { pattern_name: 'Card Testing Bot', confidence: 0.93 },
     top_factors: [
@@ -516,7 +516,7 @@ const DEMO_RECORDS = [
   {
     explanation_id: 'xai_demo_002', transaction_id: 'txn_b81e3c', verdict: 'HIGH',
     combined_score: 0.76, ml_score: 0.74, narrative: 'ATO bot pattern detected — headless browser accessing wire transfer at unusual hour.',
-    explanation_method: 'SHAP TreeExplainer', model_id: 'riposte-fraud-xgb-v1', model_version: '2',
+    explanation_method: 'SHAP TreeExplainer', model_id: 'redwing-fraud-xgb-v1', model_version: '2',
     human_review_required: false,
     pattern_match: { pattern_name: 'AI-Powered ATO', confidence: 0.81 },
     top_factors: [
@@ -530,7 +530,7 @@ const DEMO_RECORDS = [
   {
     explanation_id: 'xai_demo_003', transaction_id: 'txn_c93d17', verdict: 'MEDIUM',
     combined_score: 0.52, ml_score: 0.49, narrative: 'Moderate risk — round amount to new crypto recipient. Below block threshold but flagged for review.',
-    explanation_method: 'SHAP TreeExplainer', model_id: 'riposte-fraud-xgb-v1', model_version: '2',
+    explanation_method: 'SHAP TreeExplainer', model_id: 'redwing-fraud-xgb-v1', model_version: '2',
     human_review_required: false,
     pattern_match: null,
     top_factors: [
@@ -544,7 +544,7 @@ const DEMO_RECORDS = [
   {
     explanation_id: 'xai_demo_004', transaction_id: 'txn_a27f58', verdict: 'LOW',
     combined_score: 0.08, ml_score: 0.07, narrative: 'Low risk — established account, known recipient, modest amount on standard rail.',
-    explanation_method: 'SHAP TreeExplainer', model_id: 'riposte-fraud-xgb-v1', model_version: '2',
+    explanation_method: 'SHAP TreeExplainer', model_id: 'redwing-fraud-xgb-v1', model_version: '2',
     human_review_required: false,
     pattern_match: null,
     top_factors: [
@@ -558,7 +558,7 @@ const DEMO_RECORDS = [
 ];
 
 const DEMO_MODEL_CARD = {
-  model_id: 'riposte-fraud-xgb-v1',
+  model_id: 'redwing-fraud-xgb-v1',
   model_type: 'XGBoost (GBT) + Isolation Forest ensemble',
   version: '2',
   task: 'Binary fraud classification',

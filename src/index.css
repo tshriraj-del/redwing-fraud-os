@@ -215,7 +215,7 @@ html, body, #root {
 }
 .pulse-dot { animation: pulse-dot 2s ease-in-out infinite; }
 
-/* SyntheticID Lab — alias vars so its components resolve against Riposte tokens */
+/* SyntheticID Lab — alias vars so its components resolve against RedWing tokens */
 :root {
   --bg:           var(--bg-base);
   --surface:      var(--bg-surface);

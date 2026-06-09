@@ -50,7 +50,7 @@ export default function Sidebar() {
         {!collapsed && (
           <div>
             <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)', letterSpacing: '-0.01em' }}>
-              Riposte
+              RedWing
             </div>
             <div style={{ fontSize: 10, color: 'var(--text-muted)', letterSpacing: '0.04em', marginTop: 1 }}>
               AI COMMAND CENTER

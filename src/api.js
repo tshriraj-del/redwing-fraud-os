@@ -1,4 +1,4 @@
-// Riposte — LLM + operator API layer.
+// RedWing — LLM + operator API layer.
 // All ML scoring goes through the Operator (port 8000).
 
 import { callLLM, streamLLM } from './llm-provider.js';

@@ -6,6 +6,8 @@ import {
 import { callOnce } from '../api.js';
 
 const BACKEND = 'http://localhost:8000';
+const IS_LOCAL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
 const AUTO_ESCALATE_THRESHOLD = 0.85; // combined_score to auto-investigate
 const MAX_AUTO_INVESTIGATIONS = 8;    // cap per stream session
 
@@ -477,6 +479,11 @@ export default function Operator() {
   const demoStreamingRef = useRef(false);
 
   useEffect(() => {
+    if (!IS_LOCAL) {
+      setBackendOnline(false);
+      setIsDemoMode(true);
+      return;
+    }
     fetch(`${BACKEND}/health`, { signal: AbortSignal.timeout(2500) })
       .then(r => r.json())
       .then(d => setBackendOnline(d.status === 'ok' || d.status === 'degraded'))

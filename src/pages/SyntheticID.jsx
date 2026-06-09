@@ -2,6 +2,8 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { Bot, Shield, AlertTriangle, CheckCircle, XCircle, ChevronDown, ChevronRight, Zap, Brain } from 'lucide-react';
 
 const BACKEND = 'http://localhost:8000';
+const IS_LOCAL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
 
 const THREAT_META = {
   card_testing_bot:        { label: 'Card Testing Bot',      color: '#22c55e' },
@@ -835,6 +837,7 @@ export default function SyntheticID() {
 
   // Status poll — first failure → demo mode
   useEffect(() => {
+    if (!IS_LOCAL) { setIsDemoMode(true); return; }
     const poll = async () => {
       try {
         const res = await fetch(`${BACKEND}/agent/status`, { signal: AbortSignal.timeout(2500) });

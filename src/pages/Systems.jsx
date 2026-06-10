@@ -41,6 +41,9 @@ const SYSTEMS = [
       { method: 'POST', path: '/drift/reset',               desc: 'Reset drift buffers after model retrain — returns monitor to warming_up state' },
       { method: 'GET',  path: '/graph/stats',               desc: 'Graph feature store stats — entity count, last refresh time (Tier 3 offline embeddings)' },
       { method: 'GET',  path: '/gnn/stats',                 desc: 'GNN Tier 2 table coverage — user/device/recipient embeddings + 1-hop neighbourhood aggregates' },
+      { method: 'POST', path: '/ingest',                    desc: 'Inject a live transaction into the full 4-tier pipeline — scores, fans out to SSE clients, drift monitor, and persists to ingest_log.jsonl' },
+      { method: 'POST', path: '/ingest/batch',              desc: 'Batch inject up to 1 000 transactions — returns scored results + alert_rate summary' },
+      { method: 'GET',  path: '/ingest/stats',              desc: 'Injection pipeline health — ring buffer occupancy, log transaction count, log size' },
     ],
   },
   {

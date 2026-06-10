@@ -37,6 +37,9 @@ const SYSTEMS = [
       { method: 'GET',  path: '/network/graph',             desc: 'Fraud ring graph — nodes, edges, cluster assignments' },
       { method: 'GET',  path: '/network/typologies',        desc: 'Transaction counts and fraud rates per typology' },
       { method: 'POST', path: '/llm/proxy',                 desc: 'Routes LLM requests server-side — Anthropic, OpenAI, Groq, Mistral. API key never touches browser.' },
+      { method: 'GET',  path: '/drift/status',              desc: 'ADWIN-style PSI drift monitor — score distribution + feature drift state: warming_up | stable | warning | drift' },
+      { method: 'POST', path: '/drift/reset',               desc: 'Reset drift buffers after model retrain — returns monitor to warming_up state' },
+      { method: 'GET',  path: '/graph/stats',               desc: 'Graph feature store stats — entity count, last refresh time (Tier 3 offline embeddings)' },
     ],
   },
   {

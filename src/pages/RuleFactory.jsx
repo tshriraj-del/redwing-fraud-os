@@ -5,17 +5,36 @@ import {
   TrendingUp, ShieldAlert, BarChart2,
 } from 'lucide-react';
 
-const BACKEND = 'http://localhost:8000';
+const BACKEND  = 'http://localhost:8000';
+const IS_LOCAL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
-// ── Demo data (shown when backend is offline) ─────────────────────────────────
+// ── Demo data (shown when backend is offline / Vercel) ────────────────────────
 
 const DEMO_GAP_DATA = {
   count: 14,
-  coverage_gaps: [
-    { typology: 'card_testing_bot',        gap_score: 0.84, description: 'Micro-amount burst on P2P rails escapes velocity rules' },
-    { typology: 'ai_powered_ato',          gap_score: 0.71, description: 'Headless-browser ATO bypasses device fingerprint checks' },
-    { typology: 'deepfake_bypass',         gap_score: 0.67, description: 'Deepfake KYC bypass not covered by existing identity rules' },
-    { typology: 'synthetic_identity_farm', gap_score: 0.59, description: 'Thin-file synthetics with slow velocity stay under threshold' },
+  sample: [
+    { transaction_id: 'txn_a1b2c3d4', amount: 1.47,    fraud_typology: 'card_testing_bot',        payment_rail: 'zelle', ensemble_score: 0.84, rule_score: 0  },
+    { transaction_id: 'txn_e5f6g7h8', amount: 4250.00, fraud_typology: 'ai_powered_ato',           payment_rail: 'wire',  ensemble_score: 0.78, rule_score: 12 },
+    { transaction_id: 'txn_i9j0k1l2', amount: 0.99,    fraud_typology: 'card_testing_bot',        payment_rail: 'p2p',   ensemble_score: 0.81, rule_score: 0  },
+    { transaction_id: 'txn_m3n4o5p6', amount: 8750.00, fraud_typology: 'deepfake_bypass',          payment_rail: 'wire',  ensemble_score: 0.76, rule_score: 8  },
+    { transaction_id: 'txn_q7r8s9t0', amount: 1.89,    fraud_typology: 'card_testing_bot',        payment_rail: 'zelle', ensemble_score: 0.79, rule_score: 0  },
+    { transaction_id: 'txn_u1v2w3x4', amount: 650.00,  fraud_typology: 'synthetic_identity_farm', payment_rail: 'ach',   ensemble_score: 0.71, rule_score: 18 },
+  ],
+  feature_means: {
+    ensemble_score:        0.78,
+    recipient_familiarity: 0.08,
+    amount_zscore:         2.8,
+    velocity_1h:           6.2,
+  },
+};
+
+const DEMO_RUN_RESULT = {
+  status:       'ok',
+  gaps_analyzed: 14,
+  candidates:    2,
+  results: [
+    { recommendation: 'AUTO_DEPLOY', name: 'CARD_TEST_MICRO_VELOCITY_P2P', backtest: { precision: 0.84, recall: 0.031 } },
+    { recommendation: 'SHADOW',      name: 'ATO_HEADLESS_WIRE_SPIKE',      backtest: { precision: 0.71, recall: 0.018 } },
   ],
 };
 
@@ -326,6 +345,12 @@ export default function RuleFactory() {
 
   // Check backend + load data
   useEffect(() => {
+    if (!IS_LOCAL) {
+      setBackendOnline(false);
+      setGapData(DEMO_GAP_DATA);
+      setRules(DEMO_RULES);
+      return;
+    }
     fetch(`${BACKEND}/health`, { signal: AbortSignal.timeout(2500) })
       .then(r => r.json())
       .then(() => { setBackendOnline(true); fetchAll(); })
@@ -352,6 +377,12 @@ export default function RuleFactory() {
     setRunning(true);
     setRunResult(null);
     setError(null);
+    if (!IS_LOCAL) {
+      await new Promise(r => setTimeout(r, 2200));
+      setRunResult(DEMO_RUN_RESULT);
+      setRunning(false);
+      return;
+    }
     try {
       const res = await fetch(`${BACKEND}/rule-factory/run`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
       const data = await res.json();
@@ -366,11 +397,19 @@ export default function RuleFactory() {
   }, [fetchAll]);
 
   const handleDeploy = useCallback(async (id) => {
+    if (!IS_LOCAL) {
+      setRules(prev => ({ ...prev, rules: prev.rules.map(r => r.id === id ? { ...r, status: 'deployed' } : r) }));
+      return;
+    }
     await fetch(`${BACKEND}/rule-factory/deploy/${id}`, { method: 'POST' });
     fetchAll();
   }, [fetchAll]);
 
   const handleRetire = useCallback(async (id) => {
+    if (!IS_LOCAL) {
+      setRules(prev => ({ ...prev, rules: prev.rules.map(r => r.id === id ? { ...r, status: 'retired' } : r) }));
+      return;
+    }
     await fetch(`${BACKEND}/rule-factory/retire/${id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ reason: 'manual' }) });
     fetchAll();
   }, [fetchAll]);
@@ -388,13 +427,15 @@ export default function RuleFactory() {
         background: 'var(--bg-surface)', display: 'flex', alignItems: 'center', gap: 16, flexShrink: 0,
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          {backendOnline === null
-            ? <div style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--text-muted)' }} />
-            : backendOnline
-              ? <div className="pulse-dot" style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--green)' }} />
-              : <div style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--red)' }} />}
-          <span style={{ fontSize: 11, fontWeight: 600, color: backendOnline ? 'var(--green)' : 'var(--red)' }}>
-            {backendOnline ? 'Backend online' : backendOnline === false ? 'Backend offline' : 'Connecting…'}
+          {!IS_LOCAL
+            ? <div style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--yellow)' }} />
+            : backendOnline === null
+              ? <div style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--text-muted)' }} />
+              : backendOnline
+                ? <div className="pulse-dot" style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--green)' }} />
+                : <div style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--red)' }} />}
+          <span style={{ fontSize: 11, fontWeight: 600, color: !IS_LOCAL ? 'var(--yellow)' : backendOnline ? 'var(--green)' : 'var(--red)' }}>
+            {!IS_LOCAL ? 'Demo mode' : backendOnline ? 'Backend online' : backendOnline === false ? 'Backend offline' : 'Connecting…'}
           </span>
         </div>
 
@@ -421,13 +462,13 @@ export default function RuleFactory() {
           </button>
           <button
             onClick={runFactory}
-            disabled={running || !backendOnline}
+            disabled={running || (IS_LOCAL && !backendOnline)}
             style={{
               padding: '6px 16px', borderRadius: 7,
               background: running ? 'var(--bg-elevated)' : 'linear-gradient(135deg,#818cf8,#c084fc)',
               border: 'none',
               color: running ? 'var(--text-muted)' : '#fff',
-              fontSize: 11, fontWeight: 700, cursor: running || !backendOnline ? 'default' : 'pointer',
+              fontSize: 11, fontWeight: 700, cursor: running || (IS_LOCAL && !backendOnline) ? 'default' : 'pointer',
               display: 'flex', alignItems: 'center', gap: 6,
             }}
           >
@@ -477,10 +518,9 @@ export default function RuleFactory() {
             )}
           </div>
           <div style={{ flex: 1, overflowY: 'auto' }}>
-            {!backendOnline && (
-              <div style={{ padding: 20, textAlign: 'center', fontSize: 11, color: 'var(--text-muted)' }}>
-                Backend offline. Start with:<br />
-                <code style={{ color: 'var(--accent)', fontSize: 10 }}>cd operator && python main.py</code>
+            {!IS_LOCAL && (
+              <div style={{ padding: '10px 14px 4px', fontSize: 10, color: 'var(--text-muted)', fontStyle: 'italic' }}>
+                Sample gaps — run operator locally for live data
               </div>
             )}
             {gapData?.sample?.length > 0

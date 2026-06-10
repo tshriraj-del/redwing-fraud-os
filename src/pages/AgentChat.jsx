@@ -3,7 +3,8 @@ import { Send, X, Download, RotateCcw } from 'lucide-react';
 import { WORKERS, WORKER_LIST, detectWorker, setLiveContext } from '../workers.js';
 import { streamMessage } from '../api.js';
 
-const BACKEND = 'http://localhost:8000';
+const BACKEND  = 'http://localhost:8000';
+const IS_LOCAL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
 async function fetchLiveContext() {
   try {
@@ -334,7 +335,7 @@ export default function AgentChat() {
               {STARTERS.map(s => (
                 <button
                   key={s.label}
-                  onClick={() => send(s.label)}
+                  onClick={() => { if (IS_LOCAL) send(s.label); }}
                   style={{
                     padding: '10px 14px',
                     background: 'var(--bg-surface)',
@@ -372,46 +373,64 @@ export default function AgentChat() {
       {/* Input */}
       <div
         style={{
-          padding: '12px 20px',
+          padding: IS_LOCAL ? '12px 20px' : '8px 20px 12px',
           borderTop: '1px solid var(--border)',
           background: 'var(--bg-surface)',
           flexShrink: 0,
         }}
       >
+        {!IS_LOCAL && (
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 7,
+            marginBottom: 8, padding: '5px 10px',
+            background: 'rgba(245,158,11,0.07)', border: '1px solid rgba(245,158,11,0.2)',
+            borderRadius: 7,
+          }}>
+            <div style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--yellow)', flexShrink: 0 }} />
+            <span style={{ fontSize: 11, color: 'var(--yellow)', fontWeight: 500 }}>
+              Demo mode — live AI responses require the operator backend running locally with <code style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10 }}>LLM_API_KEY</code> set
+            </span>
+          </div>
+        )}
         <div
           style={{
             display: 'flex',
             gap: 10,
-            background: 'var(--bg-elevated)',
-            border: '1px solid var(--border)',
+            background: IS_LOCAL ? 'var(--bg-elevated)' : 'rgba(0,0,0,0.15)',
+            border: `1px solid ${IS_LOCAL ? 'var(--border)' : 'rgba(255,255,255,0.04)'}`,
             borderRadius: 10,
             padding: '8px 10px 8px 16px',
             alignItems: 'flex-end',
+            opacity: IS_LOCAL ? 1 : 0.5,
           }}
         >
           <textarea
             ref={inputRef}
             value={input}
-            onChange={e => setInput(e.target.value)}
+            onChange={e => { if (IS_LOCAL) setInput(e.target.value); }}
             onKeyDown={e => {
+              if (!IS_LOCAL) return;
               if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
             }}
-            placeholder="Ask RedWing Intelligence… (Shift+Enter for new line)"
+            readOnly={!IS_LOCAL}
+            placeholder={IS_LOCAL ? 'Ask RedWing Intelligence… (Shift+Enter for new line)' : 'Live AI unavailable in demo — run operator locally to enable'}
             rows={1}
             style={{
               flex: 1,
               background: 'transparent',
               border: 'none',
               outline: 'none',
-              color: 'var(--text)',
+              color: IS_LOCAL ? 'var(--text)' : 'var(--text-muted)',
               fontSize: 13,
               resize: 'none',
               lineHeight: 1.6,
               maxHeight: 120,
               overflowY: 'auto',
               fontFamily: 'inherit',
+              cursor: IS_LOCAL ? 'text' : 'not-allowed',
             }}
             onInput={e => {
+              if (!IS_LOCAL) return;
               e.target.style.height = 'auto';
               e.target.style.height = Math.min(e.target.scrollHeight, 120) + 'px';
             }}
@@ -422,13 +441,13 @@ export default function AgentChat() {
             </button>
           ) : (
             <button
-              onClick={() => send()}
-              disabled={!input.trim()}
+              onClick={() => { if (IS_LOCAL) send(); }}
+              disabled={!IS_LOCAL || !input.trim()}
               style={{
                 ...sendBtnStyle,
-                background: input.trim() ? 'var(--accent)' : 'var(--bg-elevated)',
-                color: input.trim() ? '#fff' : 'var(--text-muted)',
-                cursor: input.trim() ? 'pointer' : 'default',
+                background: IS_LOCAL && input.trim() ? 'var(--accent)' : 'var(--bg-elevated)',
+                color: IS_LOCAL && input.trim() ? '#fff' : 'var(--text-muted)',
+                cursor: IS_LOCAL && input.trim() ? 'pointer' : 'not-allowed',
               }}
             >
               <Send size={14} />

@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import {
-  ShieldCheck, FlaskConical, Brain, BrainCircuit,
+  ShieldCheck, FlaskConical, BrainCircuit,
   TrendingUp, ArrowRight, Zap, Clock, Sparkles, Swords, FileText,
 } from 'lucide-react';
 import { fetchMLMetrics } from '../api.js';
@@ -24,15 +24,6 @@ const TOOLS = [
     color: '#f97316',
     colorDim: 'rgba(249,115,22,0.1)',
     link: '/rulebreaker',
-  },
-  {
-    id: 'syntheticid',
-    name: 'SyntheticID Agent',
-    desc: 'Autonomous AI fraud agent · real-time blocking · self-learning',
-    icon: Brain,
-    color: '#c084fc',
-    colorDim: 'rgba(192,132,252,0.1)',
-    link: '/syntheticid',
   },
   {
     id: 'xai',
@@ -159,11 +150,8 @@ export default function Dashboard() {
           <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 12 }}>
             Analyst Tools
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
-            {TOOLS.slice(0, 3).map(t => <ToolCard key={t.id} tool={t} />)}
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12, marginTop: 12 }}>
-            {TOOLS.slice(3).map(t => <ToolCard key={t.id} tool={t} />)}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12 }}>
+            {TOOLS.map(t => <ToolCard key={t.id} tool={t} />)}
           </div>
         </div>
 

@@ -6,6 +6,8 @@ import {
 import { TrendingUp, AlertTriangle, CheckCircle2, RefreshCw, Zap, Cpu, Activity } from 'lucide-react';
 import { callOnce, fetchMLMetrics, fetchMLFeatures, fetchMLDrift, scoreTransactionML } from '../api.js';
 
+const IS_LOCAL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
 const THRESHOLDS = { 'AUC-ROC': 0.93, 'Precision': 0.85, 'Recall': 0.80, 'F1 Score': 0.83 };
 
 const SCORER_SYSTEM = `You are a fraud risk scoring engine for an ML fraud detection platform.
@@ -110,7 +112,7 @@ export default function MLLab() {
   const [scoring, setScoring]       = useState(false);
   const [scoreResult, setScoreResult] = useState(null);
   const [scoreError, setScoreError] = useState(null);
-  const [useMLEngine, setUseMLEngine] = useState(true);
+  const [useMLEngine, setUseMLEngine] = useState(IS_LOCAL);
 
   // Live data from RedWing ML server
   const [metrics, setMetrics]     = useState(null);
@@ -261,7 +263,7 @@ export default function MLLab() {
         </div>
         <div style={{ fontSize: 11, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 6 }}>
           <Cpu size={11} />
-          {serverOk === null ? 'Connecting…' : serverOk ? 'Live · port 8001' : 'Server offline — run: uvicorn server:app --port 8001'}
+          {serverOk === null ? 'Connecting…' : serverOk ? 'Live · localhost:8000' : 'Demo mode · start operator locally for live ML scoring'}
         </div>
         {metrics && (
           <div style={{ marginLeft: 'auto', display: 'flex', gap: 16 }}>
@@ -390,7 +392,9 @@ export default function MLLab() {
           <div style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 14 }}>
             {useMLEngine
               ? 'Parsed → RedWing model inference (real XGBoost + IsoForest, sub-ms)'
-              : 'Describe a transaction — AI scores it using ML signal patterns'}
+              : IS_LOCAL
+                ? 'Describe a transaction — AI scores it using ML signal patterns'
+                : 'AI scoring — ML Engine requires local operator backend'}
           </div>
 
           <textarea
@@ -490,7 +494,7 @@ export default function MLLab() {
               { label: 'Layer 3 — Behavioral', value: '30/60/90d baselines', color: 'var(--yellow)' },
               { label: 'Ensemble AUC', value: metrics ? metrics.auc_ensemble?.toFixed(4) ?? '—' : '—', color: 'var(--green)' },
               { label: 'Weights', value: '40% rules · 45% ML · 15% base', color: 'var(--text-muted)' },
-              { label: 'Server', value: serverOk ? 'localhost:8001 ✓' : 'offline', color: serverOk ? 'var(--green)' : 'var(--red)' },
+              { label: 'Server', value: serverOk ? 'localhost:8000 ✓' : 'demo mode', color: serverOk ? 'var(--green)' : 'var(--yellow)' },
             ].map(row => (
               <div key={row.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 0', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
                 <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>{row.label}</span>

@@ -16,6 +16,7 @@ const RuleBreakerPage = lazy(() => import('./pages/RuleBreaker.jsx'));
 const XAILab          = lazy(() => import('./pages/XAILab.jsx'));
 const SyntheticID     = lazy(() => import('./pages/SyntheticID.jsx'));
 const PrivacyLab      = lazy(() => import('./pages/PrivacyLab.jsx'));
+const Observability   = lazy(() => import('./pages/Observability.jsx'));
 
 function PageLoader() {
   return (
@@ -47,6 +48,7 @@ export default function App() {
               <Route path="/xai"         element={<XAILab />} />
               <Route path="/syntheticid" element={<SyntheticID />} />
               <Route path="/privacy"     element={<PrivacyLab />} />
+              <Route path="/observability" element={<Observability />} />
             </Routes>
           </Suspense>
         </main>

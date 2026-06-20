@@ -1,20 +1,38 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine,
 } from 'recharts';
-import { ShieldCheck, Lock, TrendingUp, Layers, Maximize2 } from 'lucide-react';
+import { ShieldCheck, TrendingUp, Layers, Maximize2 } from 'lucide-react';
+import { fetchPrivacyCurve } from '../api.js';
 
-// Measured leakage-free on held-out data (privacy_layer.py). Differential privacy
-// on the recipient-reputation / cross-user graph signal: % of fraud-detection
-// utility retained vs the privacy budget ε, at two guarantee strengths.
-const CURVE = [
-  { eps: 'ε=0.1', label: 'very strong', event: 33,  user: 7   },
-  { eps: 'ε=0.5', label: 'strong',      event: 81,  user: 33  },
-  { eps: 'ε=1',   label: 'moderate',    event: 91,  user: 54  },
-  { eps: 'ε=2',   label: 'light',       event: 95,  user: 75  },
-  { eps: 'ε=5',   label: 'minimal',     event: 97,  user: 91  },
-  { eps: 'none',  label: 'no',          event: 100, user: 100 },
-];
+const LABELS = { '0.1': 'very strong', '0.5': 'strong', '1': 'moderate', '2': 'light', '5': 'minimal' };
+
+// Fallback (demo mode — Vercel can't reach the local operator). Mirrors the
+// measured values served live by GET /privacy/curve (redwing-ml/privacy_layer.py).
+const FALLBACK = {
+  baseline_auc: 0.724, clamp_pct: 1.06,
+  curve: [
+    { eps: 'ε=0.1', label: 'very strong', event: 33,  user: 7   },
+    { eps: 'ε=0.5', label: 'strong',      event: 81,  user: 33  },
+    { eps: 'ε=1',   label: 'moderate',    event: 91,  user: 54  },
+    { eps: 'ε=2',   label: 'light',       event: 95,  user: 75  },
+    { eps: 'ε=5',   label: 'minimal',     event: 97,  user: 91  },
+    { eps: 'none',  label: 'no',          event: 100, user: 100 },
+  ],
+};
+
+function mapApi(d) {
+  const curve = d.event_level.map((e, i) => {
+    const k = e.epsilon === 'inf' ? 'none' : String(e.epsilon);
+    return {
+      eps: k === 'none' ? 'none' : `ε=${k}`,
+      label: LABELS[k] ?? 'no',
+      event: Math.round(e.utility_kept_pct),
+      user: Math.round(d.user_level[i].utility_kept_pct),
+    };
+  });
+  return { baseline_auc: d.baseline_auc, clamp_pct: d.clamp_pct, curve };
+}
 
 const CustomTooltip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null;
@@ -41,8 +59,21 @@ function MetricCard({ label, value, sub, accent }) {
 }
 
 export default function PrivacyLab() {
+  const [data, setData] = useState(FALLBACK);
+  const [live, setLive] = useState(null); // null=loading, true, false
   const [epsIdx, setEpsIdx] = useState(2); // default ε=1
-  const sel = CURVE[epsIdx];
+
+  useEffect(() => {
+    fetchPrivacyCurve()
+      .then(d => { setData(mapApi(d)); setLive(true); })
+      .catch(() => setLive(false));
+  }, []);
+
+  const curve = data.curve;
+  const sel = curve[Math.min(epsIdx, curve.length - 1)];
+  const find = (key, eps) => (curve.find(c => c.eps === eps) || {})[key];
+  const eventE1 = find('event', 'ε=1') ?? 91;
+  const userE5 = find('user', 'ε=5') ?? 91;
 
   return (
     <div style={{ height: '100%', overflowY: 'auto', padding: '24px 28px', display: 'flex', flexDirection: 'column', gap: 20 }}>
@@ -56,23 +87,23 @@ export default function PrivacyLab() {
           <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)' }}>Privacy-Preserving Fraud Detection</div>
           <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>Differential privacy on the cross-user network signal — catch fraud without centralizing or inferring any individual's raw data</div>
         </div>
-        <div style={{ marginLeft: 'auto', fontSize: 10, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap' }}>
-          <Lock size={11} /> ε-DP · held-out, leakage-free
+        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 6, fontSize: 10, color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>
+          <div style={{ width: 7, height: 7, borderRadius: '50%', background: live ? 'var(--green)' : live === false ? 'var(--yellow)' : 'var(--text-muted)' }} />
+          {live === null ? 'Connecting…' : live ? 'Live · operator /privacy/curve' : 'Demo mode · start operator for live data'}
         </div>
       </div>
 
       {/* Metric cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12 }}>
-        <MetricCard label="Non-private baseline" value="0.724" sub="Recipient-reputation AUC (no privacy)" />
-        <MetricCard label="Detection kept @ ε=1" value="91%" sub="Event-level DP — protects a transaction" accent="#818cf8" />
-        <MetricCard label="Detection kept @ ε=5" value="91%" sub="User-level DP — protects a whole user" accent="#c084fc" />
-        <MetricCard label="Data clamped (C=5)" value="1.06%" sub="Contribution bound enabling user-level DP" accent="var(--green)" />
+        <MetricCard label="Non-private baseline" value={data.baseline_auc.toFixed(3)} sub="Recipient-reputation AUC (no privacy)" />
+        <MetricCard label="Detection kept @ ε=1" value={`${eventE1}%`} sub="Event-level DP — protects a transaction" accent="#818cf8" />
+        <MetricCard label="Detection kept @ ε=5" value={`${userE5}%`} sub="User-level DP — protects a whole user" accent="#c084fc" />
+        <MetricCard label="Data clamped (C=5)" value={`${data.clamp_pct}%`} sub="Contribution bound enabling user-level DP" accent="var(--green)" />
       </div>
 
       {/* Chart + interactive panel */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: 16 }}>
 
-        {/* Trade-off curve + ε slider */}
         <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 10, padding: '16px 18px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
             <div>
@@ -88,7 +119,7 @@ export default function PrivacyLab() {
             </div>
           </div>
           <ResponsiveContainer width="100%" height={220}>
-            <LineChart data={CURVE} margin={{ top: 4, right: 8, bottom: 0, left: -22 }}>
+            <LineChart data={curve} margin={{ top: 4, right: 8, bottom: 0, left: -22 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
               <XAxis dataKey="eps" tick={{ fill: 'var(--text-muted)', fontSize: 9 }} tickLine={false} axisLine={false} />
               <YAxis domain={[0, 100]} tick={{ fill: 'var(--text-muted)', fontSize: 9 }} tickLine={false} axisLine={false} tickFormatter={v => v + '%'} />
@@ -104,7 +135,7 @@ export default function PrivacyLab() {
               <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>Privacy budget</span>
               <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text)', fontFamily: 'JetBrains Mono, monospace' }}>{sel.eps} · {sel.label} privacy</span>
             </div>
-            <input type="range" min={0} max={CURVE.length - 1} step={1} value={epsIdx} onChange={e => setEpsIdx(+e.target.value)} style={{ width: '100%', accentColor: '#818cf8', cursor: 'pointer' }} />
+            <input type="range" min={0} max={curve.length - 1} step={1} value={epsIdx} onChange={e => setEpsIdx(+e.target.value)} style={{ width: '100%', accentColor: '#818cf8', cursor: 'pointer' }} />
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginTop: 12 }}>
               <div style={{ background: 'var(--bg-elevated)', borderRadius: 8, padding: '10px 12px', textAlign: 'center' }}>
                 <div style={{ fontSize: 20, fontWeight: 800, color: '#818cf8', fontFamily: 'JetBrains Mono, monospace' }}>{sel.event}%</div>

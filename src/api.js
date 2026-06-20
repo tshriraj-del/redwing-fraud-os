@@ -55,3 +55,19 @@ export async function scoreTransactionML(tx) {
   if (!res.ok) throw new Error('Operator unreachable');
   return res.json();
 }
+
+// Differential-privacy utility curve — sourced from Operator /privacy/curve
+export async function fetchPrivacyCurve() {
+  if (!IS_LOCAL) throw new Error('Operator unreachable');
+  const res = await fetch(`${OPERATOR}/privacy/curve`, { signal: AbortSignal.timeout(2000) });
+  if (!res.ok) throw new Error('Operator unreachable');
+  return res.json();
+}
+
+// Training-serving skew analysis — sourced from Operator /observability/skew
+export async function fetchObservability() {
+  if (!IS_LOCAL) throw new Error('Operator unreachable');
+  const res = await fetch(`${OPERATOR}/observability/skew`, { signal: AbortSignal.timeout(2000) });
+  if (!res.ok) throw new Error('Operator unreachable');
+  return res.json();
+}

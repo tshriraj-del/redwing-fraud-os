@@ -136,18 +136,18 @@ export default function MLLab() {
       } catch {
         setServerOk(false);
         // Demo data when server offline
-        setMetrics({ auc_redwing: 0.9791, auc_ensemble: 0.9791, precision: 0.8840, recall: 0.8120, f1: 0.8465, fraud_rate: 0.0184, n_transactions: 880719, feature_count: 23 });
+        setMetrics({ auc_redwing: 0.969, auc_xgboost: 0.969, auc_isolation_forest: 0.898, auc_ensemble: 0.969, precision: 0.281, recall: 0.759, f1: 0.410, false_positive_rate: 0.0128, fraud_rate: 0.0065, n_transactions: 880726, feature_count: 23 });
         setFeatures([
-          { name: 'velocity_24h_raw', importance: 0.182 },
-          { name: 'amount_log',       importance: 0.164 },
-          { name: 'is_instant_rail',  importance: 0.141 },
-          { name: 'new_recipient',    importance: 0.128 },
-          { name: 'is_crypto',        importance: 0.097 },
-          { name: 'hour',             importance: 0.081 },
-          { name: 'is_p2p',           importance: 0.074 },
-          { name: 'account_age_days', importance: 0.068 },
-          { name: 'is_round_amount',  importance: 0.042 },
-          { name: 'velocity_7d',      importance: 0.023 },
+          { name: 'amount_zscore',               importance: 0.230 },
+          { name: 'preferred_rail_deviation',    importance: 0.160 },
+          { name: 'hour_risk',                   importance: 0.102 },
+          { name: 'is_round_amount',             importance: 0.071 },
+          { name: 'amount_vs_max',               importance: 0.061 },
+          { name: 'recipient_global_fraud_rate', importance: 0.059 },
+          { name: 'account_age_days',            importance: 0.053 },
+          { name: 'velocity_1h',                 importance: 0.050 },
+          { name: 'velocity_30d',                importance: 0.041 },
+          { name: 'velocity_4h',                 importance: 0.032 },
         ]);
         setDriftData(Array.from({ length: 30 }, (_, i) => ({
           day: `D-${29 - i}`,
@@ -157,9 +157,9 @@ export default function MLLab() {
         setScoreResult({
           score: 87, severity: 'Critical',
           key_signals: ['extreme velocity burst', 'micro-amount P2P pattern', 'new recipient', 'bot timing regularity'],
-          reasoning: 'RedWing score 87/100 — XGBoost: 0.88, IsoForest: 0.79. Card testing bot pattern confirmed across 28 transactions in 24h.',
+          reasoning: 'RedWing score 87/100 — retrained XGBoost: 0.91, novelty gate flagged. Card-testing bot pattern confirmed across 28 transactions in 24h.',
           recommended_action: 'Decline',
-          model_version: 'redwing-fraud-xgb-v1-v2',
+          model_version: 'v3-retrained-23f',
           source: 'ml-engine',
         });
         setTxInput('$0.97 P2P Zelle to new recipient — 28th transaction this hour, each under $1.00');
@@ -490,10 +490,10 @@ export default function MLLab() {
             {[
               { label: 'Layer 1 — Rule Engine', value: '41 rules · 6 typologies', color: 'var(--accent)' },
               { label: 'Layer 2 — XGBoost', value: metrics ? `AUC ${metrics.auc_xgboost || '—'}` : '—', color: '#818cf8' },
-              { label: 'Layer 2 — IsoForest', value: metrics ? `AUC ${metrics.auc_isolation_forest || '—'}` : '—', color: '#c084fc' },
-              { label: 'Layer 3 — Behavioral', value: '30/60/90d baselines', color: 'var(--yellow)' },
-              { label: 'Ensemble AUC', value: metrics ? metrics.auc_ensemble?.toFixed(4) ?? '—' : '—', color: 'var(--green)' },
-              { label: 'Weights', value: '40% rules · 45% ML · 15% base', color: 'var(--text-muted)' },
+              { label: 'Layer 3 — Novelty gate', value: metrics ? `AUC ${metrics.auc_isolation_forest || '—'}` : '—', color: '#c084fc' },
+              { label: 'Layer 4 — Graph / reputation', value: 'recipient DP signal', color: 'var(--yellow)' },
+              { label: 'Served AUC', value: metrics ? metrics.auc_ensemble?.toFixed(4) ?? '—' : '—', color: 'var(--green)' },
+              { label: 'Decision', value: 'XGB primary · novelty escalation', color: 'var(--text-muted)' },
               { label: 'Server', value: serverOk ? 'localhost:8000 ✓' : 'demo mode', color: serverOk ? 'var(--green)' : 'var(--yellow)' },
             ].map(row => (
               <div key={row.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 0', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>

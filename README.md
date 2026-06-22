@@ -1,4 +1,4 @@
-# RedWing — AI Fraud Prevention Platform
+# RedWing - AI Fraud Prevention Platform
 
 > A production-grade, full-stack AI fraud prevention platform. Five integrated analyst tools. One unified command center. A closed feedback loop that gets smarter with every fraud event.
 

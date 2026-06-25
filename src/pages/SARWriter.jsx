@@ -23,8 +23,8 @@ const TYPOLOGIES = [
 ]
 
 const ACTIVITY_TYPES = [
-  'BSA/Structuring', 'Fraud — ACH', 'Fraud — Card', 'Fraud — Check',
-  'Fraud — Wire', 'Identity Theft', 'Money Laundering', 'Mortgage Loan Fraud',
+  'BSA/Structuring', 'Fraud - ACH', 'Fraud - Card', 'Fraud - Check',
+  'Fraud - Wire', 'Identity Theft', 'Money Laundering', 'Mortgage Loan Fraud',
   'OFAC / Sanctions Violation', 'Securities Fraud', 'Terrorist Financing', 'Other',
 ]
 
@@ -33,7 +33,7 @@ const FILING_TYPES = ['Initial SAR', 'Continuing Activity SAR', 'Corrected SAR']
 const SYSTEM_PROMPT = `You are a senior BSA/AML compliance officer with 15+ years of experience filing Suspicious Activity Reports with FinCEN. You write SAR narratives that meet FinCEN Form 111 standards and pass regulatory examination without findings.
 
 Your narratives are:
-- Factual and chronological — no speculation, no editorialising
+- Factual and chronological - no speculation, no editorialising
 - Written in third person (e.g. "The subject" not "you" or "I")
 - Structured to answer WHO, WHAT, WHEN, WHERE, WHY and HOW explicitly
 - Compliant with FinCEN's guidance: SAR Activity Review, BSA/AML Examination Manual
@@ -63,7 +63,7 @@ RELATIONSHIP TO INSTITUTION: ${form.relationship || 'Customer'}
 SUSPICIOUS ACTIVITY TYPOLOGY: ${form.typology}
 DATE RANGE OF SUSPICIOUS ACTIVITY: ${form.dateFrom} to ${form.dateTo}
 TOTAL SUSPICIOUS AMOUNT: $${form.totalAmount || '0'}
-PRIOR SAR FILED: ${form.priorSAR ? 'Yes — ' + form.priorSAR : 'No'}
+PRIOR SAR FILED: ${form.priorSAR ? 'Yes - ' + form.priorSAR : 'No'}
 ACTIONS TAKEN: ${form.actionsTaken || 'Account under review'}
 CASE NOTES FROM ANALYST: ${form.caseNotes}
 ${form.transactions ? `\nRAW TRANSACTION DATA:\n${form.transactions}` : ''}
@@ -95,7 +95,7 @@ Return this exact JSON structure:
 }
 
 const DEMO_SAR_RESULT = {
-  narrative: `On or about March 14, 2026, the subject, John R. Mercer (DOB: 1988-07-22), initiated a series of wire transfers totaling $47,500 from account ending in 4821 held at First Federal Bank, NA. The subject's account, opened in January 2026, exhibited no prior wire transfer activity. The institution's transaction monitoring system generated alerts on March 14, 15, and 16, 2026 for structuring and unusual wire activity.\n\nThe suspicious activity consists of seven wire transfers ranging from $5,200 to $8,900, each executed within a 72-hour window to four separate overseas beneficiary accounts located in Cyprus (×2), Singapore (×1), and the United Arab Emirates (×1). None of the beneficiary accounts had any prior relationship with the subject or with First Federal Bank, NA. Enhanced due diligence (EDD) conducted on March 17, 2026 revealed that the subject had received three ACH credits totaling $51,400 from a U.S.-based LLC incorporated 11 days prior to the credits, whose beneficial ownership could not be verified through standard KYC procedures.\n\nThe transaction pattern — rapid layering through multiple jurisdictions with a newly-incorporated domestic source entity and first-time overseas beneficiaries — is consistent with money laundering typologies described in FinCEN SAR Activity Review Issue 22. The subject declined to provide documentation supporting the business purpose of the transfers when contacted by the institution's fraud operations team on March 17, 2026.\n\nFirst Federal Bank, NA has placed a hold on the subject's account pending further review. All wire transfer capabilities have been suspended. The matter has been escalated to the institution's Chief Compliance Officer and external legal counsel. No prior SARs have been filed on this subject. This SAR is filed within the 30-day reporting requirement (activity detected March 14, 2026; SAR filed March 31, 2026).`,
+  narrative: `On or about March 14, 2026, the subject, John R. Mercer (DOB: 1988-07-22), initiated a series of wire transfers totaling $47,500 from account ending in 4821 held at First Federal Bank, NA. The subject's account, opened in January 2026, exhibited no prior wire transfer activity. The institution's transaction monitoring system generated alerts on March 14, 15, and 16, 2026 for structuring and unusual wire activity.\n\nThe suspicious activity consists of seven wire transfers ranging from $5,200 to $8,900, each executed within a 72-hour window to four separate overseas beneficiary accounts located in Cyprus (×2), Singapore (×1), and the United Arab Emirates (×1). None of the beneficiary accounts had any prior relationship with the subject or with First Federal Bank, NA. Enhanced due diligence (EDD) conducted on March 17, 2026 revealed that the subject had received three ACH credits totaling $51,400 from a U.S.-based LLC incorporated 11 days prior to the credits, whose beneficial ownership could not be verified through standard KYC procedures.\n\nThe transaction pattern - rapid layering through multiple jurisdictions with a newly-incorporated domestic source entity and first-time overseas beneficiaries - is consistent with money laundering typologies described in FinCEN SAR Activity Review Issue 22. The subject declined to provide documentation supporting the business purpose of the transfers when contacted by the institution's fraud operations team on March 17, 2026.\n\nFirst Federal Bank, NA has placed a hold on the subject's account pending further review. All wire transfer capabilities have been suspended. The matter has been escalated to the institution's Chief Compliance Officer and external legal counsel. No prior SARs have been filed on this subject. This SAR is filed within the 30-day reporting requirement (activity detected March 14, 2026; SAR filed March 31, 2026).`,
   form_fields: {
     activity_type: 'Money Laundering',
     instrument_type: 'Wire Transfer',
@@ -247,7 +247,7 @@ export default function SARWriter() {
           </FormCard>
 
           <FormCard title="Case Details">
-            <FormRow label="Case Notes *" hint="Describe the suspicious activity — what happened, what triggered the review, what's anomalous">
+            <FormRow label="Case Notes *" hint="Describe the suspicious activity - what happened, what triggered the review, what's anomalous">
               <textarea
                 placeholder="e.g. Customer made 9 cash deposits of $9,800 each over 12 days across 3 branches, totalling $88,200. Amounts consistently just below the $10,000 CTR threshold..."
                 value={form.caseNotes}
@@ -255,7 +255,7 @@ export default function SARWriter() {
                 style={{ width: '100%', padding: '9px 12px', minHeight: 110, resize: 'vertical', lineHeight: 1.6 }}
               />
             </FormRow>
-            <FormRow label="Raw Transaction Data" hint="Optional — paste CSV, JSON, or plain text">
+            <FormRow label="Raw Transaction Data" hint="Optional - paste CSV, JSON, or plain text">
               <textarea
                 placeholder="date,amount,type,account&#10;2024-01-03,$9800,cash deposit,****4821"
                 value={form.transactions}
@@ -320,7 +320,7 @@ export default function SARWriter() {
               }}>
                 <CheckCircle size={14} color={allChecks ? 'var(--green)' : 'var(--accent)'} />
                 <span style={{ fontSize: 13, color: allChecks ? 'var(--green)' : 'var(--accent)', fontWeight: 600 }}>
-                  {allChecks ? 'All five Ws present — narrative is FinCEN-compliant' : 'Some five-W elements need attention — see Compliance Check tab'}
+                  {allChecks ? 'All five Ws present - narrative is FinCEN-compliant' : 'Some five-W elements need attention - see Compliance Check tab'}
                 </span>
               </div>
 
@@ -418,12 +418,12 @@ export default function SARWriter() {
                       </div>
                       <div>
                         <div style={{ fontSize: 13, fontWeight: 600, color: val.present ? 'var(--green)' : 'var(--red)', marginBottom: 3 }}>
-                          {key === 'who' ? 'WHO — Subject identification' :
-                           key === 'what' ? 'WHAT — Activity description' :
-                           key === 'when' ? 'WHEN — Dates and timeline' :
-                           key === 'where' ? 'WHERE — Accounts and jurisdiction' :
-                           key === 'why' ? 'WHY — Basis for suspicion' :
-                           'HOW — Methodology and scheme'}
+                          {key === 'who' ? 'WHO - Subject identification' :
+                           key === 'what' ? 'WHAT - Activity description' :
+                           key === 'when' ? 'WHEN - Dates and timeline' :
+                           key === 'where' ? 'WHERE - Accounts and jurisdiction' :
+                           key === 'why' ? 'WHY - Basis for suspicion' :
+                           'HOW - Methodology and scheme'}
                         </div>
                         <div style={{ fontSize: 12, color: 'var(--text-muted)', lineHeight: 1.6 }}>{val.note}</div>
                       </div>

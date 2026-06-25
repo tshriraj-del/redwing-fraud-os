@@ -19,7 +19,9 @@ const GROUPS = [
   },
 ];
 
+import { FileSearch } from 'lucide-react';
 import { PANEL_ANIM, BORDER_ANIM } from '../constants.js';
+import PanelHead from './PanelHead.jsx';
 
 export default function EvidenceBasisPanel({ factAssessment = {}, order = 6 }) {
   return (
@@ -29,9 +31,7 @@ export default function EvidenceBasisPanel({ factAssessment = {}, order = 6 }) {
     >
       <span className={`edge ${BORDER_ANIM[order]} bg-[color:var(--accent-green)]`} />
 
-      <h3 className="panel-label mb-4 text-[12px] text-[color:var(--text-secondary)]">
-        Evidence Basis
-      </h3>
+      <PanelHead icon={FileSearch} title="Evidence Basis" accent="var(--accent-green)" />
 
       <div className="space-y-4">
         {GROUPS.map(({ key, label, note, color }) => {
@@ -47,7 +47,7 @@ export default function EvidenceBasisPanel({ factAssessment = {}, order = 6 }) {
                 </span>
               </div>
               {items.length === 0 ? (
-                <p className="mt-1 font-mono text-[11px] text-[color:var(--text-dim)]">—</p>
+                <p className="mt-1 font-mono text-[11px] text-[color:var(--text-dim)]">-</p>
               ) : (
                 <ul className="mt-1.5 space-y-1">
                   {items.map((it, i) => (

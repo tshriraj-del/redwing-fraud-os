@@ -5,8 +5,10 @@ import {
   EXAMPLE_CASES,
   MIN_INPUT_LENGTH,
 } from '../constants.js';
+import { Search } from 'lucide-react';
 import { ACCEPT_ATTR, MAX_FILES, prettySize } from '../files.js';
 import { PaperclipIcon, CloseIcon, FileIcon, ImageIcon } from './Icons.jsx';
+import PanelHead from './PanelHead.jsx';
 
 export default function InputSection({
   caseText,
@@ -45,14 +47,9 @@ export default function InputSection({
       className="panel mx-auto max-w-[720px] p-5 sm:p-7"
       aria-label="Case input"
     >
-      {/* 2px cyan top accent */}
-      <span className="absolute inset-x-0 top-0 h-0.5 bg-[color:var(--accent-cyan)]" />
+      <PanelHead icon={Search} title="Investigate a Case" accent="var(--accent-cyan)" />
 
-      <h2 className="panel-label mb-4 flex items-center gap-2 text-[11px] text-[color:var(--text-secondary)]">
-        <span className="text-[color:var(--accent-cyan)]">▸</span> Investigate a case
-      </h2>
-
-      {/* Case type — segmented pill buttons */}
+      {/* Case type - segmented pill buttons */}
       <div className="mb-4">
         <div className="mb-2 font-mono text-[10px] uppercase tracking-[0.12em] text-[color:var(--text-dim)]">
           Case type
@@ -103,14 +100,14 @@ export default function InputSection({
       <div className="mt-1.5 font-mono text-[10px] uppercase tracking-[0.08em]">
         {trimmedLen > 0 && tooShort ? (
           <span className="text-[color:var(--accent-amber)]">
-            {trimmedLen}/{MIN_INPUT_LENGTH} — need more detail
+            {trimmedLen}/{MIN_INPUT_LENGTH} - need more detail
           </span>
         ) : (
           <span className="text-[color:var(--text-dim)]">{trimmedLen} chars</span>
         )}
       </div>
 
-      {/* Attachments — drop zone + picker */}
+      {/* Attachments - drop zone + picker */}
       <div className="mt-4">
         <div className="mb-2 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.12em] text-[color:var(--text-dim)]">
           <span>Evidence files (optional)</span>
@@ -151,7 +148,7 @@ export default function InputSection({
             Drop files or click to attach
           </span>
           <span className="font-mono text-[10px] tracking-[0.04em] text-[color:var(--text-dim)]">
-            TXT · CSV · JSON · LOG · PNG · JPG · PDF — max 8MB each
+            TXT · CSV · JSON · LOG · PNG · JPG · PDF - max 8MB each
           </span>
         </button>
 
@@ -187,7 +184,7 @@ export default function InputSection({
         )}
       </div>
 
-      {/* Optional context — toggle chips */}
+      {/* Optional context - toggle chips */}
       <div className="mt-4">
         <div className="mb-2 font-mono text-[10px] uppercase tracking-[0.12em] text-[color:var(--text-dim)]">
           Add context (optional)
@@ -229,7 +226,7 @@ export default function InputSection({
         type="button"
         onClick={onInvestigate}
         disabled={!canSubmit}
-        className={`mt-5 flex h-12 w-full items-center justify-center gap-2 rounded-lg border font-display text-[13px] uppercase tracking-[0.1em] transition-all duration-150 disabled:opacity-40 ${
+        className={`mt-5 flex h-12 w-full items-center justify-center gap-2 rounded-lg border text-[13px] font-semibold transition-all duration-150 disabled:opacity-40 ${
           loading ? 'animate-border-pulse' : ''
         }`}
         style={{

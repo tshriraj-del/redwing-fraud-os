@@ -1,4 +1,4 @@
-// RedWing — LLM + operator API layer.
+// RedWing - LLM + operator API layer.
 // All ML scoring goes through the Operator (port 8000).
 
 import { callLLM, streamLLM } from './llm-provider.js';
@@ -21,7 +21,7 @@ export async function callOnce({ systemPrompt, userMessage, maxTokens = 1024 }) 
   });
 }
 
-// ML metrics — sourced from Operator /health (port 8000)
+// ML metrics - sourced from Operator /health (port 8000)
 export async function fetchMLMetrics() {
   if (!IS_LOCAL) throw new Error('Operator unreachable');
   const res = await fetch(`${OPERATOR}/health`, { signal: AbortSignal.timeout(2000) });
@@ -56,7 +56,7 @@ export async function scoreTransactionML(tx) {
   return res.json();
 }
 
-// Differential-privacy utility curve — sourced from Operator /privacy/curve
+// Differential-privacy utility curve - sourced from Operator /privacy/curve
 export async function fetchPrivacyCurve() {
   if (!IS_LOCAL) throw new Error('Operator unreachable');
   const res = await fetch(`${OPERATOR}/privacy/curve`, { signal: AbortSignal.timeout(2000) });
@@ -64,10 +64,74 @@ export async function fetchPrivacyCurve() {
   return res.json();
 }
 
-// Training-serving skew analysis — sourced from Operator /observability/skew
+// Training-serving skew analysis - sourced from Operator /observability/skew
 export async function fetchObservability() {
   if (!IS_LOCAL) throw new Error('Operator unreachable');
   const res = await fetch(`${OPERATOR}/observability/skew`, { signal: AbortSignal.timeout(2000) });
+  if (!res.ok) throw new Error('Operator unreachable');
+  return res.json();
+}
+
+// Investigator case file - sourced from Operator /case/{transaction_id}
+export async function fetchCase(transactionId) {
+  if (!IS_LOCAL) throw new Error('Operator unreachable');
+  const res = await fetch(`${OPERATOR}/case/${encodeURIComponent(transactionId)}`, { signal: AbortSignal.timeout(4000) });
+  if (!res.ok) throw new Error('Operator unreachable');
+  return res.json();
+}
+
+// Real fraud transaction IDs to seed the investigator queue - from Operator /alerts
+export async function fetchAlertQueue(limit = 12) {
+  if (!IS_LOCAL) throw new Error('Operator unreachable');
+  const res = await fetch(`${OPERATOR}/alerts?limit=${limit}`, { signal: AbortSignal.timeout(4000) });
+  if (!res.ok) throw new Error('Operator unreachable');
+  return res.json();
+}
+
+// Real-data model validation report (ULB card fraud) - from Operator /payment/meta
+export async function fetchPaymentMeta() {
+  if (!IS_LOCAL) throw new Error('Operator unreachable');
+  const res = await fetch(`${OPERATOR}/payment/meta`, { signal: AbortSignal.timeout(4000) });
+  if (!res.ok) throw new Error('Operator unreachable');
+  return res.json();
+}
+
+// Live inference through the real-data model - from Operator /score/payment
+export async function scorePayment(features) {
+  if (!IS_LOCAL) throw new Error('Operator unreachable');
+  const res = await fetch(`${OPERATOR}/score/payment`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ features }), signal: AbortSignal.timeout(4000),
+  });
+  if (!res.ok) throw new Error('Operator unreachable');
+  return res.json();
+}
+
+// Agent-evaluation environment - spec + episode runner (Operator /env/*)
+export async function fetchEnvSpec() {
+  if (!IS_LOCAL) throw new Error('Operator unreachable');
+  const res = await fetch(`${OPERATOR}/env/spec`, { signal: AbortSignal.timeout(4000) });
+  if (!res.ok) throw new Error('Operator unreachable');
+  return res.json();
+}
+
+export async function runEnvAll(transactionId) {
+  if (!IS_LOCAL) throw new Error('Operator unreachable');
+  const res = await fetch(`${OPERATOR}/env/run-all`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ transaction_id: transactionId }), signal: AbortSignal.timeout(6000),
+  });
+  if (!res.ok) throw new Error('Operator unreachable');
+  return res.json();
+}
+
+// Adversary simulator - cheap-vs-costly evasion sweep (Operator /adversary/simulate)
+export async function simulateAdversary(transactionId) {
+  if (!IS_LOCAL) throw new Error('Operator unreachable');
+  const res = await fetch(`${OPERATOR}/adversary/simulate`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ transaction_id: transactionId }), signal: AbortSignal.timeout(8000),
+  });
   if (!res.ok) throw new Error('Operator unreachable');
   return res.json();
 }

@@ -17,6 +17,10 @@ const XAILab          = lazy(() => import('./pages/XAILab.jsx'));
 const SyntheticID     = lazy(() => import('./pages/SyntheticID.jsx'));
 const PrivacyLab      = lazy(() => import('./pages/PrivacyLab.jsx'));
 const Observability   = lazy(() => import('./pages/Observability.jsx'));
+const Investigator    = lazy(() => import('./pages/InvestigatorPanel.jsx'));
+const RealModel       = lazy(() => import('./pages/RealModel.jsx'));
+const AgentEnv        = lazy(() => import('./pages/AgentEnv.jsx'));
+const Adversary       = lazy(() => import('./pages/Adversary.jsx'));
 
 function PageLoader() {
   return (
@@ -38,7 +42,11 @@ export default function App() {
               <Route path="/"            element={<Dashboard />} />
               <Route path="/intel"       element={<AgentChat />} />
               <Route path="/ml"          element={<MLLab />} />
+              <Route path="/real-model"  element={<RealModel />} />
               <Route path="/operator"    element={<Operator />} />
+              <Route path="/investigate" element={<Investigator />} />
+              <Route path="/agent-env"   element={<AgentEnv />} />
+              <Route path="/adversary"   element={<Adversary />} />
               <Route path="/systems"     element={<Systems />} />
               <Route path="/rules"       element={<RuleFactory />} />
               <Route path="/network"     element={<Network />} />

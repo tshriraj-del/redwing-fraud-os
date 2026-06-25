@@ -1,7 +1,7 @@
 import { NavLink } from 'react-router-dom';
 import {
   LayoutDashboard, MessageSquare, FlaskConical,
-  ChevronLeft, ChevronRight, Zap, Radar, Sparkles, GitFork, Code2, Bot, ShieldCheck, Gauge,
+  ChevronLeft, ChevronRight, Zap, Radar, Sparkles, GitFork, Code2, Bot, ShieldCheck, Gauge, ShieldAlert, Database, Boxes, Swords,
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -9,10 +9,14 @@ const NAV = [
   { to: '/',          icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/intel',     icon: MessageSquare,   label: 'Fraud Intelligence' },
   { to: '/ml',        icon: FlaskConical,    label: 'ML Detection Lab' },
-  { to: '/privacy',   icon: ShieldCheck,     label: 'Privacy Lab',       badge: 'NEW' },
-  { to: '/observability', icon: Gauge,       label: 'Observability',     badge: 'NEW' },
-  { to: '/operator',  icon: Radar,           label: 'Operator',          badge: 'LIVE' },
+  { to: '/real-model', icon: Database,       label: 'Real-Data Model' },
+  { to: '/privacy',   icon: ShieldCheck,     label: 'Privacy Lab' },
+  { to: '/observability', icon: Gauge,       label: 'Observability' },
+  { to: '/operator',  icon: Radar,           label: 'Operator' },
+  { to: '/investigate', icon: ShieldAlert,   label: 'Investigator' },
+  { to: '/agent-env',  icon: Boxes,          label: 'Agent Environment' },
   { to: '/rules',     icon: Sparkles,        label: 'Rule Factory',      badge: 'AI' },
+  { to: '/adversary', icon: Swords,          label: 'Adversary Simulator' },
   { to: '/network',   icon: GitFork,         label: 'Network Intel' },
   { to: '/syntheticid',icon: Bot,            label: 'SyntheticID Agent', badge: 'AI' },
 ];
@@ -96,7 +100,7 @@ export default function Sidebar() {
         ))}
       </nav>
 
-      {/* Developer link — separated at bottom */}
+      {/* Developer link - separated at bottom */}
       <div style={{ padding: '6px 6px 4px', borderTop: '1px solid var(--border)' }}>
         <NavLink
           to="/systems"

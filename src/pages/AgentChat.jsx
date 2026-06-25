@@ -6,22 +6,70 @@ import { streamMessage } from '../api.js';
 const BACKEND  = 'http://localhost:8000';
 const IS_LOCAL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
+// Pull the live data every specialist worker needs to do its job, in parallel.
+// Each worker reads the slice relevant to its role from this shared system state.
 async function fetchLiveContext() {
+  // 5s budget: /rule-factory/gaps and /network/typologies compute over the dataset
+  // (~2s each) and were being dropped at a tighter timeout, starving two workers.
+  const get = (path) => fetch(`${BACKEND}${path}`, { signal: AbortSignal.timeout(5000) })
+    .then(r => (r.ok ? r.json() : null)).catch(() => null);
   try {
-    const [health, gaps] = await Promise.all([
-      fetch(`${BACKEND}/health`, { signal: AbortSignal.timeout(2000) }).then(r => r.json()).catch(() => null),
-      fetch(`${BACKEND}/rule-factory/gaps`, { signal: AbortSignal.timeout(2000) }).then(r => r.json()).catch(() => null),
+    const [health, gaps, drift, payment, graph, alerts, agentCfg, typologies] = await Promise.all([
+      get('/health'),                 // ml_monitor, risk_strategist
+      get('/rule-factory/gaps'),      // rule_engineer, threat
+      get('/drift/status'),           // ml_monitor
+      get('/payment/meta'),           // ml_monitor (real-data model)
+      get('/graph/stats'),            // network_analyst
+      get('/alerts?limit=20'),        // case_analyst
+      get('/agent/config'),           // risk_strategist
+      get('/network/typologies'),     // threat, network_analyst
     ]);
-    const lines = ['Current RedWing system state (injected at session start):'];
-    if (health) {
-      lines.push(`- Model AUC: ${health.model_metrics?.auc_ensemble ?? '—'} | Fraud rate: ${health.model_metrics?.fraud_rate ? (health.model_metrics.fraud_rate * 100).toFixed(2) + '%' : '—'}`);
-      lines.push(`- Transactions in dataset: ${health.model_metrics?.n_transactions?.toLocaleString() ?? '—'}`);
-      lines.push(`- Active features: ${health.features?.length ?? '—'}`);
+
+    const L = ['Live RedWing system state (injected at session start - ground every answer in this):'];
+
+    // Model health + real-data validation (ml_monitor)
+    if (health?.model_metrics) {
+      const m = health.model_metrics;
+      L.push(`MODEL HEALTH: synthetic ensemble AUC ${m.auc_ensemble ?? '-'}, fraud rate ${m.fraud_rate ? (m.fraud_rate * 100).toFixed(2) + '%' : '-'}, ${m.n_transactions?.toLocaleString() ?? '-'} transactions, ${health.features?.length ?? '-'} features.`);
     }
+    if (payment?.metrics) {
+      const p = payment.metrics;
+      L.push(`REAL-DATA MODEL (ULB card fraud, out-of-sample): PR-AUC ${p.pr_auc}, precision ${p.precision}, recall ${p.recall} at a ${(p.base_rate * 100).toFixed(2)}% base rate (ROC-AUC ${p.roc_auc} is misleading here).`);
+    }
+    if (drift) {
+      L.push(`DRIFT: state ${drift.state ?? '-'}, score-PSI ${drift.score_psi ?? '-'} over ${drift.samples ?? 0} samples${drift.drift_events?.length ? `, ${drift.drift_events.length} drift events` : ', no drift events'}.`);
+    }
+
+    // Rules (rule_engineer)
     if (gaps) {
-      lines.push(`- Rule gaps detected: ${gaps.count ?? 0} (ML catches, rules miss)`);
+      const top = (gaps.gaps || gaps.items || [])[0];
+      L.push(`RULE GAPS: ${gaps.count ?? (gaps.gaps?.length) ?? 0} where ML catches but rules miss${top ? `; top gap "${top.typology || top.name || top.pattern}" score ${top.gap_score ?? top.score ?? '-'}` : ''}.`);
     }
-    return lines.join('\n');
+
+    // Network / rings (network_analyst)
+    if (graph) {
+      L.push(`NETWORK: ${graph.entities?.toLocaleString() ?? graph.nodes ?? '-'} entities indexed${graph.high_risk != null ? `, ${graph.high_risk} high-risk` : ''}${graph.rings != null ? `, ${graph.rings} rings flagged` : ''}.`);
+    }
+
+    // Typologies tracked (threat, network_analyst)
+    if (Array.isArray(typologies) && typologies.length) {
+      const t = typologies.slice(0, 8).map(x => typeof x === 'string' ? x : (x.typology || x.name)).join(', ');
+      L.push(`TYPOLOGIES TRACKED: ${t}.`);
+    }
+
+    // Cases / alerts (case_analyst)
+    if (Array.isArray(alerts) && alerts.length) {
+      const top = alerts[0];
+      const avg = (alerts.reduce((a, e) => a + (e.combined_score || 0), 0) / alerts.length);
+      L.push(`OPEN ALERTS: ${alerts.length} in queue, avg score ${(avg * 100).toFixed(0)}; top ${top.transaction_id} at ${(top.combined_score * 100).toFixed(0)} (${top.top_pattern || 'ML risk'}).`);
+    }
+
+    // Thresholds / policy (risk_strategist)
+    if (agentCfg) {
+      L.push(`AGENT POLICY: block ≥ ${agentCfg.block_threshold ?? '-'}, flag ≥ ${agentCfg.flag_threshold ?? '-'}${agentCfg.per_threat ? `, ${Object.keys(agentCfg.per_threat).length} per-threat overrides` : ''}.`);
+    }
+
+    return L.length > 1 ? L.join('\n') : '';
   } catch {
     return '';
   }
@@ -165,9 +213,9 @@ export default function AgentChat() {
       .catch(() => {
         setMessages([
           { id: 1, role: 'user', content: 'Why are there 14 rule gaps and what patterns is SyntheticID Agent exposing?' },
-          { id: 2, role: 'assistant', worker: 'rule_engineer', streaming: false, content: `## Rule Gap Analysis — 14 Open Gaps\n\nThe 14 gaps reflect ML catching fraud that the rule engine hasn't codified yet. Here's what's happening:\n\n**Highest-priority gaps:**\n\n- **Card testing bot on P2P rails** (gap score 0.84) — Micro-amounts ($0.50–$1.99) on Zelle/Venmo slip through velocity rules because most rules trigger at $2.00+. SyntheticID Agent has been capturing 28 micro-transactions per hour from the same device; rules see nothing.\n\n- **Headless ATO on wire** (gap score 0.71) — Bot-driven account takeovers initiating wire transfers pass device checks because the device fingerprint is consistent — it's a headless browser reusing stolen session tokens.\n\n- **Deepfake KYC bypass** (gap score 0.67) — No rule exists for the pattern: high-value wire + new recipient + ML score > 0.80 + no headless signal. These are deepfake social engineering cases (victim-authorized) that rules can't fingerprint.\n\n**What Rule Factory should do next:**\n\nRun the pipeline — it will synthesize rules from SyntheticID's novel buffer. The \`CARD_TEST_MICRO_VELOCITY_P2P\` candidate is already in shadow mode with 84% precision. Deploy it.\n\nThe closed feedback loop: **SyntheticID detects → Rule Factory codifies → Agent's operating surface tightens → Agent finds the next gap**. That's how the system self-improves.` },
+          { id: 2, role: 'assistant', worker: 'rule_engineer', streaming: false, content: `## Rule Gap Analysis - 14 Open Gaps\n\nThe 14 gaps reflect ML catching fraud that the rule engine hasn't codified yet. Here's what's happening:\n\n**Highest-priority gaps:**\n\n- **Card testing bot on P2P rails** (gap score 0.84) - Micro-amounts ($0.50–$1.99) on Zelle/Venmo slip through velocity rules because most rules trigger at $2.00+. SyntheticID Agent has been capturing 28 micro-transactions per hour from the same device; rules see nothing.\n\n- **Headless ATO on wire** (gap score 0.71) - Bot-driven account takeovers initiating wire transfers pass device checks because the device fingerprint is consistent - it's a headless browser reusing stolen session tokens.\n\n- **Deepfake KYC bypass** (gap score 0.67) - No rule exists for the pattern: high-value wire + new recipient + ML score > 0.80 + no headless signal. These are deepfake social engineering cases (victim-authorized) that rules can't fingerprint.\n\n**What Rule Factory should do next:**\n\nRun the pipeline - it will synthesize rules from SyntheticID's novel buffer. The \`CARD_TEST_MICRO_VELOCITY_P2P\` candidate is already in shadow mode with 84% precision. Deploy it.\n\nThe closed feedback loop: **SyntheticID detects → Rule Factory codifies → Agent's operating surface tightens → Agent finds the next gap**. That's how the system self-improves.` },
           { id: 3, role: 'user', content: 'What should I do about the deepfake bypass gap specifically?' },
-          { id: 4, role: 'assistant', worker: 'threat', streaming: false, content: `## Deepfake Bypass — Threat Deep-Dive\n\nThis is the hardest gap to close because deepfake cases are **victim-authorized** — the customer genuinely believes they're sending to a legitimate payee. Rules struggle because there's no bot signal.\n\n**Attack playbook:**\n1. Adversary creates a convincing deepfake video call posing as bank/investment advisor\n2. Victim authorizes a large wire to a mule account ("investment opportunity")\n3. Transaction looks legitimate: real customer, known device, correct biometrics\n4. ML catches it: amount + new recipient + no headless signal + score > 0.70\n\n**Rule Factory candidate (\`DEEPFAKE_HIGH_VALUE_NEW_RECIP\`):**\n\`\`\`python\ndef rule(tx):\n    return (\n        tx["amount"] > 5000 and\n        tx["new_recipient"] and\n        not tx["is_headless_browser"] and\n        tx["ml_score"] > 0.70\n    )\n\`\`\`\n\nThis is in shadow mode — 78% precision. **Don't auto-deploy yet.** The 22% false positive rate will hit legitimate large transfers to new payees (real estate, major purchases).\n\n**Recommended action:** Deploy with a **step-up friction** trigger (callback confirmation for transactions > $5K to new recipients) rather than a hard block. This catches deepfake cases without blocking legitimate transfers.` },
+          { id: 4, role: 'assistant', worker: 'threat', streaming: false, content: `## Deepfake Bypass - Threat Deep-Dive\n\nThis is the hardest gap to close because deepfake cases are **victim-authorized** - the customer genuinely believes they're sending to a legitimate payee. Rules struggle because there's no bot signal.\n\n**Attack playbook:**\n1. Adversary creates a convincing deepfake video call posing as bank/investment advisor\n2. Victim authorizes a large wire to a mule account ("investment opportunity")\n3. Transaction looks legitimate: real customer, known device, correct biometrics\n4. ML catches it: amount + new recipient + no headless signal + score > 0.70\n\n**Rule Factory candidate (\`DEEPFAKE_HIGH_VALUE_NEW_RECIP\`):**\n\`\`\`python\ndef rule(tx):\n    return (\n        tx["amount"] > 5000 and\n        tx["new_recipient"] and\n        not tx["is_headless_browser"] and\n        tx["ml_score"] > 0.70\n    )\n\`\`\`\n\nThis is in shadow mode - 78% precision. **Don't auto-deploy yet.** The 22% false positive rate will hit legitimate large transfers to new payees (real estate, major purchases).\n\n**Recommended action:** Deploy with a **step-up friction** trigger (callback confirmation for transactions > $5K to new recipients) rather than a hard block. This catches deepfake cases without blocking legitimate transfers.` },
         ]);
       });
   }, []);
@@ -388,7 +436,7 @@ export default function AgentChat() {
           }}>
             <div style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--yellow)', flexShrink: 0 }} />
             <span style={{ fontSize: 11, color: 'var(--yellow)', fontWeight: 500 }}>
-              Demo mode — live AI responses require the operator backend running locally with <code style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10 }}>LLM_API_KEY</code> set
+              Demo mode - live AI responses require the operator backend running locally with <code style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 10 }}>LLM_API_KEY</code> set
             </span>
           </div>
         )}
@@ -413,7 +461,7 @@ export default function AgentChat() {
               if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
             }}
             readOnly={!IS_LOCAL}
-            placeholder={IS_LOCAL ? 'Ask RedWing Intelligence… (Shift+Enter for new line)' : 'Live AI unavailable in demo — run operator locally to enable'}
+            placeholder={IS_LOCAL ? 'Ask RedWing Intelligence… (Shift+Enter for new line)' : 'Live AI unavailable in demo - run operator locally to enable'}
             rows={1}
             style={{
               flex: 1,

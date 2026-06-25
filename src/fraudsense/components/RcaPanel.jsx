@@ -1,4 +1,6 @@
+import { GitBranch } from 'lucide-react';
 import { PANEL_ANIM, BORDER_ANIM } from '../constants.js';
+import PanelHead from './PanelHead.jsx';
 
 const SECTIONS = [
   { key: 'attack_narrative', label: 'Attack Narrative', accent: null },
@@ -15,9 +17,7 @@ export default function RcaPanel({ rca = {}, order = 5 }) {
     >
       <span className={`edge ${BORDER_ANIM[order]} bg-[color:var(--accent-cyan)]`} />
 
-      <h3 className="panel-label mb-3 text-[12px] text-[color:var(--text-secondary)]">
-        Root Cause Analysis
-      </h3>
+      <PanelHead icon={GitBranch} title="Root Cause Analysis" accent="var(--accent-cyan)" />
 
       <div className="divide-y divide-[color:var(--border)]">
         {SECTIONS.map(({ key, label, accent }) => (
@@ -27,13 +27,13 @@ export default function RcaPanel({ rca = {}, order = 5 }) {
             style={accent ? { borderLeft: `2px solid ${accent}`, paddingLeft: '12px', marginLeft: '-2px' } : undefined}
           >
             <h4
-              className="font-display mb-1.5 text-[10px] uppercase tracking-[0.12em]"
+              className="mb-1.5 text-[10px] font-semibold uppercase tracking-[0.05em]"
               style={{ color: accent ?? 'var(--text-dim)' }}
             >
               {label}
             </h4>
             <p className="font-mono text-[12px] leading-[1.7] text-[color:var(--text-secondary)]">
-              {rca[key] ?? '—'}
+              {rca[key] ?? '-'}
             </p>
           </div>
         ))}

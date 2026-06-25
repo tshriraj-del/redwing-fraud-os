@@ -86,8 +86,8 @@ const DEMO_RULES = {
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-function pct(v) { return v != null ? `${(v * 100).toFixed(1)}%` : '—'; }
-function num(v)  { return v != null ? v.toLocaleString() : '—'; }
+function pct(v) { return v != null ? `${(v * 100).toFixed(1)}%` : '-'; }
+function num(v)  { return v != null ? v.toLocaleString() : '-'; }
 
 function scoreColor(p) {
   if (p >= 0.78) return 'var(--green)';
@@ -160,7 +160,7 @@ function GapCard({ gap }) {
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2 }}>
           <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--text)', fontFamily: 'JetBrains Mono, monospace' }}>
-            {gap.transaction_id || '—'}
+            {gap.transaction_id || '-'}
           </span>
           <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>
             ${Number(gap.amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}
@@ -442,7 +442,7 @@ export default function RuleFactory() {
         <div style={{ width: 1, height: 16, background: 'var(--border)' }} />
 
         <MiniStat label="Rule Gaps" value={gapCount} color={gapCount > 0 ? 'var(--yellow)' : 'var(--text-muted)'} />
-        <MiniStat label="Generated" value={rules?.total ?? '—'} />
+        <MiniStat label="Generated" value={rules?.total ?? '-'} />
         <MiniStat label="Deployed"  value={deployed} color={deployed > 0 ? 'var(--green)' : undefined} />
         <MiniStat label="Shadow"    value={shadow}   color={shadow > 0 ? 'var(--yellow)' : undefined} />
 
@@ -520,14 +520,14 @@ export default function RuleFactory() {
           <div style={{ flex: 1, overflowY: 'auto' }}>
             {!IS_LOCAL && (
               <div style={{ padding: '10px 14px 4px', fontSize: 10, color: 'var(--text-muted)', fontStyle: 'italic' }}>
-                Sample gaps — run operator locally for live data
+                Sample gaps - run operator locally for live data
               </div>
             )}
             {gapData?.sample?.length > 0
               ? gapData.sample.map((g, i) => <GapCard key={i} gap={g} />)
               : backendOnline && gapData && (
                 <div style={{ padding: 20, textAlign: 'center', fontSize: 11, color: 'var(--green)' }}>
-                  ✓ No rule gaps — full coverage
+                  ✓ No rule gaps - full coverage
                 </div>
               )}
           </div>
@@ -540,7 +540,7 @@ export default function RuleFactory() {
               Generated Rules
             </div>
             <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>
-              AI-generated rules — each backtested before deploy. Shadow mode monitors without blocking.
+              AI-generated rules - each backtested before deploy. Shadow mode monitors without blocking.
             </div>
           </div>
 

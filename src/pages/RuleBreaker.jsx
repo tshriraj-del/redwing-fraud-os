@@ -65,7 +65,7 @@ export default function RuleBreaker() {
 
   const handleSubmit = async () => {
     if (rule.trim().length < 15) {
-      setValidationError('Please provide more detail — at least 15 characters.');
+      setValidationError('Please provide more detail - at least 15 characters.');
       return;
     }
     setValidationError('');

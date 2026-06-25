@@ -7,7 +7,7 @@ import { fetchPrivacyCurve } from '../api.js';
 
 const LABELS = { '0.1': 'very strong', '0.5': 'strong', '1': 'moderate', '2': 'light', '5': 'minimal' };
 
-// Fallback (demo mode — Vercel can't reach the local operator). Mirrors the
+// Fallback (demo mode - Vercel can't reach the local operator). Mirrors the
 // measured values served live by GET /privacy/curve (redwing-ml/privacy_layer.py).
 const FALLBACK = {
   baseline_auc: 0.724, clamp_pct: 1.06,
@@ -85,7 +85,7 @@ export default function PrivacyLab() {
         </div>
         <div>
           <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)' }}>Privacy-Preserving Fraud Detection</div>
-          <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>Differential privacy on the cross-user network signal — catch fraud without centralizing or inferring any individual's raw data</div>
+          <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>Differential privacy on the cross-user network signal - catch fraud without centralizing or inferring any individual's raw data</div>
         </div>
         <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 6, fontSize: 10, color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>
           <div style={{ width: 7, height: 7, borderRadius: '50%', background: live ? 'var(--green)' : live === false ? 'var(--yellow)' : 'var(--text-muted)' }} />
@@ -96,8 +96,8 @@ export default function PrivacyLab() {
       {/* Metric cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12 }}>
         <MetricCard label="Non-private baseline" value={data.baseline_auc.toFixed(3)} sub="Recipient-reputation AUC (no privacy)" />
-        <MetricCard label="Detection kept @ ε=1" value={`${eventE1}%`} sub="Event-level DP — protects a transaction" accent="#818cf8" />
-        <MetricCard label="Detection kept @ ε=5" value={`${userE5}%`} sub="User-level DP — protects a whole user" accent="#c084fc" />
+        <MetricCard label="Detection kept @ ε=1" value={`${eventE1}%`} sub="Event-level DP - protects a transaction" accent="#818cf8" />
+        <MetricCard label="Detection kept @ ε=5" value={`${userE5}%`} sub="User-level DP - protects a whole user" accent="#c084fc" />
         <MetricCard label="Data clamped (C=5)" value={`${data.clamp_pct}%`} sub="Contribution bound enabling user-level DP" accent="var(--green)" />
       </div>
 
@@ -157,7 +157,7 @@ export default function PrivacyLab() {
               <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text)' }}>The Scale Advantage</div>
             </div>
             <div style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.6, marginBottom: 12 }}>
-              User-level DP at ε=1 — detection retained grows with data volume:
+              User-level DP at ε=1 - detection retained grows with data volume:
             </div>
             {[
               { label: 'Full data', val: 54, color: '#c084fc' },
@@ -174,7 +174,7 @@ export default function PrivacyLab() {
               </div>
             ))}
             <div style={{ marginTop: 10, fontSize: 10, color: 'var(--text)', lineHeight: 1.6, padding: '8px 10px', background: 'var(--accent-dim)', borderRadius: 7 }}>
-              DP noise is fixed by sensitivity/ε, not data size — so at consumer-payments scale, strong formal privacy is nearly free. <b>Privacy is a scale advantage.</b>
+              DP noise is fixed by sensitivity/ε, not data size - so at consumer-payments scale, strong formal privacy is nearly free. <b>Privacy is a scale advantage.</b>
             </div>
           </div>
 

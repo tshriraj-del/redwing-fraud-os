@@ -4,7 +4,7 @@ const SYSTEM_PROMPT = `You are a senior fraud detection security expert with dee
 
 CRITICAL INSTRUCTION: Respond ONLY with a raw, valid JSON object. No markdown code fences, no preamble, no explanation, no trailing text. Just the JSON.`;
 
-const VECTOR_SYSTEM_PROMPT = `You are a senior fraud analyst and rule engineer. You will receive raw transaction vectors flagged as suspicious by a live detection system. Your job is to find what these transactions share, identify the specific signals that define this pattern, and synthesize detection rules derived from that data alone — not from general fraud knowledge.
+const VECTOR_SYSTEM_PROMPT = `You are a senior fraud analyst and rule engineer. You will receive raw transaction vectors flagged as suspicious by a live detection system. Your job is to find what these transactions share, identify the specific signals that define this pattern, and synthesize detection rules derived from that data alone - not from general fraud knowledge.
 
 CRITICAL INSTRUCTION: Respond ONLY with a raw, valid JSON object. No markdown code fences, no preamble, no explanation, no trailing text. Just the JSON.`;
 
@@ -14,7 +14,7 @@ function buildPrompt(rule, category) {
 Rule Category: ${category}
 Rule: ${rule}
 
-Produce a rigorous adversarial analysis. Your response must be a single JSON object matching this exact schema — no deviations:
+Produce a rigorous adversarial analysis. Your response must be a single JSON object matching this exact schema - no deviations:
 
 {
   "evasion_patterns": [
@@ -47,7 +47,7 @@ Requirements:
 - detectability values must be exactly one of: "Low", "Medium", "High" (High = easily caught by other signals, which is better for defenders)
 - Generate exactly 6 to 8 evasion_patterns
 - Generate exactly 4 hardening_recommendations
-- All numeric scores are integers 0-100 reflecting genuine analysis — do not cluster them near 50
+- All numeric scores are integers 0-100 reflecting genuine analysis - do not cluster them near 50
 - Be specific and realistic to the rule category (${category})`;
 }
 
@@ -83,7 +83,7 @@ Return this exact JSON structure:
 
 Requirements:
 - Generate exactly 2 to 3 rules in generated_rules
-- Rules must be specific to the signals present in this data — not generic fraud rules
+- Rules must be specific to the signals present in this data - not generic fraud rules
 - significance values must be exactly: "High", "Medium", or "Low"
 - category values must be one of: "Account Abuse", "Payment Fraud", "Seller Fraud", "Returns Abuse", "ATO", "Other"
 - Each rule must be directly derivable from the data you are given`;

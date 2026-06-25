@@ -137,7 +137,7 @@ export default function Recommendations({ data }) {
           <path d="M7 1a6 6 0 1 0 0 12A6 6 0 0 0 7 1zm0 2.5c.3 0 .5.2.5.5v3c0 .3-.2.5-.5.5s-.5-.2-.5-.5V4c0-.3.2-.5.5-.5zm0 6.5a.65.65 0 1 1 0-1.3.65.65 0 0 1 0 1.3z"/>
         </svg>
         <p style={{ fontSize: 12, color: 'rgba(56,139,253,0.85)', lineHeight: 1.6, margin: 0 }}>
-          Estimates assume proper implementation and tuning. Start with Priority 1 — it typically delivers the highest risk reduction per dollar spent before tackling deeper infrastructure changes.
+          Estimates assume proper implementation and tuning. Start with Priority 1 - it typically delivers the highest risk reduction per dollar spent before tackling deeper infrastructure changes.
         </p>
       </div>
     </div>

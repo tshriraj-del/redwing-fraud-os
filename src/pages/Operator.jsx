@@ -3,6 +3,7 @@ import {
   Radar, AlertTriangle, CheckCircle2, Play, Square,
   ChevronDown, ChevronRight, Zap, ExternalLink, RefreshCw,
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { callOnce } from '../api.js';
 
 const BACKEND = 'http://localhost:8000';
@@ -13,11 +14,11 @@ const MAX_AUTO_INVESTIGATIONS = 8;    // cap per stream session
 
 // ── Investigation system prompt ──────────────────────────────────────────────
 
-const INVESTIGATION_SYSTEM = `You are FraudSense — an AI fraud investigator embedded in a real-time detection system.
+const INVESTIGATION_SYSTEM = `You are FraudSense - an AI fraud investigator embedded in a real-time detection system.
 You receive structured ML signals auto-escalated by the SyntheticID Operator.
 Your job: rapid triage. Be direct, calibrated, and specific.
 
-Output ONLY a single valid JSON object — no markdown, no preamble:
+Output ONLY a single valid JSON object - no markdown, no preamble:
 {
   "verdict": "Escalate" | "Decline" | "Monitor" | "Approve",
   "severity": "Critical" | "High" | "Medium" | "Low",
@@ -32,14 +33,14 @@ Rules:
 - Do NOT invent signals not present in the input.
 - If device_familiarity is HIGH and only amount is anomalous, consider APP scam or deepfake (victim-authorized) rather than ATO.
 - "Decline" means block the transaction. "Escalate" means hold + human review. "Monitor" means flag for watch.
-- Be precise about the recommended_action — name the team, channel, or system.`;
+- Be precise about the recommended_action - name the team, channel, or system.`;
 
 function buildCaseText(alert) {
   const signals = (alert.matched_signals || [])
     .map(s => `  • ${s.label} (strength: ${(s.strength * 100).toFixed(0)}%)`)
     .join('\n');
 
-  return `AUTO-ESCALATED by SyntheticID Operator — score ${(alert.combined_score * 100).toFixed(0)}/100
+  return `AUTO-ESCALATED by SyntheticID Operator - score ${(alert.combined_score * 100).toFixed(0)}/100
 
 TRANSACTION
   ID:     ${alert.transaction_id}
@@ -49,7 +50,7 @@ TRANSACTION
 DETECTION
   ML Score:        ${(alert.ml_score * 100).toFixed(0)}/100
   Combined Score:  ${(alert.combined_score * 100).toFixed(0)}/100
-  Pattern Match:   ${alert.top_pattern ?? 'none'} — ${((alert.confidence ?? 0) * 100).toFixed(0)}% confidence
+  Pattern Match:   ${alert.top_pattern ?? 'none'} - ${((alert.confidence ?? 0) * 100).toFixed(0)}% confidence
 
 SIGNALS CONFIRMED
 ${signals || '  (none above threshold)'}
@@ -93,12 +94,12 @@ const DEMO_INVESTIGATIONS = {
   'TX4001': {
     status: 'done',
     alertData: { transaction_id: 'TX4001', amount: 0.97, rail: 'Zelle', ml_score: 0.88, combined_score: 0.89, is_alert: true, top_pattern: 'Card Testing Bot', pattern_color: '#4ade80', confidence: 0.92, matched_signals: [{ label: 'micro_amount_sequence', strength: 0.91 }, { label: 'velocity_burst_24h', strength: 0.88 }] },
-    result: { verdict: 'Decline', severity: 'Critical', summary: 'Card testing bot confirmed — 28 micro-transactions under $1.00 on Zelle in a 3-hour window. Velocity and timing regularity are machine-driven.', top_finding: 'velocity_burst_24h = 28 transactions with timing regularity < 40ms variance', recommended_action: 'Block all outbound Zelle transactions from this account. Escalate to fraud ops for device ban and rule synthesis.', fraud_type_confirmed: 'Card Testing Bot', confidence: 'High' },
+    result: { verdict: 'Decline', severity: 'Critical', summary: 'Card testing bot confirmed - 28 micro-transactions under $1.00 on Zelle in a 3-hour window. Velocity and timing regularity are machine-driven.', top_finding: 'velocity_burst_24h = 28 transactions with timing regularity < 40ms variance', recommended_action: 'Block all outbound Zelle transactions from this account. Escalate to fraud ops for device ban and rule synthesis.', fraud_type_confirmed: 'Card Testing Bot', confidence: 'High' },
   },
   'TX4002': {
     status: 'done',
     alertData: { transaction_id: 'TX4002', amount: 3850.00, rail: 'wire', ml_score: 0.81, combined_score: 0.87, is_alert: true, top_pattern: 'AI-Powered ATO', pattern_color: '#f59e0b', confidence: 0.84, matched_signals: [{ label: 'headless_browser_flag', strength: 0.84 }, { label: 'new_recipient', strength: 0.77 }] },
-    result: { verdict: 'Escalate', severity: 'High', summary: 'ATO bot pattern — headless browser session initiated wire to first-time overseas recipient. Behavioral biometrics absent. Consistent with automated credential replay.', top_finding: 'headless_browser_flag + new_recipient + wire to overseas account — ATO playbook match', recommended_action: 'Place account on step-up auth hold. Call customer to verify intent. Block wire pending confirmation.', fraud_type_confirmed: 'AI-Powered ATO', confidence: 'High' },
+    result: { verdict: 'Escalate', severity: 'High', summary: 'ATO bot pattern - headless browser session initiated wire to first-time overseas recipient. Behavioral biometrics absent. Consistent with automated credential replay.', top_finding: 'headless_browser_flag + new_recipient + wire to overseas account - ATO playbook match', recommended_action: 'Place account on step-up auth hold. Call customer to verify intent. Block wire pending confirmation.', fraud_type_confirmed: 'AI-Powered ATO', confidence: 'High' },
   },
 };
 
@@ -122,7 +123,7 @@ const PATTERNS = [
     id: 'app_scam', name: 'APP Scam', icon: '📲',
     risk: 'High', color: '#f97316', prevalence: '20%',
     description: 'Victim socially engineered into authorizing large push payment.',
-    evasion: 'Victim authorizes — evades authorization checks.',
+    evasion: 'Victim authorizes - evades authorization checks.',
     signals: [
       { label: 'High amount vs. normal behavior', weight: 0.30 },
       { label: 'Instant/irrevocable rail', weight: 0.25 },
@@ -381,9 +382,23 @@ function AlertRow({ event, investigation, onInvestigate }) {
             }}
           >
             <Zap size={10} />
-            {autoTriggered ? 'Auto-investigating…' : 'Investigate with FraudSense'}
+            {autoTriggered ? 'Auto-investigating…' : 'Quick triage (FraudSense AI)'}
           </button>
         )}
+
+        {/* Escalate to the full investigator workbench - the real decisioning surface */}
+        <Link
+          to={`/investigate?txn=${encodeURIComponent(event.transaction_id)}`}
+          style={{
+            marginTop: 6, width: '100%', boxSizing: 'border-box', padding: '5px 10px', borderRadius: 6,
+            background: 'rgba(248,113,113,0.08)', border: '1px solid rgba(248,113,113,0.3)',
+            color: 'var(--red)', fontSize: 10, fontWeight: 600, cursor: 'pointer', textDecoration: 'none',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4,
+          }}
+        >
+          <ExternalLink size={10} />
+          Open full case file
+        </Link>
       </div>
 
       {/* Investigation result */}
@@ -662,7 +677,7 @@ export default function Operator() {
         {/* Pattern Library */}
         <div style={{ borderRight: '1px solid var(--border)', overflowY: 'auto', padding: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
           <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 4 }}>
-            Pattern Library — {PATTERNS.length} fingerprints
+            Pattern Library - {PATTERNS.length} fingerprints
           </div>
           {[...PATTERNS].sort((a, b) => RISK_ORDER[a.risk] - RISK_ORDER[b.risk]).map(p => (
             <PatternCard key={p.id} pattern={p} />
@@ -738,7 +753,7 @@ export default function Operator() {
 
               return (
                 <>
-                  {/* Investigated cases — always pinned at top */}
+                  {/* Investigated cases - always pinned at top */}
                   {invList.map(inv => (
                     <AlertRow
                       key={`inv-${inv.alertData?.transaction_id}`}

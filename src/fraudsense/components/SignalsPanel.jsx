@@ -1,5 +1,7 @@
+import { Activity } from 'lucide-react';
 import { STRENGTH_META, CATEGORY_COLOR, BASIS_STYLE, PANEL_ANIM, BORDER_ANIM } from '../constants.js';
 import { SignalBars } from './Icons.jsx';
+import PanelHead from './PanelHead.jsx';
 
 export default function SignalsPanel({ signals = [], order = 3 }) {
   const count = String(signals.length).padStart(2, '0');
@@ -11,21 +13,19 @@ export default function SignalsPanel({ signals = [], order = 3 }) {
     >
       <span className={`edge ${BORDER_ANIM[order]} bg-[color:var(--accent-cyan)]`} />
 
-      <div className="mb-4 flex items-center justify-between">
-        <h3 className="panel-label text-[12px] text-[color:var(--text-primary)]">
-          Signals Detected
-        </h3>
-        <span
-          className="rounded-lg px-2 py-0.5 font-mono text-[12px] font-medium"
-          style={{
-            color: 'var(--accent-cyan)',
-            background: 'var(--accent-cyan-dim)',
-            border: '1px solid var(--accent-cyan)',
-          }}
-        >
-          {count}
-        </span>
-      </div>
+      <PanelHead
+        icon={Activity}
+        title="Signals Detected"
+        accent="var(--accent-cyan)"
+        right={
+          <span
+            className="rounded-md px-2 py-0.5 font-mono text-[11px] font-medium"
+            style={{ color: 'var(--accent-cyan)', background: 'var(--accent-cyan-dim)', border: '1px solid var(--accent-cyan)55' }}
+          >
+            {count}
+          </span>
+        }
+      />
 
       {signals.length === 0 ? (
         <p className="font-mono text-[12px] text-[color:var(--text-secondary)]">

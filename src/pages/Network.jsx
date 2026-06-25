@@ -229,7 +229,7 @@ export default function Network() {
       setStats(gData.stats);
       setTypologies(tData || []);
     } catch (e) {
-      // Backend offline — use generated demo graph
+      // Backend offline - use generated demo graph
       let nodes = _DN;
       let links = _DL;
       if (!showDevices) {
@@ -458,8 +458,8 @@ export default function Network() {
               <div style={{ marginTop: 14, fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>Tips</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 {[
-                  ['Orange squares', 'Shared device — same hardware across 3+ users'],
-                  ['Red triangles', 'Mule recipient — 5+ fraud transactions received'],
+                  ['Orange squares', 'Shared device - same hardware across 3+ users'],
+                  ['Red triangles', 'Mule recipient - 5+ fraud transactions received'],
                   ['Red particles', 'Fraud transaction flow'],
                 ].map(([label, tip]) => (
                   <div key={label}>

@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
+import { Tag } from 'lucide-react';
 import ConfidenceMeter from './ConfidenceMeter.jsx';
 import { PANEL_ANIM, BORDER_ANIM } from '../constants.js';
+import PanelHead from './PanelHead.jsx';
 
 // Types `text` out one character at a time once, after `startDelay`.
 function useTypewriter(text, startDelay = 0, speed = 40) {
@@ -33,7 +35,7 @@ function useTypewriter(text, startDelay = 0, speed = 40) {
 
 export default function ClassificationPanel({ classification = {}, order = 4 }) {
   const { primary_type, secondary_type, confidence, reasoning } = classification;
-  const { out, done } = useTypewriter(primary_type ?? '—', 650);
+  const { out, done } = useTypewriter(primary_type ?? '-', 650);
 
   return (
     <section
@@ -42,12 +44,10 @@ export default function ClassificationPanel({ classification = {}, order = 4 }) 
     >
       <span className={`edge ${BORDER_ANIM[order]} bg-[color:var(--accent-cyan)]`} />
 
-      <h3 className="panel-label mb-3 text-[12px] text-[color:var(--text-secondary)]">
-        Classification
-      </h3>
+      <PanelHead icon={Tag} title="Classification" accent="var(--accent-cyan)" />
 
       <h2
-        className={`font-display text-2xl font-bold leading-tight text-[color:var(--text-primary)] ${
+        className={`text-2xl font-bold leading-tight text-[color:var(--text-primary)] ${
           done ? '' : 'caret'
         }`}
       >

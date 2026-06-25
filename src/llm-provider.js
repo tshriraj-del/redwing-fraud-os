@@ -1,7 +1,7 @@
-// llm-provider.js — provider-agnostic LLM abstraction for RedWing.
+// llm-provider.js - provider-agnostic LLM abstraction for RedWing.
 //
 // ALL LLM calls route through the Operator backend proxy (port 8000).
-// API keys live in operator/.env only — never in the browser.
+// API keys live in operator/.env only - never in the browser.
 //
 // operator/.env:
 //   LLM_PROVIDER=anthropic          # anthropic | openai | groq | mistral

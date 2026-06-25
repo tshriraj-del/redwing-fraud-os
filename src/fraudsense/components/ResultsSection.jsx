@@ -52,24 +52,25 @@ export default function ResultsSection({ analysis, caseMeta, onReset }) {
       </div>
 
       {/* Copy / reset controls */}
-      <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
+      <div className="mt-5 flex flex-wrap items-center justify-end gap-2">
         <button
           type="button"
           onClick={copyReport}
-          className="rounded-lg border border-dashed px-4 py-2 font-mono text-[11px] uppercase tracking-[0.1em] transition-all duration-150"
+          className="rounded-lg border px-3.5 py-2 text-[12px] font-semibold transition-all duration-150"
           style={{
-            borderColor: flash ? 'var(--accent-cyan)' : 'var(--border-active)',
+            borderColor: flash ? 'var(--accent-cyan)' : 'var(--border)',
+            background: flash ? 'var(--accent-cyan-dim)' : 'var(--bg-surface)',
             color: flash ? 'var(--accent-cyan)' : 'var(--text-secondary)',
           }}
         >
-          {copied ? 'Copied to clipboard ✓' : 'Copy Report'}
+          {copied ? 'Copied to clipboard ✓' : 'Copy report'}
         </button>
         <button
           type="button"
           onClick={onReset}
-          className="rounded-lg border border-dashed border-[color:var(--border-active)] px-4 py-2 font-mono text-[11px] uppercase tracking-[0.1em] text-[color:var(--text-secondary)] transition-colors duration-150 hover:text-[color:var(--text-primary)]"
+          className="rounded-lg border border-[color:var(--border)] bg-[color:var(--bg-surface)] px-3.5 py-2 text-[12px] font-semibold text-[color:var(--text-secondary)] transition-colors duration-150 hover:text-[color:var(--text-primary)]"
         >
-          New Case
+          New case
         </button>
       </div>
     </div>

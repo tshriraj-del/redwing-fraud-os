@@ -26,7 +26,7 @@ const TOGGLE_DEFS = [
 ];
 
 function formatUptime(s) {
-  if (!s && s !== 0) return '—';
+  if (!s && s !== 0) return '-';
   const h = Math.floor(s / 3600);
   const m = Math.floor((s % 3600) / 60);
   return h > 0 ? `${h}h ${m}m` : `${m}m`;
@@ -307,7 +307,7 @@ function LearnedPatterns({ rules }) {
               Precision: <span style={{
                 color: (rule.backtest?.precision || 0) >= 0.78 ? 'var(--green)' : 'var(--yellow)',
                 fontFamily: 'JetBrains Mono, monospace', fontWeight: 600,
-              }}>{rule.backtest?.precision ? `${(rule.backtest.precision * 100).toFixed(0)}%` : '—'}</span>
+              }}>{rule.backtest?.precision ? `${(rule.backtest.precision * 100).toFixed(0)}%` : '-'}</span>
             </span>
             {rule.typology && (
               <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>
@@ -349,7 +349,7 @@ function IntelPanel({ threatCounts, learnedRules }) {
 function LiveFeedTab({ events, threatCounts, learnedRules }) {
   return (
     <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
-      {/* Feed — 60% */}
+      {/* Feed - 60% */}
       <div style={{ flex: '0 0 60%', display: 'flex', flexDirection: 'column', overflow: 'hidden', borderRight: '1px solid var(--border)' }}>
         <div style={{
           padding: '8px 14px', borderBottom: '1px solid var(--border)', flexShrink: 0,
@@ -369,7 +369,7 @@ function LiveFeedTab({ events, threatCounts, learnedRules }) {
         </div>
       </div>
 
-      {/* Intel — 40% */}
+      {/* Intel - 40% */}
       <div style={{ flex: '0 0 40%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         <IntelPanel threatCounts={threatCounts} learnedRules={learnedRules} />
       </div>
@@ -717,17 +717,17 @@ function AgentSettingsTab({ config, setConfig, onSave, saving }) {
 // ── Demo mode ─────────────────────────────────────────────────────────────────
 
 const DEMO_SCENARIOS = [
-  { threat: 'card_testing_bot',        action: 'block', minAmt: 0.50,  maxAmt: 1.99,  rails: ['p2p','zelle'],       signals: ['micro_amount_sequence','timing_regularity'], conf: [0.88,0.96], reason: 'Card testing bot confirmed — micro-amount sequence + sub-second timing regularity' },
-  { threat: 'card_testing_bot',        action: 'block', minAmt: 0.01,  maxAmt: 1.50,  rails: ['zelle'],             signals: ['timing_regularity','headless_device'],       conf: [0.84,0.93], reason: 'Automated card probing — headless browser signature detected on sub-$2 transaction' },
-  { threat: 'ato_bot',                 action: 'block', minAmt: 2500,  maxAmt: 9500,  rails: ['wire','ACH'],        signals: ['headless_device','ip_reputation'],            conf: [0.79,0.88], reason: 'ATO bot confirmed — headless device + high-risk IP on large outbound wire' },
-  { threat: 'ato_bot',                 action: 'flag',  minAmt: 600,   maxAmt: 3500,  rails: ['ACH','p2p'],         signals: ['timing_regularity'],                         conf: [0.61,0.72], reason: 'ATO bot probable — timing regularity on first-time recipient' },
-  { threat: 'credential_stuffing',     action: 'flag',  minAmt: 50,    maxAmt: 800,   rails: ['p2p','zelle'],       signals: ['ip_reputation','timing_regularity'],         conf: [0.65,0.74], reason: 'Credential stuffing detected — known breach IP cluster + velocity spike' },
-  { threat: 'synthetic_identity_farm', action: 'flag',  minAmt: 800,   maxAmt: 6000,  rails: ['ACH','wire'],        signals: ['identity_clone'],                            conf: [0.64,0.73], reason: 'Synthetic identity signal — SSN linked to 3 other flagged accounts' },
-  { threat: 'deepfake_bypass',         action: 'block', minAmt: 7500,  maxAmt: 28000, rails: ['wire','crypto'],     signals: ['ip_reputation'],                             conf: [0.81,0.89], reason: 'Deepfake bypass attempt — high-value wire immediately after synthetic voice auth' },
-  { threat: 'adversarial_ml',          action: 'flag',  minAmt: 150,   maxAmt: 2500,  rails: ['crypto','zelle'],    signals: ['timing_regularity'],                         conf: [0.72,0.79], reason: 'Adversarial ML input — features crafted to sit just below block threshold' },
-  { threat: 'clean',                   action: 'allow', minAmt: 15,    maxAmt: 800,   rails: ['zelle','p2p'],       signals: [],                                            conf: [0.04,0.18], reason: 'No threat signals — within behavioural baseline' },
-  { threat: 'clean',                   action: 'allow', minAmt: 200,   maxAmt: 8000,  rails: ['ACH','wire'],        signals: [],                                            conf: [0.06,0.22], reason: 'Legitimate transfer — familiar recipient and normal velocity' },
-  { threat: 'clean',                   action: 'allow', minAmt: 5,     maxAmt: 200,   rails: ['p2p','zelle'],       signals: [],                                            conf: [0.03,0.12], reason: 'Low-risk P2P — known contact, within 30-day spending profile' },
+  { threat: 'card_testing_bot',        action: 'block', minAmt: 0.50,  maxAmt: 1.99,  rails: ['p2p','zelle'],       signals: ['micro_amount_sequence','timing_regularity'], conf: [0.88,0.96], reason: 'Card testing bot confirmed - micro-amount sequence + sub-second timing regularity' },
+  { threat: 'card_testing_bot',        action: 'block', minAmt: 0.01,  maxAmt: 1.50,  rails: ['zelle'],             signals: ['timing_regularity','headless_device'],       conf: [0.84,0.93], reason: 'Automated card probing - headless browser signature detected on sub-$2 transaction' },
+  { threat: 'ato_bot',                 action: 'block', minAmt: 2500,  maxAmt: 9500,  rails: ['wire','ACH'],        signals: ['headless_device','ip_reputation'],            conf: [0.79,0.88], reason: 'ATO bot confirmed - headless device + high-risk IP on large outbound wire' },
+  { threat: 'ato_bot',                 action: 'flag',  minAmt: 600,   maxAmt: 3500,  rails: ['ACH','p2p'],         signals: ['timing_regularity'],                         conf: [0.61,0.72], reason: 'ATO bot probable - timing regularity on first-time recipient' },
+  { threat: 'credential_stuffing',     action: 'flag',  minAmt: 50,    maxAmt: 800,   rails: ['p2p','zelle'],       signals: ['ip_reputation','timing_regularity'],         conf: [0.65,0.74], reason: 'Credential stuffing detected - known breach IP cluster + velocity spike' },
+  { threat: 'synthetic_identity_farm', action: 'flag',  minAmt: 800,   maxAmt: 6000,  rails: ['ACH','wire'],        signals: ['identity_clone'],                            conf: [0.64,0.73], reason: 'Synthetic identity signal - SSN linked to 3 other flagged accounts' },
+  { threat: 'deepfake_bypass',         action: 'block', minAmt: 7500,  maxAmt: 28000, rails: ['wire','crypto'],     signals: ['ip_reputation'],                             conf: [0.81,0.89], reason: 'Deepfake bypass attempt - high-value wire immediately after synthetic voice auth' },
+  { threat: 'adversarial_ml',          action: 'flag',  minAmt: 150,   maxAmt: 2500,  rails: ['crypto','zelle'],    signals: ['timing_regularity'],                         conf: [0.72,0.79], reason: 'Adversarial ML input - features crafted to sit just below block threshold' },
+  { threat: 'clean',                   action: 'allow', minAmt: 15,    maxAmt: 800,   rails: ['zelle','p2p'],       signals: [],                                            conf: [0.04,0.18], reason: 'No threat signals - within behavioural baseline' },
+  { threat: 'clean',                   action: 'allow', minAmt: 200,   maxAmt: 8000,  rails: ['ACH','wire'],        signals: [],                                            conf: [0.06,0.22], reason: 'Legitimate transfer - familiar recipient and normal velocity' },
+  { threat: 'clean',                   action: 'allow', minAmt: 5,     maxAmt: 200,   rails: ['p2p','zelle'],       signals: [],                                            conf: [0.03,0.12], reason: 'Low-risk P2P - known contact, within 30-day spending profile' },
 ];
 
 const DEMO_WEIGHTS = [2, 2, 1.5, 1, 1, 1, 1, 1, 3, 2.5, 2];
@@ -785,7 +785,7 @@ const DEMO_CASES = [
     created_at: new Date(Date.now() - 180000).toISOString(),
     status: 'pending', agent_action: 'flag', threat_type: 'ato_bot', threat_label: 'ATO Bot',
     combined_score: 0.74, ml_score: 0.71, ai_confidence: 0.68,
-    reason: 'ATO bot probable — timing regularity on new recipient, no prior wire history at this amount.',
+    reason: 'ATO bot probable - timing regularity on new recipient, no prior wire history at this amount.',
     ai_signals: ['timing_regularity', 'headless_device'], amount: 2850, rail: 'ACH',
     escalate_human: false, analyst_action: null, analyst_id: null, analyst_note: '', resolved_at: null,
   },
@@ -794,7 +794,7 @@ const DEMO_CASES = [
     created_at: new Date(Date.now() - 420000).toISOString(),
     status: 'pending', agent_action: 'block', threat_type: 'deepfake_bypass', threat_label: 'Deepfake Bypass',
     combined_score: 0.87, ml_score: 0.83, ai_confidence: 0.79,
-    reason: 'Deepfake bypass — large wire initiated immediately after voice auth on new device. Escalated for human review.',
+    reason: 'Deepfake bypass - large wire initiated immediately after voice auth on new device. Escalated for human review.',
     ai_signals: ['ip_reputation'], amount: 14500, rail: 'wire',
     escalate_human: true, analyst_action: null, analyst_id: null, analyst_note: '', resolved_at: null,
   },
@@ -835,7 +835,7 @@ export default function SyntheticID() {
     } catch {}
   }, []);
 
-  // Status poll — first failure → demo mode
+  // Status poll - first failure → demo mode
   useEffect(() => {
     if (!IS_LOCAL) { setIsDemoMode(true); return; }
     const poll = async () => {
@@ -850,7 +850,7 @@ export default function SyntheticID() {
     return () => clearInterval(id);
   }, []);
 
-  // Demo mode — seed + stream fake events
+  // Demo mode - seed + stream fake events
   useEffect(() => {
     if (!isDemoMode) return;
     // Seed initial state
@@ -882,7 +882,7 @@ export default function SyntheticID() {
     return () => clearTimeout(timeoutId);
   }, [isDemoMode]); // eslint-disable-line
 
-  // Live mode — load config + SSE
+  // Live mode - load config + SSE
   useEffect(() => {
     if (isDemoMode) return;
     fetch(`${BACKEND}/agent/config`)

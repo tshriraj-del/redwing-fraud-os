@@ -1,4 +1,4 @@
-// Lightweight inline SVG icons (stroke-based, currentColor) — no icon library.
+// Lightweight inline SVG icons (stroke-based, currentColor) - no icon library.
 
 const base = {
   fill: 'none',

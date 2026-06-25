@@ -38,7 +38,7 @@ function MetricCard({ label, value, threshold }) {
           : <AlertTriangle size={13} style={{ color: 'var(--yellow)' }} />}
       </div>
       <div style={{ fontSize: 24, fontWeight: 700, color: 'var(--text)', letterSpacing: '-0.02em', marginBottom: 8, fontFamily: 'JetBrains Mono, monospace' }}>
-        {value > 0 ? value.toFixed(4) : '—'}
+        {value > 0 ? value.toFixed(4) : '-'}
       </div>
       <div style={{ height: 3, background: 'rgba(255,255,255,0.06)', borderRadius: 2, marginBottom: 6 }}>
         <div style={{
@@ -157,12 +157,12 @@ export default function MLLab() {
         setScoreResult({
           score: 87, severity: 'Critical',
           key_signals: ['extreme velocity burst', 'micro-amount P2P pattern', 'new recipient', 'bot timing regularity'],
-          reasoning: 'RedWing score 87/100 — retrained XGBoost: 0.91, novelty gate flagged. Card-testing bot pattern confirmed across 28 transactions in 24h.',
+          reasoning: 'RedWing score 87/100 - retrained XGBoost: 0.91, novelty gate flagged. Card-testing bot pattern confirmed across 28 transactions in 24h.',
           recommended_action: 'Decline',
           model_version: 'v3-retrained-23f',
           source: 'ml-engine',
         });
-        setTxInput('$0.97 P2P Zelle to new recipient — 28th transaction this hour, each under $1.00');
+        setTxInput('$0.97 P2P Zelle to new recipient - 28th transaction this hour, each under $1.00');
       } finally {
         setLoading(false);
       }
@@ -209,7 +209,7 @@ export default function MLLab() {
           score: mlResult.redwing_score,
           severity: sev,
           key_signals: mlResult.top_signals,
-          reasoning: `RedWing score ${mlResult.redwing_score}/100 — XGBoost: ${mlResult.xgb_score}, IsoForest: ${mlResult.iso_score}. Latency: ${mlResult.latency_ms}ms.`,
+          reasoning: `RedWing score ${mlResult.redwing_score}/100 - XGBoost: ${mlResult.xgb_score}, IsoForest: ${mlResult.iso_score}. Latency: ${mlResult.latency_ms}ms.`,
           recommended_action: decision === 'DECLINE' ? 'Decline' : decision === 'APPROVE' ? 'Approve' : 'Review',
           model_version: mlResult.model_version,
           source: 'ml-engine',
@@ -257,7 +257,7 @@ export default function MLLab() {
           <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)' }}>
             RedWing ML Engine &nbsp;
             <span style={{ fontSize: 10, fontWeight: 500, color: 'var(--text-muted)' }}>
-              {metrics ? metrics.model_version : '—'}
+              {metrics ? metrics.model_version : '-'}
             </span>
           </span>
         </div>
@@ -267,10 +267,10 @@ export default function MLLab() {
         </div>
         {metrics && (
           <div style={{ marginLeft: 'auto', display: 'flex', gap: 16 }}>
-            <Stat label="Transactions" value={metrics.n_transactions?.toLocaleString() ?? '—'} />
-            <Stat label="Fraud rate" value={metrics.fraud_rate ? `${(metrics.fraud_rate * 100).toFixed(2)}%` : '—'} />
-            <Stat label="Features" value={metrics.feature_count ?? '—'} ok={metrics.feature_count === 23} />
-            <Stat label="FP rate" value={metrics.false_positive_rate ? `${(metrics.false_positive_rate * 100).toFixed(2)}%` : '—'} ok />
+            <Stat label="Transactions" value={metrics.n_transactions?.toLocaleString() ?? '-'} />
+            <Stat label="Fraud rate" value={metrics.fraud_rate ? `${(metrics.fraud_rate * 100).toFixed(2)}%` : '-'} />
+            <Stat label="Features" value={metrics.feature_count ?? '-'} ok={metrics.feature_count === 23} />
+            <Stat label="FP rate" value={metrics.false_positive_rate ? `${(metrics.false_positive_rate * 100).toFixed(2)}%` : '-'} ok />
           </div>
         )}
       </div>
@@ -310,35 +310,25 @@ export default function MLLab() {
           </div>
           <ResponsiveContainer width="100%" height={180}>
             <AreaChart data={driftData} margin={{ top: 4, right: 4, bottom: 0, left: -20 }}>
-              <defs>
-                <linearGradient id="gradAUC" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#818cf8" stopOpacity={0.25} />
-                  <stop offset="95%" stopColor="#818cf8" stopOpacity={0} />
-                </linearGradient>
-                <linearGradient id="gradPrec" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.2} />
-                  <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
-                </linearGradient>
-              </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
               <XAxis dataKey="day" tick={{ fill: 'var(--text-muted)', fontSize: 9 }} tickLine={false} axisLine={false} interval={4} />
               <YAxis domain={[0.82, 0.99]} tick={{ fill: 'var(--text-muted)', fontSize: 9 }} tickLine={false} axisLine={false} tickFormatter={v => v.toFixed(2)} />
               <Tooltip content={<CustomTooltip />} />
-              <Area type="monotone" dataKey="AUC" stroke="#818cf8" strokeWidth={1.5} fill="url(#gradAUC)" dot={false} />
-              <Area type="monotone" dataKey="Precision" stroke="#f59e0b" strokeWidth={1.5} fill="url(#gradPrec)" dot={false} />
+              <Area key="auc" type="monotone" dataKey="AUC" stroke="#818cf8" strokeWidth={1.5} fill="#818cf8" fillOpacity={0.14} dot={false} />
+              <Area key="prec" type="monotone" dataKey="Precision" stroke="#f59e0b" strokeWidth={1.5} fill="#f59e0b" fillOpacity={0.1} dot={false} />
             </AreaChart>
           </ResponsiveContainer>
         </div>
 
-        {/* Feature importance — live SHAP */}
+        {/* Feature importance - live SHAP */}
         <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 10, padding: '16px 18px' }}>
           <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text)', marginBottom: 2 }}>Feature Importance</div>
           <div style={{ fontSize: 10, color: 'var(--text-muted)', marginBottom: 14 }}>
             {features.length ? 'Live SHAP values (top 10)' : 'Loading…'}
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {features.map(f => (
-              <div key={f.name}>
+            {features.map((f, fi) => (
+              <div key={f.name ?? fi}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>
                   <span style={{ fontSize: 10, color: 'var(--text-muted)', fontFamily: 'JetBrains Mono, monospace' }}>{f.name}</span>
                   <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text)', fontFamily: 'JetBrains Mono, monospace' }}>
@@ -393,8 +383,8 @@ export default function MLLab() {
             {useMLEngine
               ? 'Parsed → RedWing model inference (real XGBoost + IsoForest, sub-ms)'
               : IS_LOCAL
-                ? 'Describe a transaction — AI scores it using ML signal patterns'
-                : 'AI scoring — ML Engine requires local operator backend'}
+                ? 'Describe a transaction - AI scores it using ML signal patterns'
+                : 'AI scoring - ML Engine requires local operator backend'}
           </div>
 
           <textarea
@@ -488,11 +478,11 @@ export default function MLLab() {
           <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text)', marginBottom: 14 }}>RedWing Stack</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {[
-              { label: 'Layer 1 — Rule Engine', value: '41 rules · 6 typologies', color: 'var(--accent)' },
-              { label: 'Layer 2 — XGBoost', value: metrics ? `AUC ${metrics.auc_xgboost || '—'}` : '—', color: '#818cf8' },
-              { label: 'Layer 3 — Novelty gate', value: metrics ? `AUC ${metrics.auc_isolation_forest || '—'}` : '—', color: '#c084fc' },
-              { label: 'Layer 4 — Graph / reputation', value: 'recipient DP signal', color: 'var(--yellow)' },
-              { label: 'Served AUC', value: metrics ? metrics.auc_ensemble?.toFixed(4) ?? '—' : '—', color: 'var(--green)' },
+              { label: 'Layer 1 - Rule Engine', value: '41 rules · 6 typologies', color: 'var(--accent)' },
+              { label: 'Layer 2 - XGBoost', value: metrics ? `AUC ${metrics.auc_xgboost || '-'}` : '-', color: '#818cf8' },
+              { label: 'Layer 3 - Novelty gate', value: metrics ? `AUC ${metrics.auc_isolation_forest || '-'}` : '-', color: '#c084fc' },
+              { label: 'Layer 4 - Graph / reputation', value: 'recipient DP signal', color: 'var(--yellow)' },
+              { label: 'Served AUC', value: metrics ? metrics.auc_ensemble?.toFixed(4) ?? '-' : '-', color: 'var(--green)' },
               { label: 'Decision', value: 'XGB primary · novelty escalation', color: 'var(--text-muted)' },
               { label: 'Server', value: serverOk ? 'localhost:8000 ✓' : 'demo mode', color: serverOk ? 'var(--green)' : 'var(--yellow)' },
             ].map(row => (

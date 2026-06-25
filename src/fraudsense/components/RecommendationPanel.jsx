@@ -1,5 +1,7 @@
+import { Gavel } from 'lucide-react';
 import { ACTION_STYLE, PANEL_ANIM, BORDER_ANIM } from '../constants.js';
 import ConfidenceMeter from './ConfidenceMeter.jsx';
+import PanelHead from './PanelHead.jsx';
 
 export default function RecommendationPanel({ recommendation = {}, order = 7 }) {
   const { action, confidence, reasoning, decision_logic = [], next_steps = [], escalation_path } =
@@ -17,15 +19,14 @@ export default function RecommendationPanel({ recommendation = {}, order = 7 }) 
     >
       <span className={`edge ${BORDER_ANIM[order]}`} style={{ background: style.color }} />
 
-      <h3 className="panel-label mb-4 text-center text-[12px] text-[color:var(--text-secondary)]">
-        Recommended Action
-      </h3>
+      <PanelHead icon={Gavel} title="Recommended Action" accent={style.color} />
 
-      {/* Verdict — flashes white then settles to the action color */}
+      {/* Verdict - flashes white then settles to the action color */}
       <div
-        className="font-display text-center text-[32px] font-extrabold uppercase leading-none tracking-[0.08em] sm:text-5xl sm:tracking-[0.2em]"
+        className="text-[32px] font-extrabold uppercase leading-none sm:text-4xl"
         style={{
           color: style.color,
+          letterSpacing: '0.02em',
           animation: 'actionFlash 0.4s ease-out both',
           animationDelay: '1050ms',
         }}
@@ -33,18 +34,18 @@ export default function RecommendationPanel({ recommendation = {}, order = 7 }) 
         {style.label}
       </div>
 
-      <div className="mx-auto mt-5 max-w-[280px]">
+      <div className="mt-4 max-w-[280px]">
         <ConfidenceMeter confidence={confidence} delay={1100} />
       </div>
 
       {reasoning && (
-        <p className="mx-auto mt-5 max-w-[560px] text-center font-mono text-[13px] leading-[1.8] text-[color:var(--text-secondary)]">
+        <p className="mt-4 max-w-[640px] font-mono text-[12px] leading-[1.7] text-[color:var(--text-secondary)]">
           {reasoning}
         </p>
       )}
 
       {decision_logic.length > 0 && (
-        <div className="mx-auto mt-6 max-w-[560px] rounded-lg border border-[color:var(--border)] bg-[color:var(--bg-base)] p-4">
+        <div className="mt-5 max-w-[640px] rounded-lg border border-[color:var(--border)] bg-[color:var(--bg-base)] p-4">
           <div className="font-display mb-2 text-[10px] uppercase tracking-[0.12em] text-[color:var(--text-dim)]">
             Decision Logic
           </div>
@@ -63,7 +64,7 @@ export default function RecommendationPanel({ recommendation = {}, order = 7 }) 
       )}
 
       {next_steps.length > 0 && (
-        <div className="mx-auto mt-6 max-w-[560px]">
+        <div className="mt-5 max-w-[640px]">
           <div className="font-display mb-3 text-[10px] uppercase tracking-[0.12em] text-[color:var(--text-dim)]">
             Next Steps
           </div>
@@ -94,7 +95,7 @@ export default function RecommendationPanel({ recommendation = {}, order = 7 }) 
       )}
 
       {escalation_path && (
-        <div className="mx-auto mt-6 max-w-[560px] rounded-lg border border-dashed border-[color:var(--border-active)] bg-[color:var(--bg-elevated)] p-4">
+        <div className="mt-5 max-w-[640px] rounded-lg border border-dashed border-[color:var(--border-active)] bg-[color:var(--bg-elevated)] p-4">
           <div className="font-display mb-1.5 text-[10px] uppercase tracking-[0.12em] text-[color:var(--text-dim)]">
             ↗ Escalation Path
           </div>

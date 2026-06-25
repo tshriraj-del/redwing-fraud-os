@@ -14,12 +14,12 @@ const FALLBACK = {
   features_reproducible_before: 13,
   root_cause: [
     '10 of 23 features had no reproducible definition at serving time',
-    'They silently defaulted to zero — including the #2 and #3 most important features',
+    'They silently defaulted to zero - including the #2 and #3 most important features',
     '~24% of the model’s signal was dead in production',
     'Invisible to offline AUC, which is computed where the features still exist',
   ],
   fix: [
-    'One feature foundation — a single definition computed identically for training and serving',
+    'One feature foundation - a single definition computed identically for training and serving',
     'train == serve → skew impossible by construction',
     '23/23 features restored; field catch 0.3% → 91%',
   ],
@@ -57,8 +57,8 @@ export default function Observability() {
   }, []);
 
   const CATCH = [
-    { stage: 'Before — skew', value: data.field_catch_before_pct, fill: '#ef4444' },
-    { stage: 'After — fixed', value: data.field_catch_after_pct, fill: '#22c55e' },
+    { stage: 'Before - skew', value: data.field_catch_before_pct, fill: '#ef4444' },
+    { stage: 'After - fixed', value: data.field_catch_after_pct, fill: '#22c55e' },
   ];
 
   return (
@@ -70,7 +70,7 @@ export default function Observability() {
           <Gauge size={15} color="#fff" />
         </div>
         <div>
-          <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)' }}>Model Observability — Training-Serving Skew Detection</div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)' }}>Model Observability - Training-Serving Skew Detection</div>
           <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>The failure standard metrics hide: a model that scores great offline but catches almost no fraud in production</div>
         </div>
         <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 6, fontSize: 10, color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>
@@ -92,7 +92,7 @@ export default function Observability() {
             <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--red)' }}>The metric lied</span>
           </div>
           <div style={{ fontSize: 12, color: 'var(--text)', lineHeight: 1.6 }}>
-            In the live scoring path the model caught <b style={{ color: 'var(--red)' }}>under 1% of fraud</b> — it was blind to <b>~24% of its own inputs</b> ({data.feature_count - data.features_reproducible_before} of {data.feature_count} features couldn't be reproduced at serving and silently defaulted to zero). No offline metric revealed it.
+            In the live scoring path the model caught <b style={{ color: 'var(--red)' }}>under 1% of fraud</b> - it was blind to <b>~24% of its own inputs</b> ({data.feature_count - data.features_reproducible_before} of {data.feature_count} features couldn't be reproduced at serving and silently defaulted to zero). No offline metric revealed it.
           </div>
         </div>
       </div>
@@ -100,8 +100,8 @@ export default function Observability() {
       {/* Metric cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12 }}>
         <MetricCard label="Offline AUC" value={data.offline_auc.toFixed(3)} sub="What the dashboard reported" />
-        <MetricCard label="Field catch — skew" value={`${data.field_catch_before_pct}%`} sub="Live path, before the fix" accent="var(--red)" />
-        <MetricCard label="Field catch — fixed" value={`${data.field_catch_after_pct}%`} sub="After feature-consistency rebuild" accent="var(--green)" />
+        <MetricCard label="Field catch - skew" value={`${data.field_catch_before_pct}%`} sub="Live path, before the fix" accent="var(--red)" />
+        <MetricCard label="Field catch - fixed" value={`${data.field_catch_after_pct}%`} sub="After feature-consistency rebuild" accent="var(--green)" />
         <MetricCard label="Features restored" value={`${data.feature_count}/${data.feature_count}`} sub="No silent zero-fill" accent="#818cf8" />
       </div>
 
@@ -113,7 +113,7 @@ export default function Observability() {
             <Gauge size={12} style={{ color: 'var(--accent)' }} />
             <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text)' }}>Production Fraud Catch Rate</div>
           </div>
-          <div style={{ fontSize: 10, color: 'var(--text-muted)', marginBottom: 16 }}>Held-out, full operator pipeline · same model, same thresholds — only feature reproduction changed</div>
+          <div style={{ fontSize: 10, color: 'var(--text-muted)', marginBottom: 16 }}>Held-out, full operator pipeline · same model, same thresholds - only feature reproduction changed</div>
           <ResponsiveContainer width="100%" height={230}>
             <BarChart data={CATCH} margin={{ top: 16, right: 8, bottom: 0, left: -22 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
@@ -127,7 +127,7 @@ export default function Observability() {
             </BarChart>
           </ResponsiveContainer>
           <div style={{ marginTop: 8, fontSize: 11, color: 'var(--text)', textAlign: 'center', padding: '8px 10px', background: 'var(--accent-dim)', borderRadius: 7 }}>
-            <b>+90 points of catch rate</b> recovered — entirely from making features reproducible, not retraining a better model.
+            <b>+90 points of catch rate</b> recovered - entirely from making features reproducible, not retraining a better model.
           </div>
         </div>
 

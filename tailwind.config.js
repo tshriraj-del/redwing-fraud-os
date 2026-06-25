@@ -14,7 +14,9 @@ export default {
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
         mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
-        display: ['Syne', 'system-ui', 'sans-serif'],
+        // Aligned to the rest of the suite: the command-center pages use Inter, not a
+        // separate display face. font-display now renders Inter so FraudSense matches.
+        display: ['Inter', 'system-ui', 'sans-serif'],
       },
       keyframes: {
         fadeUp: {

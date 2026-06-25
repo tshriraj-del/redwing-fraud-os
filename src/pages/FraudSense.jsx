@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Sparkles, Search } from 'lucide-react';
 import InputSection from '../fraudsense/components/InputSection.jsx';
 import ResultsSection from '../fraudsense/components/ResultsSection.jsx';
 import SkeletonLoader from '../fraudsense/components/SkeletonLoader.jsx';
@@ -8,7 +9,7 @@ import { CASE_TYPES, MIN_INPUT_LENGTH } from '../fraudsense/constants.js';
 
 const DEMO_ANALYSIS = {
   risk_score: { score: 87, tier: 'HIGH', confidence: 'High', score_basis: 'Multiple strong behavioural signals consistent with card testing bot. Extreme velocity, micro-amounts, and machine-timing regularity.' },
-  loss_estimate: { direct: 0, indirect: 4200, total: 4200, currency: 'USD', recovery_likelihood: 'High', recovery_basis: 'No successful large-value transaction completed — testing phase intercepted.' },
+  loss_estimate: { direct: 0, indirect: 4200, total: 4200, currency: 'USD', recovery_likelihood: 'High', recovery_basis: 'No successful large-value transaction completed - testing phase intercepted.' },
   signals: [
     { label: 'Micro-amount velocity burst', strength: 'Strong', basis: 'Observed', direction: 'Increases risk' },
     { label: 'Machine-like timing regularity (< 40ms variance)', strength: 'Strong', basis: 'Observed', direction: 'Increases risk' },
@@ -26,7 +27,7 @@ const DEMO_ANALYSIS = {
   recommendation: {
     action: 'Decline',
     rationale: 'Card testing bot confirmed with high confidence. Block all further transactions and initiate rule synthesis.',
-    steps: ['Immediately block all outbound Zelle from this account', 'Quarantine device fingerprint — block same device on all accounts', 'Escalate to fraud operations for rule synthesis via Rule Factory', 'Notify card issuer of potential compromised card data'],
+    steps: ['Immediately block all outbound Zelle from this account', 'Quarantine device fingerprint - block same device on all accounts', 'Escalate to fraud operations for rule synthesis via Rule Factory', 'Notify card issuer of potential compromised card data'],
     escalation_required: true, law_enforcement: false,
   },
 };
@@ -42,10 +43,13 @@ export default function FraudSense() {
   const [error, setError]             = useState('');
   const [analysis, setAnalysis]       = useState(null);
   const [caseMeta, setCaseMeta]       = useState(null);
+  const [live, setLive]               = useState(null);
 
   useEffect(() => {
     fetch('http://localhost:8000/health', { signal: AbortSignal.timeout(2500) })
+      .then(() => setLive(true))
       .catch(() => {
+        setLive(false);
         setCaseText(DEMO_CASE_TEXT);
         setAnalysis(DEMO_ANALYSIS);
         setCaseMeta({ caseText: DEMO_CASE_TEXT, caseType: CASE_TYPES[0], contextFlags: [], attachments: [] });
@@ -116,8 +120,25 @@ export default function FraudSense() {
   const status = loading ? 'analyzing' : analysis ? 'complete' : 'ready';
 
   return (
-    <div className="relative min-h-full overflow-auto" style={{ background: 'var(--bg-base)', color: 'var(--text-primary)' }}>
-      <main className="relative z-10 mx-auto max-w-[1100px] px-4 py-8 sm:px-6 sm:py-10">
+    <div style={{ height: '100%', overflowY: 'auto', background: 'var(--bg-base)', color: 'var(--text-primary)' }}>
+      <div style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+
+        {/* Suite-style header bar */}
+        <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 10, padding: '14px 18px', display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{ width: 28, height: 28, background: 'linear-gradient(135deg,#a78bfa,#c084fc)', borderRadius: 7, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <Sparkles size={15} color="#fff" />
+          </div>
+          <div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)' }}>FraudSense - Investigation Copilot</div>
+            <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>LLM investigation: signal extraction → risk scoring → classification → root cause → recommended action</div>
+          </div>
+          <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 6, fontSize: 10, color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>
+            <div style={{ width: 7, height: 7, borderRadius: '50%', background: live ? 'var(--green)' : live === false ? 'var(--yellow)' : 'var(--text-muted)' }} />
+            {live === null ? 'Connecting…' : live ? 'Live · operator online' : 'Demo mode · showing a sample case'}
+          </div>
+        </div>
+
+      <main className="mx-auto max-w-[1100px]" style={{ width: '100%' }}>
         <InputSection
           caseText={caseText}
           setCaseText={setCaseText}
@@ -164,26 +185,24 @@ export default function FraudSense() {
           {!loading && !analysis && !error && <FraudSenseEmptyState />}
         </div>
       </main>
+      </div>
     </div>
   );
 }
 
 function FraudSenseEmptyState() {
   return (
-    <div className="mx-auto max-w-[720px] rounded-lg border border-dashed px-6 py-14 text-center"
-      style={{ borderColor: 'var(--border-active)', background: 'rgba(13,17,23,0.4)' }}>
-      <span className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-lg border"
-        style={{ borderColor: 'var(--border-active)', background: 'var(--bg-base)', color: 'var(--accent-cyan)' }}>
-        <svg className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 15.803M10.5 7.5v6m3-3h-6" />
-        </svg>
-      </span>
-      <h3 className="font-display text-sm font-bold uppercase tracking-[0.12em]" style={{ color: 'var(--text-primary)' }}>
-        Awaiting case input
-      </h3>
-      <p className="mx-auto mt-2 max-w-md font-mono text-[12px] leading-[1.7]" style={{ color: 'var(--text-secondary)' }}>
-        FraudSense runs a 4-stage investigation — signal extraction, classification, root cause analysis, and a recommended action.
-      </p>
+    <div style={{ maxWidth: 560, margin: '0 auto', textAlign: 'center', background: 'var(--bg-surface)',
+      border: '1px solid var(--border)', borderRadius: 10, padding: '40px 24px' }}>
+      <div style={{ width: 40, height: 40, margin: '0 auto 14px', borderRadius: 9, display: 'flex', alignItems: 'center',
+        justifyContent: 'center', background: 'var(--accent-dim)', color: 'var(--accent-bright)' }}>
+        <Search size={18} />
+      </div>
+      <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)' }}>Awaiting case input</div>
+      <div style={{ fontSize: 11.5, color: 'var(--text-muted)', marginTop: 6, lineHeight: 1.6, maxWidth: 420, marginInline: 'auto' }}>
+        Paste a case or open one from the Investigator panel. FraudSense extracts signals, scores risk, classifies the typology,
+        reconstructs root cause, and recommends a data-grounded action - citing the evidence it used.
+      </div>
     </div>
   );
 }

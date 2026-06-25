@@ -47,12 +47,12 @@ const TOOLS = [
 ];
 
 const FEED = [
-  { time: '2m ago',  msg: 'FraudSense flagged 3 high-risk ATO cases — escalation recommended',            color: 'var(--red)' },
+  { time: '2m ago',  msg: 'FraudSense flagged 3 high-risk ATO cases - escalation recommended',            color: 'var(--red)' },
   { time: '11m ago', msg: 'RuleBreaker: velocity_abuse_v3 bypassed under low-balance condition',           color: 'var(--yellow)' },
   { time: '34m ago', msg: 'SyntheticID Agent: card_testing_bot triggered 5 new rule gap signals',           color: 'var(--yellow)' },
   { time: '1h ago',  msg: 'Rule Factory: 3 candidates generated from SyntheticID stress-test',             color: 'var(--green)' },
-  { time: '2h ago',  msg: 'SAR Writer: OFAC SDN match auto-detected — draft generated for review',         color: 'var(--red)' },
-  { time: '3h ago',  msg: 'ML Detection Lab: XGBoost retrained on 23 features — AUC 0.979',               color: 'var(--green)' },
+  { time: '2h ago',  msg: 'SAR Writer: OFAC SDN match auto-detected - draft generated for review',         color: 'var(--red)' },
+  { time: '3h ago',  msg: 'ML Detection Lab: XGBoost retrained on 23 features - AUC 0.979',               color: 'var(--green)' },
 ];
 
 function MetricCard({ label, value, delta, good, icon: Icon }) {
@@ -130,9 +130,9 @@ export default function Dashboard() {
   }, []);
 
   const metricCards = [
-    { label: 'Model AUC',          value: metrics ? (metrics.auc_redwing || metrics.auc_ensemble || 0).toFixed(4) : '—', delta: metrics?.feature_count === 23 ? '23 features · v2' : '13 features · v1', good: true,  icon: TrendingUp },
-    { label: 'Fraud Rate',         value: metrics ? `${(metrics.fraud_rate * 100).toFixed(2)}%` : '—',  delta: `of ${metrics ? metrics.n_transactions?.toLocaleString() : '—'} transactions`, good: true,  icon: ShieldCheck },
-    { label: 'Rule Gaps',          value: ruleGaps !== null ? ruleGaps : '—',  delta: 'ML catching what rules miss', good: false, icon: Sparkles },
+    { label: 'Model AUC',          value: metrics ? (metrics.auc_redwing || metrics.auc_ensemble || 0).toFixed(4) : '-', delta: metrics?.feature_count === 23 ? '23 features · v2' : '13 features · v1', good: true,  icon: TrendingUp },
+    { label: 'Fraud Rate',         value: metrics ? `${(metrics.fraud_rate * 100).toFixed(2)}%` : '-',  delta: `of ${metrics ? metrics.n_transactions?.toLocaleString() : '-'} transactions`, good: true,  icon: ShieldCheck },
+    { label: 'Rule Gaps',          value: ruleGaps !== null ? ruleGaps : '-',  delta: 'ML catching what rules miss', good: false, icon: Sparkles },
     { label: 'Analyst Tools',      value: TOOLS.length, delta: 'All integrated · internal routes', good: true,  icon: Zap },
   ];
 

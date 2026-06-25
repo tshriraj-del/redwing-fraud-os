@@ -170,7 +170,7 @@ function ExplanationDetail({ record, onClose }) {
           borderRadius: 6, padding: '8px 12px',
         }}>
           <AlertTriangle size={14} />
-          Human analyst review required before any automated action (EU AI Act Art. 14 — human oversight).
+          Human analyst review required before any automated action (EU AI Act Art. 14 - human oversight).
         </div>
       )}
     </div>
@@ -293,7 +293,7 @@ function DecisionLog({ records, loading, onRefresh }) {
 
 function ModelCard({ card, loading }) {
   if (loading) return <div style={{ color: 'var(--text-muted)', padding: 32, textAlign: 'center' }}>Loading model card…</div>;
-  if (!card) return <div style={{ color: 'var(--text-muted)', padding: 32, textAlign: 'center' }}>Models not loaded — run the ML notebook first.</div>;
+  if (!card) return <div style={{ color: 'var(--text-muted)', padding: 32, textAlign: 'center' }}>Models not loaded - run the ML notebook first.</div>;
 
   const m = card.performance_metrics || {};
   const eu = card.eu_ai_act_compliance || {};
@@ -313,7 +313,7 @@ function ModelCard({ card, loading }) {
         ].map(([k, v]) => (
           <div key={k} style={{ display: 'flex', gap: 12, marginBottom: 8, fontSize: 12 }}>
             <span style={{ color: 'var(--text-muted)', width: 100, flexShrink: 0 }}>{k}</span>
-            <span style={{ color: 'var(--text)' }}>{v || '—'}</span>
+            <span style={{ color: 'var(--text)' }}>{v || '-'}</span>
           </div>
         ))}
       </Card>
@@ -321,7 +321,7 @@ function ModelCard({ card, loading }) {
       <Card>
         <SectionLabel>Performance Metrics</SectionLabel>
         {Object.keys(m).length === 0
-          ? <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>No metrics recorded — train the model first.</p>
+          ? <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>No metrics recorded - train the model first.</p>
           : Object.entries(m).map(([k, v]) => (
             <div key={k} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: 12 }}>
               <span style={{ color: 'var(--text-muted)' }}>{k}</span>
@@ -344,7 +344,7 @@ function ModelCard({ card, loading }) {
         ].map(([k, v, ok]) => (
           <div key={k} style={{ display: 'flex', gap: 10, marginBottom: 8, fontSize: 12 }}>
             <span style={{ color: 'var(--text-muted)', width: 160, flexShrink: 0 }}>{k}</span>
-            <span style={{ color: ok === true ? '#3fb950' : ok === false ? '#f0b429' : 'var(--text)' }}>{v || '—'}</span>
+            <span style={{ color: ok === true ? '#3fb950' : ok === false ? '#f0b429' : 'var(--text)' }}>{v || '-'}</span>
           </div>
         ))}
       </Card>
@@ -456,7 +456,7 @@ function GovernancePanel({ metrics, loading }) {
       <Card style={{ gridColumn: '1 / -1' }}>
         <SectionLabel>Top Risk Drivers</SectionLabel>
         {drivers.length === 0
-          ? <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>No data yet — score transactions to populate.</p>
+          ? <p style={{ fontSize: 12, color: 'var(--text-muted)' }}>No data yet - score transactions to populate.</p>
           : drivers.map((d, i) => {
             const max = drivers[0]?.count || 1;
             return (
@@ -501,7 +501,7 @@ function GovernancePanel({ metrics, loading }) {
 const DEMO_RECORDS = [
   {
     explanation_id: 'xai_demo_001', transaction_id: 'txn_4f2a9b', verdict: 'CRITICAL',
-    combined_score: 0.91, ml_score: 0.88, narrative: 'High-confidence card testing bot pattern — micro-amount burst on P2P rails with extreme velocity.',
+    combined_score: 0.91, ml_score: 0.88, narrative: 'High-confidence card testing bot pattern - micro-amount burst on P2P rails with extreme velocity.',
     explanation_method: 'SHAP TreeExplainer', model_id: 'redwing-fraud-xgb-v1', model_version: '2',
     human_review_required: true,
     pattern_match: { pattern_name: 'Card Testing Bot', confidence: 0.93 },
@@ -515,7 +515,7 @@ const DEMO_RECORDS = [
   },
   {
     explanation_id: 'xai_demo_002', transaction_id: 'txn_b81e3c', verdict: 'HIGH',
-    combined_score: 0.76, ml_score: 0.74, narrative: 'ATO bot pattern detected — headless browser accessing wire transfer at unusual hour.',
+    combined_score: 0.76, ml_score: 0.74, narrative: 'ATO bot pattern detected - headless browser accessing wire transfer at unusual hour.',
     explanation_method: 'SHAP TreeExplainer', model_id: 'redwing-fraud-xgb-v1', model_version: '2',
     human_review_required: false,
     pattern_match: { pattern_name: 'AI-Powered ATO', confidence: 0.81 },
@@ -529,7 +529,7 @@ const DEMO_RECORDS = [
   },
   {
     explanation_id: 'xai_demo_003', transaction_id: 'txn_c93d17', verdict: 'MEDIUM',
-    combined_score: 0.52, ml_score: 0.49, narrative: 'Moderate risk — round amount to new crypto recipient. Below block threshold but flagged for review.',
+    combined_score: 0.52, ml_score: 0.49, narrative: 'Moderate risk - round amount to new crypto recipient. Below block threshold but flagged for review.',
     explanation_method: 'SHAP TreeExplainer', model_id: 'redwing-fraud-xgb-v1', model_version: '2',
     human_review_required: false,
     pattern_match: null,
@@ -543,7 +543,7 @@ const DEMO_RECORDS = [
   },
   {
     explanation_id: 'xai_demo_004', transaction_id: 'txn_a27f58', verdict: 'LOW',
-    combined_score: 0.08, ml_score: 0.07, narrative: 'Low risk — established account, known recipient, modest amount on standard rail.',
+    combined_score: 0.08, ml_score: 0.07, narrative: 'Low risk - established account, known recipient, modest amount on standard rail.',
     explanation_method: 'SHAP TreeExplainer', model_id: 'redwing-fraud-xgb-v1', model_version: '2',
     human_review_required: false,
     pattern_match: null,
@@ -568,14 +568,14 @@ const DEMO_MODEL_CARD = {
     'F1 Score': 0.8465, 'Brier Score': 0.0412,
   },
   eu_ai_act_compliance: {
-    risk_tier: 'High-risk (Annex III — AI in creditworthiness)',
+    risk_tier: 'High-risk (Annex III - AI in creditworthiness)',
     explainability_method: 'SHAP TreeExplainer (per-prediction)',
     human_oversight_policy: 'Mandatory review for CRITICAL verdicts',
     conformity_assessment: 'pending',
     registration_required: true,
   },
   sr_26_02_governance: {
-    model_owner: 'Risk Technology — Fraud Models',
+    model_owner: 'Risk Technology - Fraud Models',
     board_accountability: true,
     challenger_model: 'LightGBM v1 (shadow)',
     last_validation: '2026-05-14',
@@ -603,11 +603,11 @@ const DEMO_GOVERNANCE = {
   verdict_pct: { CRITICAL: 2.1, HIGH: 12.4, MEDIUM: 26.4, LOW: 59.0 },
   score_histogram: [3200, 2100, 1400, 980, 720, 1100, 1600, 1980, 1100, 647],
   top_risk_drivers: [
-    { label: 'velocity_24h_raw — high transaction velocity', count: 4821 },
-    { label: 'is_instant_rail — instant payment rail', count: 3744 },
-    { label: 'new_recipient — first-time recipient', count: 3291 },
-    { label: 'amount_log — unusually large amount', count: 2887 },
-    { label: 'is_crypto — cryptocurrency payment', count: 1943 },
+    { label: 'velocity_24h_raw - high transaction velocity', count: 4821 },
+    { label: 'is_instant_rail - instant payment rail', count: 3744 },
+    { label: 'new_recipient - first-time recipient', count: 3291 },
+    { label: 'amount_log - unusually large amount', count: 2887 },
+    { label: 'is_crypto - cryptocurrency payment', count: 1943 },
   ],
 };
 

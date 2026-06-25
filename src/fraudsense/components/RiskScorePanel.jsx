@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
+import { Gauge } from 'lucide-react';
 import { SEVERITY_STYLE, severityFromScore, PANEL_ANIM, BORDER_ANIM } from '../constants.js';
+import PanelHead from './PanelHead.jsx';
 
 // Animated count-up from 0 to `target`.
 function useCountUp(target, duration = 700, delay = 450) {
@@ -42,18 +44,22 @@ export default function RiskScorePanel({ riskScore = {}, order = 1 }) {
     >
       <span className={`edge ${BORDER_ANIM[order]}`} style={{ background: style.color }} />
 
-      <div className="flex items-start justify-between">
-        <h3 className="panel-label text-[12px] text-[color:var(--text-secondary)]">Risk Score</h3>
-        <span
-          className="rounded-lg px-2 py-0.5 font-display text-[11px] uppercase tracking-[0.12em]"
-          style={{ color: style.color, background: style.dim, border: `1px solid ${style.color}` }}
-        >
-          {severity}
-        </span>
-      </div>
+      <PanelHead
+        icon={Gauge}
+        title="Risk Score"
+        accent={style.color}
+        right={
+          <span
+            className="rounded-md px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-[0.06em]"
+            style={{ color: style.color, background: style.dim, border: `1px solid ${style.color}55` }}
+          >
+            {severity}
+          </span>
+        }
+      />
 
-      <div className="mt-2 flex items-baseline gap-1">
-        <span className="font-display text-5xl font-extrabold leading-none" style={{ color: style.color }}>
+      <div className="flex items-baseline gap-1">
+        <span className="font-mono text-5xl font-extrabold leading-none" style={{ color: style.color, letterSpacing: '-0.02em' }}>
           {shown}
         </span>
         <span className="font-mono text-sm text-[color:var(--text-dim)]">/ 100</span>

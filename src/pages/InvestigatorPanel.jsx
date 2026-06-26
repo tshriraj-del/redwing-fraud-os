@@ -4,7 +4,7 @@ import {
   CheckCircle2, XCircle, AlertTriangle, MinusCircle, Search, RefreshCw, FileText,
   Sparkles, Quote,
 } from 'lucide-react';
-import { fetchCase, fetchAlertQueue } from '../api.js';
+import { fetchCase, fetchAlertQueue, postFeedback } from '../api.js';
 import { investigateStructuredCase } from '../fraudsense/api.js';
 
 // ── Demo fallback (Vercel / operator-down) - a confirmed card-fraud case ──────
@@ -187,6 +187,22 @@ export default function InvestigatorPanel() {
   const [query, setQuery] = useState('');
   const [queue, setQueue] = useState([]);
   const [decision, setDecision] = useState(null);
+  const [loopMsg, setLoopMsg] = useState(null);
+
+  const submitDecision = useCallback((id) => {
+    setDecision(id);
+    postFeedback({
+      transactionId: c.transaction_id,
+      label: id,
+      recipientId: c.transaction?.recipient_id || c.device_network?.recipient_id || '',
+    }).then((r) => {
+      if (r?.online_reputation_update) {
+        setLoopMsg(`Fed back to the model. Payee reputation now ${(r.online_reputation_update.recipient_global_fraud_rate * 100).toFixed(1)}% - next payment to it scores higher.`);
+      } else if (r?.recorded) {
+        setLoopMsg('Disposition recorded and queued for retraining.');
+      }
+    }).catch(() => {});
+  }, [c]);
   const [note, setNote] = useState('');
   const [ai, setAi] = useState({ status: 'idle' }); // FraudSense second opinion
 
@@ -529,7 +545,7 @@ export default function InvestigatorPanel() {
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
               {c.disposition_options?.map(o => (
-                <button key={o.id} onClick={() => setDecision(o.id)}
+                <button key={o.id} onClick={() => submitDecision(o.id)}
                   style={{ fontSize: 10.5, fontWeight: 600, padding: '7px 8px', borderRadius: 7, cursor: 'pointer',
                     textAlign: 'left', color: chosen === o.id ? '#fff' : TONE[o.tone],
                     background: chosen === o.id ? TONE[o.tone] : `${TONE[o.tone]}14`,
@@ -539,6 +555,11 @@ export default function InvestigatorPanel() {
                 </button>
               ))}
             </div>
+            {loopMsg && (
+              <div style={{ marginTop: 8, fontSize: 10, color: 'var(--green)', background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.25)', borderRadius: 7, padding: '7px 9px', lineHeight: 1.5 }}>
+                {loopMsg}
+              </div>
+            )}
             <textarea value={note} onChange={e => setNote(e.target.value)} placeholder="Investigator notes (audited)…"
               style={{ width: '100%', marginTop: 10, minHeight: 48, background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: 7, padding: '7px 9px', color: 'var(--text)', fontSize: 11, resize: 'vertical', fontFamily: 'inherit', boxSizing: 'border-box' }} />
 

@@ -1,7 +1,7 @@
 import { NavLink } from 'react-router-dom';
 import {
   LayoutDashboard, MessageSquare, FlaskConical,
-  ChevronLeft, ChevronRight, Zap, Radar, Sparkles, GitFork, Code2, Bot, ShieldCheck, Gauge, ShieldAlert, Database, Boxes, Swords,
+  ChevronLeft, ChevronRight, Zap, Radar, Sparkles, GitFork, Code2, Bot, ShieldCheck, Gauge, ShieldAlert, Database, Boxes, Swords, Network,
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -11,6 +11,7 @@ const NAV = [
   { to: '/ml',        icon: FlaskConical,    label: 'ML Detection Lab' },
   { to: '/real-model', icon: Database,       label: 'Real-Data Model' },
   { to: '/privacy',   icon: ShieldCheck,     label: 'Privacy Lab' },
+  { to: '/consortium', icon: Network,        label: 'Consortium Network' },
   { to: '/observability', icon: Gauge,       label: 'Observability' },
   { to: '/operator',  icon: Radar,           label: 'Operator' },
   { to: '/investigate', icon: ShieldAlert,   label: 'Investigator' },

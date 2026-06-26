@@ -56,6 +56,14 @@ export async function scoreTransactionML(tx) {
   return res.json();
 }
 
+// Privacy-preserving cross-institution consortium - sourced from Operator /consortium/demo
+export async function fetchConsortium() {
+  if (!IS_LOCAL) throw new Error('Operator unreachable');
+  const res = await fetch(`${OPERATOR}/consortium/demo`, { signal: AbortSignal.timeout(4000) });
+  if (!res.ok) throw new Error('Operator unreachable');
+  return res.json();
+}
+
 // Differential-privacy utility curve - sourced from Operator /privacy/curve
 export async function fetchPrivacyCurve() {
   if (!IS_LOCAL) throw new Error('Operator unreachable');
@@ -120,6 +128,18 @@ export async function runEnvAll(transactionId) {
   const res = await fetch(`${OPERATOR}/env/run-all`, {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ transaction_id: transactionId }), signal: AbortSignal.timeout(6000),
+  });
+  if (!res.ok) throw new Error('Operator unreachable');
+  return res.json();
+}
+
+// Closed feedback loop - record an analyst disposition (Operator /feedback)
+export async function postFeedback({ transactionId, label, recipientId, source = 'investigator' }) {
+  if (!IS_LOCAL) return { recorded: false, demo: true };
+  const res = await fetch(`${OPERATOR}/feedback`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ transaction_id: transactionId, label, recipient_id: recipientId, source }),
+    signal: AbortSignal.timeout(4000),
   });
   if (!res.ok) throw new Error('Operator unreachable');
   return res.json();

@@ -21,6 +21,7 @@ const Investigator    = lazy(() => import('./pages/InvestigatorPanel.jsx'));
 const RealModel       = lazy(() => import('./pages/RealModel.jsx'));
 const AgentEnv        = lazy(() => import('./pages/AgentEnv.jsx'));
 const Adversary       = lazy(() => import('./pages/Adversary.jsx'));
+const Consortium      = lazy(() => import('./pages/ConsortiumNetwork.jsx'));
 
 function PageLoader() {
   return (
@@ -56,6 +57,7 @@ export default function App() {
               <Route path="/xai"         element={<XAILab />} />
               <Route path="/syntheticid" element={<SyntheticID />} />
               <Route path="/privacy"     element={<PrivacyLab />} />
+              <Route path="/consortium"  element={<Consortium />} />
               <Route path="/observability" element={<Observability />} />
             </Routes>
           </Suspense>

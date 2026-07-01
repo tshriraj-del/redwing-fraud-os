@@ -42,7 +42,7 @@ const FALLBACK = {
   headline: 'PR-AUC 0.897 on REAL fraud at a 0.17% base rate - the honest metric, not ROC-AUC 0.985.',
 };
 
-const EM = '#34d399';   // "real data" accent
+const EM = 'var(--accent)';   // "real data" accent
 
 function Metric({ label, value, sub, accent, big }) {
   return (
@@ -69,7 +69,7 @@ function SampleCard({ s }) {
   const blocked = s.decision === 'BLOCK';
   const isFraud = s.ground_truth === 1;
   const correct = (blocked && isFraud) || (!blocked && !isFraud);
-  const vColor = correct ? '#22c55e' : '#ef4444';
+  const vColor = correct ? 'var(--green)' : 'var(--red)';
   const vText = correct ? (isFraud ? 'Caught ✓' : 'Correctly allowed ✓') : (isFraud ? 'Missed ✗' : 'False positive ✗');
   return (
     <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 10, padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -80,19 +80,19 @@ function SampleCard({ s }) {
       <div style={{ fontSize: 10.5, color: 'var(--text-muted)', lineHeight: 1.5, minHeight: 30 }}>{s.story}</div>
       {!revealed ? (
         <button onClick={() => setRevealed(true)}
-          style={{ fontSize: 11, fontWeight: 600, color: EM, background: `${EM}14`, border: `1px solid ${EM}44`, borderRadius: 7, padding: '6px 0', cursor: 'pointer' }}>
+          style={{ fontSize: 11, fontWeight: 600, color: EM, background: 'var(--accent-dim)', border: '1px solid var(--accent)', borderRadius: 7, padding: '6px 0', cursor: 'pointer' }}>
           Score it →
         </button>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 5, borderTop: '1px solid var(--border)', paddingTop: 8 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11 }}>
             <span style={{ color: 'var(--text-muted)' }}>model P(fraud)</span>
-            <span style={{ fontFamily: 'JetBrains Mono, monospace', fontWeight: 700, color: blocked ? '#ef4444' : 'var(--text)' }}>{(s.p_fraud * 100).toFixed(1)}%</span>
+            <span style={{ fontFamily: 'JetBrains Mono, monospace', fontWeight: 700, color: blocked ? 'var(--red)' : 'var(--text)' }}>{(s.p_fraud * 100).toFixed(1)}%</span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11 }}>
             <span style={{ color: 'var(--text-muted)' }}>decision → truth</span>
             <span style={{ fontWeight: 600 }}>
-              <span style={{ color: blocked ? '#ef4444' : '#22c55e' }}>{s.decision}</span>
+              <span style={{ color: blocked ? 'var(--red)' : 'var(--green)' }}>{s.decision}</span>
               <span style={{ color: 'var(--text-muted)' }}> → {isFraud ? 'fraud' : 'legit'}</span>
             </span>
           </div>
@@ -121,15 +121,15 @@ export default function RealModel() {
 
       {/* header */}
       <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 10, padding: '14px 18px', display: 'flex', alignItems: 'center', gap: 12 }}>
-        <div style={{ width: 30, height: 30, background: `linear-gradient(135deg,${EM},#10b981)`, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-          <Database size={16} color="#062c22" />
+        <div style={{ width: 30, height: 30, background: 'var(--accent)', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+          <Database size={16} color="#fff" />
         </div>
         <div>
           <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text)' }}>Real-Data Validation - Payment Fraud</div>
           <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>The engine, graded on real labels - not the synthetic data it was built on</div>
         </div>
         <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 10 }}>
-          <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 10, fontWeight: 700, color: EM, background: `${EM}1a`, border: `1px solid ${EM}55`, padding: '3px 9px', borderRadius: 6, letterSpacing: '0.04em' }}>
+          <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 10, fontWeight: 700, color: EM, background: 'var(--accent-dim)', border: '1px solid var(--accent)', padding: '3px 9px', borderRadius: 6, letterSpacing: '0.04em' }}>
             <ShieldCheck size={12} /> REAL DATA · OUT-OF-SAMPLE
           </span>
           <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 10, color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>
@@ -145,7 +145,7 @@ export default function RealModel() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 10 }}>
             <Database size={13} style={{ color: EM }} />
             <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text)' }}>Dataset provenance</span>
-            <span style={{ marginLeft: 'auto', fontSize: 9.5, fontWeight: 700, color: EM, background: `${EM}1a`, border: `1px solid ${EM}55`, padding: '2px 7px', borderRadius: 5 }}>SYNTHETIC: NO</span>
+            <span style={{ marginLeft: 'auto', fontSize: 9.5, fontWeight: 700, color: EM, background: 'var(--accent-dim)', border: '1px solid var(--accent)', padding: '2px 7px', borderRadius: 5 }}>SYNTHETIC: NO</span>
           </div>
           <div style={{ fontSize: 11.5, color: 'var(--text)', fontWeight: 600, marginBottom: 2 }}>{ds.name}</div>
           <div style={{ fontSize: 10.5, color: 'var(--text-muted)', lineHeight: 1.6 }}>{ds.source}</div>
@@ -159,8 +159,8 @@ export default function RealModel() {
 
         <div style={{ background: 'var(--bg-surface)', border: '1px solid rgba(245,158,11,0.25)', borderRadius: 10, padding: '14px 16px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
-            <AlertTriangle size={13} style={{ color: '#f59e0b' }} />
-            <span style={{ fontSize: 12, fontWeight: 700, color: '#f59e0b' }}>Why PR-AUC, not ROC-AUC</span>
+            <AlertTriangle size={13} style={{ color: 'var(--yellow)' }} />
+            <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--yellow)' }}>Why PR-AUC, not ROC-AUC</span>
           </div>
           <div style={{ fontSize: 11.5, color: 'var(--text)', lineHeight: 1.65 }}>
             At a <b>{(mt.base_rate * 100).toFixed(2)}%</b> base rate, ROC-AUC <b style={{ fontFamily: 'JetBrains Mono, monospace' }}>{mt.roc_auc.toFixed(3)}</b> flatters the model - a near-perfect-looking score that hides the real cost. <b style={{ color: EM }}>PR-AUC {mt.pr_auc.toFixed(3)}</b> is the honest number: it's measured against the rarity of fraud, where false positives actually hurt.
@@ -188,7 +188,7 @@ export default function RealModel() {
               <XAxis dataKey="recall" type="number" domain={[0, 1]} tick={{ fill: 'var(--text-muted)', fontSize: 9 }} tickFormatter={v => `${(v * 100).toFixed(0)}%`} tickLine={false} axisLine={false} label={{ value: 'recall', position: 'insideBottom', offset: -2, fill: 'var(--text-muted)', fontSize: 10 }} />
               <YAxis domain={[0, 1]} tick={{ fill: 'var(--text-muted)', fontSize: 9 }} tickFormatter={v => `${(v * 100).toFixed(0)}%`} tickLine={false} axisLine={false} />
               <Tooltip content={<PRTooltip />} />
-              <ReferenceLine y={mt.base_rate} stroke="#64748b" strokeDasharray="5 4" />
+              <ReferenceLine y={mt.base_rate} stroke="var(--text-muted)" strokeDasharray="5 4" />
               <Line type="monotone" dataKey="precision" stroke={EM} strokeWidth={2} dot={false} />
             </LineChart>
           </ResponsiveContainer>
@@ -199,7 +199,7 @@ export default function RealModel() {
           <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 10, padding: '14px 16px' }}>
             <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text)', marginBottom: 10 }}>Confusion (test split)</div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-              {[['True positive', mt.tp, '#22c55e'], ['False positive', mt.fp, '#ef4444'], ['False negative', mt.fn, '#f59e0b'], ['True negative', mt.tn, 'var(--text-muted)']].map(([l, v, c]) => (
+              {[['True positive', mt.tp, 'var(--green)'], ['False positive', mt.fp, 'var(--red)'], ['False negative', mt.fn, 'var(--yellow)'], ['True negative', mt.tn, 'var(--text-muted)']].map(([l, v, c]) => (
                 <div key={l} style={{ background: 'var(--bg-elevated)', borderRadius: 8, padding: '9px 11px' }}>
                   <div style={{ fontSize: 9.5, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{l}</div>
                   <div style={{ fontSize: 18, fontWeight: 700, color: c, fontFamily: 'JetBrains Mono, monospace', marginTop: 3 }}>{v.toLocaleString()}</div>

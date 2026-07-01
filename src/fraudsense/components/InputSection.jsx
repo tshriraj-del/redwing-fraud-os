@@ -237,12 +237,10 @@ export default function InputSection({
         onMouseEnter={(e) => {
           if (canSubmit) {
             e.currentTarget.style.background = 'var(--accent-cyan-dim)';
-            e.currentTarget.style.boxShadow = '0 0 20px rgba(57,208,216,0.15)';
           }
         }}
         onMouseLeave={(e) => {
           e.currentTarget.style.background = 'transparent';
-          e.currentTarget.style.boxShadow = 'none';
         }}
       >
         {loading ? (

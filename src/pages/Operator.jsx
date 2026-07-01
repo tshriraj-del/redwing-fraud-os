@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { callOnce } from '../api.js';
+import Badge from '../components/Badge.jsx';
 
 const BACKEND = 'http://localhost:8000';
 const IS_LOCAL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
@@ -62,12 +63,12 @@ Triage this transaction.`;
 
 const DEMO_TX_SCENARIOS = [
   { pattern: 'Card Testing Bot',        color: '#4ade80', rail: 'Zelle',  minAmt: 0.50, maxAmt: 1.99, mlBase: 0.86, signals: [{ label: 'micro_amount_sequence', strength: 0.91 }, { label: 'velocity_burst_24h', strength: 0.88 }] },
-  { pattern: 'AI-Powered ATO',          color: '#f59e0b', rail: 'wire',   minAmt: 1200, maxAmt: 4500, mlBase: 0.79, signals: [{ label: 'headless_browser_flag',  strength: 0.84 }, { label: 'new_recipient',         strength: 0.77 }] },
+  { pattern: 'AI-Powered ATO',          color: 'var(--yellow)', rail: 'wire',   minAmt: 1200, maxAmt: 4500, mlBase: 0.79, signals: [{ label: 'headless_browser_flag',  strength: 0.84 }, { label: 'new_recipient',         strength: 0.77 }] },
   { pattern: 'Pig Butchering Scam',     color: '#fb923c', rail: 'crypto', minAmt: 3500, maxAmt: 18000,mlBase: 0.72, signals: [{ label: 'crypto_exchange_mule',   strength: 0.79 }, { label: 'social_engineering_flag', strength: 0.68 }] },
-  { pattern: 'APP Scam',                color: '#38bdf8', rail: 'wire',   minAmt: 800,  maxAmt: 6000, mlBase: 0.68, signals: [{ label: 'authorized_push_pattern', strength: 0.73 }, { label: 'new_payee',             strength: 0.61 }] },
-  { pattern: 'Synthetic Identity Farm', color: '#c084fc', rail: 'ACH',    minAmt: 200,  maxAmt: 1200, mlBase: 0.61, signals: [{ label: 'thin_file_mismatch',      strength: 0.69 }, { label: 'address_velocity',      strength: 0.55 }] },
-  { pattern: null, color: '#64748b', rail: 'card', minAmt: 20, maxAmt: 380, mlBase: 0.08, signals: [] },
-  { pattern: null, color: '#64748b', rail: 'ACH',  minAmt: 50, maxAmt: 900, mlBase: 0.11, signals: [] },
+  { pattern: 'APP Scam',                color: 'var(--blue)', rail: 'wire',   minAmt: 800,  maxAmt: 6000, mlBase: 0.68, signals: [{ label: 'authorized_push_pattern', strength: 0.73 }, { label: 'new_payee',             strength: 0.61 }] },
+  { pattern: 'Synthetic Identity Farm', color: 'var(--purple)', rail: 'ACH',    minAmt: 200,  maxAmt: 1200, mlBase: 0.61, signals: [{ label: 'thin_file_mismatch',      strength: 0.69 }, { label: 'address_velocity',      strength: 0.55 }] },
+  { pattern: null, color: 'var(--text-muted)', rail: 'card', minAmt: 20, maxAmt: 380, mlBase: 0.08, signals: [] },
+  { pattern: null, color: 'var(--text-muted)', rail: 'ACH',  minAmt: 50, maxAmt: 900, mlBase: 0.11, signals: [] },
 ];
 const DEMO_WEIGHTS_OP = [1.5, 1.5, 1, 1, 1, 4, 4];
 let _demoCtrOp = 4000;
@@ -98,7 +99,7 @@ const DEMO_INVESTIGATIONS = {
   },
   'TX4002': {
     status: 'done',
-    alertData: { transaction_id: 'TX4002', amount: 3850.00, rail: 'wire', ml_score: 0.81, combined_score: 0.87, is_alert: true, top_pattern: 'AI-Powered ATO', pattern_color: '#f59e0b', confidence: 0.84, matched_signals: [{ label: 'headless_browser_flag', strength: 0.84 }, { label: 'new_recipient', strength: 0.77 }] },
+    alertData: { transaction_id: 'TX4002', amount: 3850.00, rail: 'wire', ml_score: 0.81, combined_score: 0.87, is_alert: true, top_pattern: 'AI-Powered ATO', pattern_color: 'var(--yellow)', confidence: 0.84, matched_signals: [{ label: 'headless_browser_flag', strength: 0.84 }, { label: 'new_recipient', strength: 0.77 }] },
     result: { verdict: 'Escalate', severity: 'High', summary: 'ATO bot pattern - headless browser session initiated wire to first-time overseas recipient. Behavioral biometrics absent. Consistent with automated credential replay.', top_finding: 'headless_browser_flag + new_recipient + wire to overseas account - ATO playbook match', recommended_action: 'Place account on step-up auth hold. Call customer to verify intent. Block wire pending confirmation.', fraud_type_confirmed: 'AI-Powered ATO', confidence: 'High' },
   },
 };
@@ -108,7 +109,7 @@ const DEMO_INVESTIGATIONS = {
 const PATTERNS = [
   {
     id: 'pig_butchering', name: 'Pig Butchering', icon: '🐷',
-    risk: 'Critical', color: '#ef4444', prevalence: '30%',
+    risk: 'Critical', color: 'var(--red)', prevalence: '30%',
     description: 'Long grooming builds victim trust; large one-way exit via crypto or FedNow.',
     evasion: 'Gradual amount escalation; warms recipient slowly before strike.',
     signals: [
@@ -121,7 +122,7 @@ const PATTERNS = [
   },
   {
     id: 'app_scam', name: 'APP Scam', icon: '📲',
-    risk: 'High', color: '#f97316', prevalence: '20%',
+    risk: 'High', color: 'var(--orange)', prevalence: '20%',
     description: 'Victim socially engineered into authorizing large push payment.',
     evasion: 'Victim authorizes - evades authorization checks.',
     signals: [
@@ -134,7 +135,7 @@ const PATTERNS = [
   },
   {
     id: 'account_takeover_ai', name: 'AI-Powered ATO', icon: '🤖',
-    risk: 'Critical', color: '#c084fc', prevalence: '20%',
+    risk: 'Critical', color: 'var(--purple)', prevalence: '20%',
     description: 'AI-assisted takeover: new device + immediate high-value transfer.',
     evasion: 'Mimics victim behavior with LLM; waits hours before striking.',
     signals: [
@@ -147,7 +148,7 @@ const PATTERNS = [
   },
   {
     id: 'deepfake_social_engineering', name: 'Deepfake Social Eng.', icon: '🎭',
-    risk: 'Critical', color: '#38bdf8', prevalence: '15%',
+    risk: 'Critical', color: 'var(--blue)', prevalence: '15%',
     description: 'AI voice/video impersonates authority to authorize extreme transfer.',
     evasion: 'Known device + business hours bypasses time/device signals.',
     signals: [
@@ -159,7 +160,7 @@ const PATTERNS = [
   },
   {
     id: 'synthetic_id_ai', name: 'AI Synthetic Identity', icon: '🪪',
-    risk: 'High', color: '#f59e0b', prevalence: '10%',
+    risk: 'High', color: 'var(--yellow)', prevalence: '10%',
     description: 'AI-generated identity; gradual build then bust-out at max velocity.',
     evasion: 'Slow build mimics legit user; bust-out in a single session.',
     signals: [
@@ -171,7 +172,7 @@ const PATTERNS = [
   },
   {
     id: 'card_testing_bot', name: 'Card Testing Bot', icon: '🃏',
-    risk: 'Medium', color: '#22c55e', prevalence: '5%',
+    risk: 'Medium', color: 'var(--green)', prevalence: '5%',
     description: 'Bot validates stolen cards with micro-transactions before full exploitation.',
     evasion: 'Distributed across merchants to evade per-merchant velocity blocks.',
     signals: [
@@ -189,17 +190,13 @@ const RISK_ORDER = { Critical: 0, High: 1, Medium: 2, Low: 3 };
 
 function scoreColor(s) {
   if (s >= 0.85) return 'var(--red)';
-  if (s >= 0.65) return '#f97316';
+  if (s >= 0.65) return 'var(--orange)';
   if (s >= 0.40) return 'var(--yellow)';
   return 'var(--green)';
 }
 
-const VERDICT_COLORS = {
-  Escalate: { bg: 'rgba(239,68,68,0.12)', border: 'rgba(239,68,68,0.35)', text: '#ef4444' },
-  Decline:  { bg: 'rgba(249,115,22,0.12)', border: 'rgba(249,115,22,0.35)', text: '#f97316' },
-  Monitor:  { bg: 'rgba(245,158,11,0.12)', border: 'rgba(245,158,11,0.35)', text: '#f59e0b' },
-  Approve:  { bg: 'rgba(34,197,94,0.12)',  border: 'rgba(34,197,94,0.35)',  text: '#22c55e' },
-};
+const VERDICT_TONE  = { Escalate: 'danger', Decline: 'orange', Monitor: 'warning', Approve: 'success' };
+const VERDICT_COLOR = { Escalate: 'var(--red)', Decline: 'var(--orange)', Monitor: 'var(--yellow)', Approve: 'var(--green)' };
 
 function ScoreBar({ value, color }) {
   return (
@@ -212,17 +209,10 @@ function ScoreBar({ value, color }) {
   );
 }
 
-function RiskBadge({ risk, small }) {
-  const colors = { Critical: '#ef4444', High: '#f97316', Medium: '#f59e0b', Low: '#22c55e' };
-  const c = colors[risk] || '#64748b';
-  return (
-    <span style={{
-      fontSize: small ? 9 : 10, fontWeight: 700, color: c,
-      background: `${c}18`, border: `1px solid ${c}40`,
-      padding: small ? '1px 5px' : '2px 7px', borderRadius: 4,
-      textTransform: 'uppercase', letterSpacing: '0.05em',
-    }}>{risk}</span>
-  );
+const RISK_TONE = { Critical: 'danger', High: 'orange', Medium: 'warning', Low: 'success' };
+
+function RiskBadge({ risk }) {
+  return <Badge tone={RISK_TONE[risk] || 'neutral'}>{risk}</Badge>;
 }
 
 // ── Pattern Card ─────────────────────────────────────────────────────────────
@@ -232,11 +222,11 @@ function PatternCard({ pattern }) {
   return (
     <div
       style={{
-        background: 'var(--bg-surface)', border: `1px solid ${pattern.color}28`,
+        background: 'var(--bg-surface)', border: '1px solid var(--border)',
         borderRadius: 10, overflow: 'hidden', transition: 'border-color 0.2s ease',
       }}
-      onMouseEnter={e => e.currentTarget.style.borderColor = pattern.color + '60'}
-      onMouseLeave={e => e.currentTarget.style.borderColor = pattern.color + '28'}
+      onMouseEnter={e => e.currentTarget.style.borderColor = pattern.color}
+      onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border)'}
     >
       <div style={{ padding: '12px 14px', cursor: 'pointer', userSelect: 'none' }} onClick={() => setOpen(o => !o)}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
@@ -245,7 +235,7 @@ function PatternCard({ pattern }) {
             <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text)' }}>{pattern.name}</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <RiskBadge risk={pattern.risk} small />
+            <RiskBadge risk={pattern.risk} />
             <span style={{ fontSize: 9, color: 'var(--text-muted)', fontFamily: 'JetBrains Mono, monospace' }}>{pattern.prevalence}</span>
             {open ? <ChevronDown size={11} style={{ color: 'var(--text-muted)' }} /> : <ChevronRight size={11} style={{ color: 'var(--text-muted)' }} />}
           </div>
@@ -262,13 +252,13 @@ function PatternCard({ pattern }) {
                   <span style={{ fontSize: 10, fontWeight: 600, color: pattern.color, fontFamily: 'JetBrains Mono, monospace' }}>{Math.round(s.weight * 100)}%</span>
                 </div>
                 <div style={{ height: 2, background: 'rgba(255,255,255,0.06)', borderRadius: 1 }}>
-                  <div style={{ width: `${s.weight * 100 / 0.35 * 100}%`, height: '100%', background: pattern.color + '80', borderRadius: 1 }} />
+                  <div style={{ width: `${s.weight * 100 / 0.35 * 100}%`, height: '100%', background: pattern.color, borderRadius: 1 }} />
                 </div>
               </div>
             ))}
           </div>
           <div style={{ marginTop: 10, padding: '6px 10px', background: 'rgba(0,0,0,0.2)', borderRadius: 6, fontSize: 10, color: 'var(--text-muted)', lineHeight: 1.5 }}>
-            <span style={{ color: '#f97316', fontWeight: 600 }}>Evasion: </span>{pattern.evasion}
+            <span style={{ color: 'var(--orange)', fontWeight: 600 }}>Evasion: </span>{pattern.evasion}
           </div>
         </div>
       )}
@@ -303,9 +293,9 @@ function FeedRow({ event }) {
         </div>
         {event.top_pattern && (
           <div style={{ marginTop: 3, display: 'flex', alignItems: 'center', gap: 4 }}>
-            <div style={{ width: 4, height: 4, borderRadius: '50%', background: event.pattern_color || '#64748b', flexShrink: 0 }} />
+            <div style={{ width: 4, height: 4, borderRadius: '50%', background: event.pattern_color || 'var(--text-muted)', flexShrink: 0 }} />
             <span style={{ fontSize: 9, color: 'var(--text-muted)' }}>{event.top_pattern}</span>
-            <span style={{ fontSize: 9, color: event.pattern_color || '#64748b', fontFamily: 'JetBrains Mono, monospace' }}>
+            <span style={{ fontSize: 9, color: event.pattern_color || 'var(--text-muted)', fontFamily: 'JetBrains Mono, monospace' }}>
               {event.confidence ? `${(event.confidence * 100).toFixed(0)}%` : ''}
             </span>
           </div>
@@ -319,7 +309,7 @@ function FeedRow({ event }) {
 
 function AlertRow({ event, investigation, onInvestigate }) {
   const sc = event.combined_score || 0;
-  const vc = VERDICT_COLORS[investigation?.result?.verdict] || VERDICT_COLORS.Escalate;
+  const vc = VERDICT_COLOR[investigation?.result?.verdict] || VERDICT_COLOR.Escalate;
   const autoTriggered = event.combined_score >= AUTO_ESCALATE_THRESHOLD;
 
   return (
@@ -342,7 +332,7 @@ function AlertRow({ event, investigation, onInvestigate }) {
         </div>
 
         {event.top_pattern && (
-          <div style={{ fontSize: 10, color: event.pattern_color || '#64748b', marginBottom: 4, fontWeight: 600 }}>
+          <div style={{ fontSize: 10, color: event.pattern_color || 'var(--text-muted)', marginBottom: 4, fontWeight: 600 }}>
             {event.top_pattern}
           </div>
         )}
@@ -361,7 +351,7 @@ function AlertRow({ event, investigation, onInvestigate }) {
             {event.matched_signals.slice(0, 3).map((s, i) => (
               <span key={i} style={{
                 fontSize: 9, padding: '1px 6px',
-                background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)',
+                background: 'var(--bg-elevated)', border: '1px solid var(--border)',
                 borderRadius: 3, color: 'var(--text-muted)',
               }}>{s.label}</span>
             ))}
@@ -391,7 +381,7 @@ function AlertRow({ event, investigation, onInvestigate }) {
           to={`/investigate?txn=${encodeURIComponent(event.transaction_id)}`}
           style={{
             marginTop: 6, width: '100%', boxSizing: 'border-box', padding: '5px 10px', borderRadius: 6,
-            background: 'rgba(248,113,113,0.08)', border: '1px solid rgba(248,113,113,0.3)',
+            background: 'var(--red-dim)', border: '1px solid rgba(239,68,68,0.3)',
             color: 'var(--red)', fontSize: 10, fontWeight: 600, cursor: 'pointer', textDecoration: 'none',
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4,
           }}
@@ -418,18 +408,12 @@ function AlertRow({ event, investigation, onInvestigate }) {
         return (
           <div style={{
             margin: '0 12px 10px', padding: '10px 12px',
-            background: vc.bg, border: `1px solid ${vc.border}`, borderRadius: 8,
+            background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: 8,
           }}>
             {/* Verdict + severity */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
-              <span style={{
-                fontSize: 11, fontWeight: 800, color: vc.text,
-                background: vc.bg, border: `1px solid ${vc.border}`,
-                padding: '2px 8px', borderRadius: 4, textTransform: 'uppercase', letterSpacing: '0.05em',
-              }}>
-                {r.verdict}
-              </span>
-              <RiskBadge risk={r.severity} small />
+              <Badge tone={VERDICT_TONE[r.verdict] || 'danger'}>{r.verdict}</Badge>
+              <RiskBadge risk={r.severity} />
               <span style={{ marginLeft: 'auto', fontSize: 9, color: 'var(--text-muted)' }}>{r.confidence} confidence</span>
             </div>
 
@@ -439,7 +423,7 @@ function AlertRow({ event, investigation, onInvestigate }) {
             {/* Top finding */}
             <div style={{ padding: '6px 8px', background: 'rgba(0,0,0,0.2)', borderRadius: 5, marginBottom: 8 }}>
               <div style={{ fontSize: 9, color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 3 }}>Key Finding</div>
-              <div style={{ fontSize: 11, color: vc.text, fontWeight: 500 }}>{r.top_finding}</div>
+              <div style={{ fontSize: 11, color: vc, fontWeight: 500 }}>{r.top_finding}</div>
             </div>
 
             {/* Recommended action */}
@@ -719,11 +703,7 @@ export default function Operator() {
             <AlertTriangle size={12} style={{ color: alerts.length > 0 ? 'var(--red)' : 'var(--text-muted)' }} />
             <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text)' }}>Alert Queue</span>
             {alerts.length > 0 && (
-              <span style={{
-                fontSize: 10, fontWeight: 700, color: 'var(--red)',
-                background: 'var(--red-dim)', border: '1px solid rgba(239,68,68,0.3)',
-                padding: '1px 6px', borderRadius: 10,
-              }}>{stats.alerts}</span>
+              <Badge tone="danger" dot={false}>{stats.alerts}</Badge>
             )}
             <span style={{ marginLeft: 'auto', fontSize: 9, color: 'var(--accent)', fontWeight: 600 }}>
               {investigatedCount > 0 && `${investigatedCount} investigated`}

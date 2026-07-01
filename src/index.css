@@ -6,7 +6,8 @@
   --bg-base: #07091a;
   --bg-surface: #111827;
   --bg-elevated: #1a2235;
-  --border: rgba(99, 102, 241, 0.22);
+  --border: rgba(255, 255, 255, 0.09);
+  --border-accent: rgba(129, 140, 248, 0.35);
   --border-subtle: rgba(255, 255, 255, 0.08);
   --text: #e2e8f0;
   --text-muted: #64748b;
@@ -165,7 +166,6 @@ html, body, #root {
 /* FraudSense utility animations */
 .animate-eq           { animation: eq 0.8s ease-in-out infinite; }
 .animate-border-pulse { animation: borderPulse 1s ease-in-out infinite; }
-.animate-icon-scan    { animation: iconScan 3s ease-in-out infinite; }
 .animate-pulse-dot    { animation: pulseDot 1s steps(1) infinite; }
 .animate-scaleY-in    { animation: scaleY-in 0.4s ease forwards; }
 .animate-action-flash { animation: actionFlash 0.4s ease-out both; }
@@ -180,13 +180,6 @@ html, body, #root {
 }
 @keyframes scaleY-in { from { transform: scaleY(0); } to { transform: scaleY(1); } }
 @keyframes eq { 0%,100% { transform: scaleY(0.3); } 50% { transform: scaleY(1); } }
-@keyframes iconScan {
-  0%   { transform: translateY(-2px); opacity: 0; }
-  15%  { opacity: 0.9; }
-  50%  { transform: translateY(18px); opacity: 0.9; }
-  65%  { opacity: 0; }
-  100% { transform: translateY(18px); opacity: 0; }
-}
 @keyframes actionFlash {
   0%   { filter: brightness(2.4); }
   100% { filter: brightness(1); }

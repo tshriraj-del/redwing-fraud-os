@@ -51,7 +51,7 @@ export default function RiskScorePanel({ riskScore = {}, order = 1 }) {
         right={
           <span
             className="rounded-md px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-[0.06em]"
-            style={{ color: style.color, background: style.dim, border: `1px solid ${style.color}55` }}
+            style={{ color: style.color, background: style.dim, border: '1px solid var(--border)' }}
           >
             {severity}
           </span>
@@ -69,7 +69,7 @@ export default function RiskScorePanel({ riskScore = {}, order = 1 }) {
       <div className="mt-3 h-2 w-full overflow-hidden rounded-[1px] bg-[color:var(--bg-base)] ring-1 ring-[color:var(--border)]">
         <div
           className="h-full rounded-[1px] transition-[width] duration-700 ease-out"
-          style={{ width: `${barW}%`, backgroundColor: style.color, boxShadow: `0 0 12px ${style.color}66` }}
+          style={{ width: `${barW}%`, backgroundColor: style.color }}
         />
       </div>
 

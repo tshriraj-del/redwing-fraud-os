@@ -5,7 +5,7 @@ import {
 import { Network, Lock, EyeOff, Users, ShieldCheck } from 'lucide-react';
 import { fetchConsortium } from '../api.js';
 
-const TEAL = '#2dd4bf';
+const TEAL = 'var(--accent)';
 
 // Demo fallback (Vercel / operator-down) - the real measured numbers.
 const FALLBACK = {
@@ -62,8 +62,8 @@ export default function ConsortiumNetwork() {
 
       {/* header */}
       <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 10, padding: '14px 18px', display: 'flex', alignItems: 'center', gap: 12 }}>
-        <div style={{ width: 30, height: 30, background: `linear-gradient(135deg,${TEAL},#0d9488)`, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-          <Network size={16} color="#062c28" />
+        <div style={{ width: 30, height: 30, background: 'var(--accent)', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+          <Network size={16} color="#fff" />
         </div>
         <div>
           <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text)' }}>Cross-Institution Consortium</div>
@@ -82,7 +82,7 @@ export default function ConsortiumNetwork() {
           <div style={{ fontSize: 12.5, color: 'var(--text)', fontWeight: 600, marginBottom: 4 }}>Pool raw customer data</div>
           <div style={{ fontSize: 11, color: 'var(--text-muted)', lineHeight: 1.6 }}>Every member ships customer records to a central network. Powerful, but it hits a privacy and regulatory wall that keeps most banks out.</div>
         </div>
-        <div style={{ background: 'var(--bg-surface)', border: `1px solid ${TEAL}40`, borderRadius: 10, padding: '14px 16px' }}>
+        <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--accent)', borderRadius: 10, padding: '14px 16px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
             <Lock size={12} style={{ color: TEAL }} />
             <span style={{ fontSize: 10, color: TEAL, textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 700 }}>REDWING</span>
@@ -126,7 +126,7 @@ export default function ConsortiumNetwork() {
               <Tooltip contentStyle={{ background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: 8, fontSize: 11 }} formatter={v => v.toFixed(3)} labelFormatter={v => `ε = ${v}`} />
               <ReferenceLine y={dpBase.auc_consortium} stroke={TEAL} strokeDasharray="4 4" label={{ value: 'consortium (raw)', position: 'insideTopLeft', fill: TEAL, fontSize: 9 }} />
               <ReferenceLine y={dpBase.auc_local} stroke="#94a3b8" strokeDasharray="4 4" label={{ value: 'single bank', position: 'insideBottomLeft', fill: '#94a3b8', fontSize: 9 }} />
-              <Line type="monotone" dataKey="auc" name="consortium + DP" stroke="#818cf8" strokeWidth={2.5} dot={{ r: 3 }} />
+              <Line type="monotone" dataKey="auc" name="consortium + DP" stroke="var(--accent)" strokeWidth={2.5} dot={{ r: 3 }} />
             </LineChart>
           </ResponsiveContainer>
         </div>

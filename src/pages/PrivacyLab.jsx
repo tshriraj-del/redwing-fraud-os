@@ -80,7 +80,7 @@ export default function PrivacyLab() {
 
       {/* Header */}
       <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 10, padding: '14px 18px', display: 'flex', alignItems: 'center', gap: 12 }}>
-        <div style={{ width: 28, height: 28, background: 'linear-gradient(135deg,#818cf8,#c084fc)', borderRadius: 7, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+        <div style={{ width: 28, height: 28, background: 'var(--accent)', borderRadius: 7, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
           <ShieldCheck size={15} color="#fff" />
         </div>
         <div>
@@ -96,8 +96,8 @@ export default function PrivacyLab() {
       {/* Metric cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 12 }}>
         <MetricCard label="Non-private baseline" value={data.baseline_auc.toFixed(3)} sub="Recipient-reputation AUC (no privacy)" />
-        <MetricCard label="Detection kept @ ε=1" value={`${eventE1}%`} sub="Event-level DP - protects a transaction" accent="#818cf8" />
-        <MetricCard label="Detection kept @ ε=5" value={`${userE5}%`} sub="User-level DP - protects a whole user" accent="#c084fc" />
+        <MetricCard label="Detection kept @ ε=1" value={`${eventE1}%`} sub="Event-level DP - protects a transaction" accent="var(--accent)" />
+        <MetricCard label="Detection kept @ ε=5" value={`${userE5}%`} sub="User-level DP - protects a whole user" accent="var(--purple)" />
         <MetricCard label="Data clamped (C=5)" value={`${data.clamp_pct}%`} sub="Contribution bound enabling user-level DP" accent="var(--green)" />
       </div>
 
@@ -114,8 +114,8 @@ export default function PrivacyLab() {
               <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 2 }}>% detection utility retained vs privacy budget ε · stronger privacy ← left</div>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: 10, color: 'var(--text-muted)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}><div style={{ width: 8, height: 2, background: '#818cf8' }} />Event-level</div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}><div style={{ width: 8, height: 2, background: '#c084fc' }} />User-level</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}><div style={{ width: 8, height: 2, background: 'var(--accent)' }} />Event-level</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}><div style={{ width: 8, height: 2, background: 'var(--purple)' }} />User-level</div>
             </div>
           </div>
           <ResponsiveContainer width="100%" height={220}>
@@ -125,8 +125,8 @@ export default function PrivacyLab() {
               <YAxis domain={[0, 100]} tick={{ fill: 'var(--text-muted)', fontSize: 9 }} tickLine={false} axisLine={false} tickFormatter={v => v + '%'} />
               <Tooltip content={<CustomTooltip />} />
               <ReferenceLine x={sel.eps} stroke="var(--text-muted)" strokeDasharray="4 4" />
-              <Line type="monotone" dataKey="event" stroke="#818cf8" strokeWidth={2} dot={{ r: 3 }} />
-              <Line type="monotone" dataKey="user" stroke="#c084fc" strokeWidth={2} strokeDasharray="5 4" dot={{ r: 3 }} />
+              <Line type="monotone" dataKey="event" stroke="var(--accent)" strokeWidth={2} dot={{ r: 3 }} />
+              <Line type="monotone" dataKey="user" stroke="var(--purple)" strokeWidth={2} strokeDasharray="5 4" dot={{ r: 3 }} />
             </LineChart>
           </ResponsiveContainer>
 
@@ -135,14 +135,14 @@ export default function PrivacyLab() {
               <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>Privacy budget</span>
               <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text)', fontFamily: 'JetBrains Mono, monospace' }}>{sel.eps} · {sel.label} privacy</span>
             </div>
-            <input type="range" min={0} max={curve.length - 1} step={1} value={epsIdx} onChange={e => setEpsIdx(+e.target.value)} style={{ width: '100%', accentColor: '#818cf8', cursor: 'pointer' }} />
+            <input type="range" min={0} max={curve.length - 1} step={1} value={epsIdx} onChange={e => setEpsIdx(+e.target.value)} style={{ width: '100%', accentColor: 'var(--accent)', cursor: 'pointer' }} />
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginTop: 12 }}>
               <div style={{ background: 'var(--bg-elevated)', borderRadius: 8, padding: '10px 12px', textAlign: 'center' }}>
-                <div style={{ fontSize: 20, fontWeight: 800, color: '#818cf8', fontFamily: 'JetBrains Mono, monospace' }}>{sel.event}%</div>
+                <div style={{ fontSize: 20, fontWeight: 800, color: 'var(--accent)', fontFamily: 'JetBrains Mono, monospace' }}>{sel.event}%</div>
                 <div style={{ fontSize: 9, color: 'var(--text-muted)', marginTop: 2 }}>Event-level detection kept</div>
               </div>
               <div style={{ background: 'var(--bg-elevated)', borderRadius: 8, padding: '10px 12px', textAlign: 'center' }}>
-                <div style={{ fontSize: 20, fontWeight: 800, color: '#c084fc', fontFamily: 'JetBrains Mono, monospace' }}>{sel.user}%</div>
+                <div style={{ fontSize: 20, fontWeight: 800, color: 'var(--purple)', fontFamily: 'JetBrains Mono, monospace' }}>{sel.user}%</div>
                 <div style={{ fontSize: 9, color: 'var(--text-muted)', marginTop: 2 }}>User-level detection kept</div>
               </div>
             </div>
@@ -160,7 +160,7 @@ export default function PrivacyLab() {
               User-level DP at ε=1 - detection retained grows with data volume:
             </div>
             {[
-              { label: 'Full data', val: 54, color: '#c084fc' },
+              { label: 'Full data', val: 54, color: 'var(--purple)' },
               { label: '25% subsample', val: 18, color: 'var(--yellow)' },
             ].map(r => (
               <div key={r.label} style={{ marginBottom: 8 }}>
@@ -184,8 +184,8 @@ export default function PrivacyLab() {
               <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text)' }}>Two Guarantees</div>
             </div>
             {[
-              { c: '#818cf8', t: 'Event-level DP', d: 'Protects one transaction. Laplace(1/ε) noise on counts.' },
-              { c: '#c084fc', t: 'User-level DP', d: 'Protects a whole user. Contribution clamp (C=5) bounds sensitivity → Laplace(C/ε).' },
+              { c: 'var(--accent)', t: 'Event-level DP', d: 'Protects one transaction. Laplace(1/ε) noise on counts.' },
+              { c: 'var(--purple)', t: 'User-level DP', d: 'Protects a whole user. Contribution clamp (C=5) bounds sensitivity → Laplace(C/ε).' },
             ].map(r => (
               <div key={r.t} style={{ display: 'flex', gap: 8, marginBottom: 10 }}>
                 <div style={{ width: 3, borderRadius: 2, background: r.c, flexShrink: 0 }} />

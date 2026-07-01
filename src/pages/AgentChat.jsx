@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { Send, X, Download, RotateCcw } from 'lucide-react';
 import { WORKERS, WORKER_LIST, detectWorker, setLiveContext } from '../workers.js';
 import { streamMessage } from '../api.js';
+import Badge from '../components/Badge.jsx';
 
 const BACKEND  = 'http://localhost:8000';
 const IS_LOCAL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
@@ -98,28 +99,10 @@ function renderMarkdown(text) {
     .join('');
 }
 
-function WorkerBadge({ workerId, small }) {
+function WorkerBadge({ workerId }) {
   const w = WORKERS[workerId];
   if (!w) return null;
-  return (
-    <span
-      style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: 4,
-        padding: small ? '2px 7px' : '3px 9px',
-        borderRadius: 20,
-        background: w.colorDim,
-        border: `1px solid ${w.color}30`,
-        fontSize: small ? 10 : 11,
-        fontWeight: 600,
-        color: w.color,
-        whiteSpace: 'nowrap',
-      }}
-    >
-      <span>{w.icon}</span> {w.short}
-    </span>
-  );
+  return <Badge color={w.color}>{w.icon} {w.short}</Badge>;
 }
 
 function Message({ msg }) {
@@ -152,7 +135,7 @@ function Message({ msg }) {
           height: 28,
           borderRadius: '50%',
           background: WORKERS[msg.worker]?.colorDim ?? 'var(--accent-dim)',
-          border: `1px solid ${WORKERS[msg.worker]?.color ?? 'var(--accent)'}30`,
+          border: `1px solid ${WORKERS[msg.worker]?.color ?? 'var(--accent)'}`,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -166,7 +149,7 @@ function Message({ msg }) {
 
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-          <WorkerBadge workerId={msg.worker} small />
+          <WorkerBadge workerId={msg.worker} />
           {msg.streaming && (
             <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>Thinking…</span>
           )}

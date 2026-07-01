@@ -3,8 +3,9 @@ import {
   Boxes, Play, Search, Eye, Gavel, CheckCircle2, XCircle, Trophy, ChevronRight,
 } from 'lucide-react';
 import { fetchEnvSpec, runEnvAll, fetchAlertQueue } from '../api.js';
+import Badge from '../components/Badge.jsx';
 
-const AC = '#a78bfa'; // agent-environment accent
+const AC = 'var(--accent)'; // agent-environment accent
 
 // ── Demo fallback (Vercel / operator-down) - a verified fraud-case episode ────
 const FALLBACK_SPEC = {
@@ -53,30 +54,26 @@ const AGENT_DESC = {
   cautious: 'Escalates everything without looking',
 };
 
-function Chip({ text, color = AC }) {
-  return <span style={{ fontSize: 9.5, fontFamily: 'JetBrains Mono, monospace', color, background: `${color}14`, border: `1px solid ${color}40`, borderRadius: 5, padding: '2px 7px', whiteSpace: 'nowrap' }}>{text}</span>;
-}
-
 function AgentRow({ run, rank, best }) {
   const s = run.scorecard;
   const win = rank === 0;
   return (
-    <div style={{ background: win ? `${AC}10` : 'var(--bg-elevated)', border: `1px solid ${win ? AC + '55' : 'var(--border)'}`, borderRadius: 9, padding: '10px 12px' }}>
+    <div style={{ background: win ? 'var(--accent-dim)' : 'var(--bg-elevated)', border: win ? '1px solid var(--accent)' : '1px solid var(--border)', borderRadius: 9, padding: '10px 12px' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         {win && <Trophy size={13} style={{ color: AC }} />}
         <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text)', fontFamily: 'JetBrains Mono, monospace' }}>{run.agent}</span>
         <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>{AGENT_DESC[run.agent]}</span>
         <span style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 5 }}>
-          {s.correct ? <CheckCircle2 size={13} style={{ color: '#22c55e' }} /> : <XCircle size={13} style={{ color: '#ef4444' }} />}
+          {s.correct ? <CheckCircle2 size={13} style={{ color: 'var(--green)' }} /> : <XCircle size={13} style={{ color: 'var(--red)' }} />}
           <span style={{ fontSize: 16, fontWeight: 800, fontFamily: 'JetBrains Mono, monospace', color: win ? AC : 'var(--text)' }}>{s.total_reward >= 0 ? '+' : ''}{s.total_reward.toFixed(2)}</span>
         </span>
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 7, flexWrap: 'wrap' }}>
         <span style={{ fontSize: 10.5, color: 'var(--text-muted)' }}>decided <b style={{ color: 'var(--text)', fontFamily: 'JetBrains Mono, monospace' }}>{s.terminal_action}</b></span>
-        <span style={{ fontSize: 10.5, color: 'var(--text-muted)' }}>outcome <b style={{ color: s.outcome_reward >= 0 ? '#22c55e' : '#ef4444', fontFamily: 'JetBrains Mono, monospace' }}>{s.outcome_reward >= 0 ? '+' : ''}{s.outcome_reward.toFixed(2)}</b></span>
-        <span style={{ fontSize: 10.5, color: 'var(--text-muted)' }}>process <b style={{ color: s.process_reward >= 0 ? '#22c55e' : '#ef4444', fontFamily: 'JetBrains Mono, monospace' }}>{s.process_reward >= 0 ? '+' : ''}{s.process_reward.toFixed(2)}</b></span>
+        <span style={{ fontSize: 10.5, color: 'var(--text-muted)' }}>outcome <b style={{ color: s.outcome_reward >= 0 ? 'var(--green)' : 'var(--red)', fontFamily: 'JetBrains Mono, monospace' }}>{s.outcome_reward >= 0 ? '+' : ''}{s.outcome_reward.toFixed(2)}</b></span>
+        <span style={{ fontSize: 10.5, color: 'var(--text-muted)' }}>process <b style={{ color: s.process_reward >= 0 ? 'var(--green)' : 'var(--red)', fontFamily: 'JetBrains Mono, monospace' }}>{s.process_reward >= 0 ? '+' : ''}{s.process_reward.toFixed(2)}</b></span>
         <span style={{ fontSize: 10.5, color: 'var(--text-muted)' }}>{s.n_inspections} inspections</span>
-        {s.process_detail?.guessed && <Chip text="decided blind" color="#ef4444" />}
+        {s.process_detail?.guessed && <Badge color="var(--red)">decided blind</Badge>}
       </div>
     </div>
   );
@@ -110,7 +107,7 @@ export default function AgentEnv() {
 
       {/* header */}
       <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 10, padding: '14px 18px', display: 'flex', alignItems: 'center', gap: 12 }}>
-        <div style={{ width: 30, height: 30, background: `linear-gradient(135deg,${AC},#7c3aed)`, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+        <div style={{ width: 30, height: 30, background: 'var(--accent)', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
           <Boxes size={16} color="#fff" />
         </div>
         <div>
@@ -136,11 +133,11 @@ export default function AgentEnv() {
 
             <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 6 }}>Action space · inspect</div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginBottom: 12 }}>
-              {spec.actions.inspect.map(a => <Chip key={a} text={a.replace('inspect_', '')} color="#60a5fa" />)}
+              {spec.actions.inspect.map(a => <Badge key={a} color="#60a5fa">{a.replace('inspect_', '')}</Badge>)}
             </div>
             <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 6 }}>Action space · decide</div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
-              {spec.actions.terminal.map(a => <Chip key={a} text={a} color={AC} />)}
+              {spec.actions.terminal.map(a => <Badge key={a} color={AC}>{a}</Badge>)}
             </div>
           </div>
 
@@ -178,7 +175,7 @@ export default function AgentEnv() {
               </button>
               {queue.slice(0, 6).map(id => (
                 <button key={id} onClick={() => { setTxn(id); run(id); }}
-                  style={{ fontSize: 10, fontFamily: 'JetBrains Mono, monospace', color: result.transaction_id === id ? AC : 'var(--text-muted)', background: result.transaction_id === id ? `${AC}14` : 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: 6, padding: '4px 8px', cursor: 'pointer' }}>
+                  style={{ fontSize: 10, fontFamily: 'JetBrains Mono, monospace', color: result.transaction_id === id ? AC : 'var(--text-muted)', background: result.transaction_id === id ? 'var(--accent-dim)' : 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: 6, padding: '4px 8px', cursor: 'pointer' }}>
                   {id}
                 </button>
               ))}
@@ -189,8 +186,8 @@ export default function AgentEnv() {
           <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 10, padding: '14px 16px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12, flexWrap: 'wrap' }}>
               <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text)', fontFamily: 'JetBrains Mono, monospace' }}>{result.case_id}</span>
-              <Chip text={`truth: ${result.ground_truth_label}`} color={result.ground_truth_label === 'fraud' ? '#ef4444' : '#22c55e'} />
-              <Chip text={`gold: ${result.gold_disposition}`} color="#34d399" />
+              <Badge color={result.ground_truth_label === 'fraud' ? 'var(--red)' : 'var(--green)'}>truth: {result.ground_truth_label}</Badge>
+              <Badge color="#34d399">gold: {result.gold_disposition}</Badge>
               <span style={{ marginLeft: 'auto', fontSize: 10, color: 'var(--text-muted)' }}>3 agents · same case · ranked by total reward</span>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -213,10 +210,12 @@ export default function AgentEnv() {
                   const decide = t.type === 'decide';
                   const Icon = decide ? Gavel : Eye;
                   const c = decide ? AC : '#60a5fa';
+                  const tint = decide ? 'var(--accent-dim)' : `${c}1a`;
+                  const ring = decide ? '1px solid var(--accent)' : `1px solid ${c}55`;
                   return (
                     <div key={i} style={{ display: 'flex', gap: 10, paddingBottom: i < winner.trajectory.length - 1 ? 10 : 0 }}>
                       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                        <div style={{ width: 22, height: 22, borderRadius: 6, background: `${c}1a`, border: `1px solid ${c}55`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                        <div style={{ width: 22, height: 22, borderRadius: 6, background: tint, border: ring, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                           <Icon size={11} style={{ color: c }} />
                         </div>
                         {i < winner.trajectory.length - 1 && <div style={{ width: 1, flex: 1, background: 'var(--border)', marginTop: 2 }} />}
@@ -225,7 +224,7 @@ export default function AgentEnv() {
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                           <span style={{ fontSize: 11.5, fontWeight: 600, color: 'var(--text)', fontFamily: 'JetBrains Mono, monospace' }}>{t.action}</span>
                           {t.revealed && <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>→ revealed {t.revealed}</span>}
-                          <span style={{ marginLeft: 'auto', fontSize: 11, fontFamily: 'JetBrains Mono, monospace', color: t.reward >= 0 ? '#22c55e' : 'var(--text-muted)' }}>{t.reward >= 0 ? '+' : ''}{t.reward.toFixed(2)}</span>
+                          <span style={{ marginLeft: 'auto', fontSize: 11, fontFamily: 'JetBrains Mono, monospace', color: t.reward >= 0 ? 'var(--green)' : 'var(--text-muted)' }}>{t.reward >= 0 ? '+' : ''}{t.reward.toFixed(2)}</span>
                         </div>
                       </div>
                     </div>

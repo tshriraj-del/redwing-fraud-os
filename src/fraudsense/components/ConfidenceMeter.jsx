@@ -21,7 +21,7 @@ export default function ConfidenceMeter({ confidence, delay = 0 }) {
       <div className="h-1.5 w-full overflow-hidden rounded-[1px] bg-[color:var(--bg-base)] ring-1 ring-[color:var(--border)]">
         <div
           className="h-full rounded-[1px] transition-[width] duration-[600ms] ease-out"
-          style={{ width: `${width}%`, backgroundColor: meta.color, boxShadow: `0 0 10px ${meta.color}55` }}
+          style={{ width: `${width}%`, backgroundColor: meta.color }}
         />
       </div>
     </div>

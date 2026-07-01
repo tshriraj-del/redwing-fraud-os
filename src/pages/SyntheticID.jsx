@@ -1,18 +1,19 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Bot, Shield, AlertTriangle, CheckCircle, XCircle, ChevronDown, ChevronRight, Zap, Brain } from 'lucide-react';
+import Badge from '../components/Badge.jsx';
 
 const BACKEND = 'http://localhost:8000';
 const IS_LOCAL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
 
 const THREAT_META = {
-  card_testing_bot:        { label: 'Card Testing Bot',      color: '#22c55e' },
-  synthetic_identity_farm: { label: 'Synthetic ID Farm',     color: '#f59e0b' },
-  ato_bot:                 { label: 'ATO Bot',               color: '#c084fc' },
-  deepfake_bypass:         { label: 'Deepfake Bypass',       color: '#38bdf8' },
-  adversarial_ml:          { label: 'Adversarial ML Attack', color: '#ef4444' },
-  credential_stuffing:     { label: 'Credential Stuffing',   color: '#f97316' },
-  clean:                   { label: 'Clean',                 color: '#22c55e' },
+  card_testing_bot:        { label: 'Card Testing Bot',      color: 'var(--green)' },
+  synthetic_identity_farm: { label: 'Synthetic ID Farm',     color: 'var(--yellow)' },
+  ato_bot:                 { label: 'ATO Bot',               color: 'var(--purple)' },
+  deepfake_bypass:         { label: 'Deepfake Bypass',       color: 'var(--blue)' },
+  adversarial_ml:          { label: 'Adversarial ML Attack', color: 'var(--red)' },
+  credential_stuffing:     { label: 'Credential Stuffing',   color: 'var(--orange)' },
+  clean:                   { label: 'Clean',                 color: 'var(--green)' },
 };
 
 const THREAT_ORDER = ['card_testing_bot', 'ato_bot', 'credential_stuffing', 'synthetic_identity_farm', 'deepfake_bypass', 'adversarial_ml'];
@@ -44,14 +45,8 @@ function fmtTime(iso) {
 // ── Shared atoms ──────────────────────────────────────────────────────────────
 
 function ThreatBadge({ threatType }) {
-  const meta = THREAT_META[threatType] || { label: threatType, color: '#64748b' };
-  return (
-    <span style={{
-      fontSize: 9, fontWeight: 700, padding: '2px 6px', borderRadius: 4,
-      background: meta.color + '18', border: `1px solid ${meta.color}40`,
-      color: meta.color, whiteSpace: 'nowrap', letterSpacing: '0.04em',
-    }}>{meta.label}</span>
-  );
+  const meta = THREAT_META[threatType] || { label: threatType, color: 'var(--text-muted)' };
+  return <Badge color={meta.color}>{meta.label}</Badge>;
 }
 
 function ActionChip({ action }) {
@@ -284,7 +279,7 @@ function LearnedPatterns({ rules }) {
       </div>
     );
   }
-  const STATUS_COLOR = { deployed: 'var(--green)', shadow: 'var(--yellow)', retired: 'var(--text-muted)' };
+  const STATUS_TONE = { deployed: 'success', shadow: 'warning', retired: 'neutral' };
   return (
     <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 10 }}>
       {rules.map(rule => (
@@ -294,12 +289,7 @@ function LearnedPatterns({ rules }) {
         }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
             <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--text)' }}>{rule.name}</span>
-            <span style={{
-              fontSize: 9, fontWeight: 700, padding: '1px 6px', borderRadius: 3,
-              color: STATUS_COLOR[rule.status] || 'var(--text-muted)',
-              background: (STATUS_COLOR[rule.status] || '#64748b') + '18',
-              textTransform: 'uppercase',
-            }}>{rule.status}</span>
+            <Badge tone={STATUS_TONE[rule.status] || 'neutral'}>{rule.status}</Badge>
           </div>
           <div style={{ fontSize: 10, color: 'var(--text-muted)', lineHeight: 1.5, marginBottom: 6 }}>{rule.reason}</div>
           <div style={{ display: 'flex', gap: 12 }}>
@@ -573,7 +563,7 @@ function ThresholdSlider({ label, value, onChange, color = 'var(--accent)' }) {
 
 function ThreatAccordion({ threatKey, perThreat, onChange }) {
   const [open, setOpen] = useState(false);
-  const meta = THREAT_META[threatKey] || { label: threatKey, color: '#64748b' };
+  const meta = THREAT_META[threatKey] || { label: threatKey, color: 'var(--text-muted)' };
   const cfg  = perThreat[threatKey] || { block: 0.65, flag: 0.45, enabled: true };
 
   return (
@@ -976,12 +966,7 @@ export default function SyntheticID() {
             padding: '0 14px', height: 56, display: 'flex', alignItems: 'center', flexShrink: 0,
             borderBottom: '1px solid var(--border)', background: 'var(--bg-surface)',
           }}>
-            <span style={{
-              fontSize: 9, fontWeight: 700, letterSpacing: '0.06em',
-              padding: '2px 7px', borderRadius: 4,
-              background: 'rgba(129,140,248,0.12)', border: '1px solid rgba(129,140,248,0.3)',
-              color: 'var(--accent)',
-            }}>DEMO</span>
+            <Badge tone="brand">DEMO</Badge>
           </div>
         )}
       </div>

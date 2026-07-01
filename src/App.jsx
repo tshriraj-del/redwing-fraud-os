@@ -5,23 +5,20 @@ import Header from './components/Header.jsx';
 
 const Dashboard       = lazy(() => import('./pages/Dashboard.jsx'));
 const AgentChat       = lazy(() => import('./pages/AgentChat.jsx'));
-const MLLab           = lazy(() => import('./pages/MLLab.jsx'));
 const Operator        = lazy(() => import('./pages/Operator.jsx'));
 const Systems         = lazy(() => import('./pages/Systems.jsx'));
-const RuleFactory     = lazy(() => import('./pages/RuleFactory.jsx'));
 const Network         = lazy(() => import('./pages/Network.jsx'));
 const SARWriter       = lazy(() => import('./pages/SARWriter.jsx'));
 const FraudSensePage  = lazy(() => import('./pages/FraudSense.jsx'));
-const RuleBreakerPage = lazy(() => import('./pages/RuleBreaker.jsx'));
 const XAILab          = lazy(() => import('./pages/XAILab.jsx'));
 const SyntheticID     = lazy(() => import('./pages/SyntheticID.jsx'));
-const PrivacyLab      = lazy(() => import('./pages/PrivacyLab.jsx'));
 const Observability   = lazy(() => import('./pages/Observability.jsx'));
 const Investigator    = lazy(() => import('./pages/InvestigatorPanel.jsx'));
-const RealModel       = lazy(() => import('./pages/RealModel.jsx'));
 const AgentEnv        = lazy(() => import('./pages/AgentEnv.jsx'));
 const Adversary       = lazy(() => import('./pages/Adversary.jsx'));
-const Consortium      = lazy(() => import('./pages/ConsortiumNetwork.jsx'));
+const NetworkPrivacy  = lazy(() => import('./pages/NetworkPrivacy.jsx'));
+const Models          = lazy(() => import('./pages/Models.jsx'));
+const RuleStudio      = lazy(() => import('./pages/RuleStudio.jsx'));
 
 function PageLoader() {
   return (
@@ -42,22 +39,22 @@ export default function App() {
             <Routes>
               <Route path="/"            element={<Dashboard />} />
               <Route path="/intel"       element={<AgentChat />} />
-              <Route path="/ml"          element={<MLLab />} />
-              <Route path="/real-model"  element={<RealModel />} />
+              <Route path="/ml"          element={<Models />} />
+              <Route path="/real-model"  element={<Models />} />
               <Route path="/operator"    element={<Operator />} />
               <Route path="/investigate" element={<Investigator />} />
               <Route path="/agent-env"   element={<AgentEnv />} />
               <Route path="/adversary"   element={<Adversary />} />
               <Route path="/systems"     element={<Systems />} />
-              <Route path="/rules"       element={<RuleFactory />} />
+              <Route path="/rules"       element={<RuleStudio />} />
               <Route path="/network"     element={<Network />} />
               <Route path="/sar"         element={<SARWriter />} />
               <Route path="/fraudsense"  element={<FraudSensePage />} />
-              <Route path="/rulebreaker" element={<RuleBreakerPage />} />
+              <Route path="/rulebreaker" element={<RuleStudio />} />
               <Route path="/xai"         element={<XAILab />} />
               <Route path="/syntheticid" element={<SyntheticID />} />
-              <Route path="/privacy"     element={<PrivacyLab />} />
-              <Route path="/consortium"  element={<Consortium />} />
+              <Route path="/privacy"     element={<NetworkPrivacy />} />
+              <Route path="/consortium"  element={<NetworkPrivacy />} />
               <Route path="/observability" element={<Observability />} />
             </Routes>
           </Suspense>

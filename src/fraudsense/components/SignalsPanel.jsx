@@ -20,7 +20,7 @@ export default function SignalsPanel({ signals = [], order = 3 }) {
         right={
           <span
             className="rounded-md px-2 py-0.5 font-mono text-[11px] font-medium"
-            style={{ color: 'var(--accent-cyan)', background: 'var(--accent-cyan-dim)', border: '1px solid var(--accent-cyan)55' }}
+            style={{ color: 'var(--accent-cyan)', background: 'var(--accent-cyan-dim)', border: '1px solid var(--border)' }}
           >
             {count}
           </span>
@@ -56,14 +56,14 @@ export default function SignalsPanel({ signals = [], order = 3 }) {
                     </span>
                     <span
                       className="rounded-lg px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-[0.08em]"
-                      style={{ color: cat.color, background: cat.dim, border: `1px solid ${cat.color}55` }}
+                      style={{ color: cat.color, background: cat.dim, border: '1px solid var(--border)' }}
                     >
                       {s.category}
                     </span>
                     {basis && (
                       <span
                         className="rounded-lg px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-[0.08em]"
-                        style={{ color: basis.color, background: basis.dim, border: `1px solid ${basis.color}55` }}
+                        style={{ color: basis.color, background: basis.dim, border: '1px solid var(--border)' }}
                         title={s.basis === 'Observed' ? 'Stated in the case material' : 'Analyst inference'}
                       >
                         {s.basis}

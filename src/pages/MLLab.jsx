@@ -5,6 +5,9 @@ import {
 } from 'recharts';
 import { TrendingUp, AlertTriangle, CheckCircle2, RefreshCw, Zap, Cpu, Activity } from 'lucide-react';
 import { callOnce, fetchMLMetrics, fetchMLFeatures, fetchMLDrift, scoreTransactionML } from '../api.js';
+import Badge from '../components/Badge.jsx';
+
+const SEVERITY_TONE = { Critical: 'danger', High: 'orange', Medium: 'warning', Low: 'success' };
 
 const IS_LOCAL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
@@ -314,8 +317,8 @@ export default function MLLab() {
               <XAxis dataKey="day" tick={{ fill: 'var(--text-muted)', fontSize: 9 }} tickLine={false} axisLine={false} interval={4} />
               <YAxis domain={[0.82, 0.99]} tick={{ fill: 'var(--text-muted)', fontSize: 9 }} tickLine={false} axisLine={false} tickFormatter={v => v.toFixed(2)} />
               <Tooltip content={<CustomTooltip />} />
-              <Area key="auc" type="monotone" dataKey="AUC" stroke="#818cf8" strokeWidth={1.5} fill="#818cf8" fillOpacity={0.14} dot={false} />
-              <Area key="prec" type="monotone" dataKey="Precision" stroke="#f59e0b" strokeWidth={1.5} fill="#f59e0b" fillOpacity={0.1} dot={false} />
+              <Area key="auc" type="monotone" dataKey="AUC" stroke="var(--accent)" strokeWidth={1.5} fill="var(--accent)" fillOpacity={0.14} dot={false} />
+              <Area key="prec" type="monotone" dataKey="Precision" stroke="var(--yellow)" strokeWidth={1.5} fill="var(--yellow)" fillOpacity={0.1} dot={false} />
             </AreaChart>
           </ResponsiveContainer>
         </div>
@@ -340,7 +343,7 @@ export default function MLLab() {
                     height: '100%',
                     width: `${Math.min(f.importance / (features[0]?.importance || 1) * 100, 100)}%`,
                     borderRadius: 2,
-                    background: 'linear-gradient(90deg, #818cf8, #c084fc)',
+                    background: 'var(--accent)',
                     transition: 'width 0.5s ease',
                   }} />
                 </div>
@@ -446,15 +449,7 @@ export default function MLLab() {
                       {scoreResult.model_version}
                     </span>
                   )}
-                  <span style={{
-                    padding: '3px 10px', borderRadius: 20,
-                    background: `${scoreColor(scoreResult.score)}18`,
-                    border: `1px solid ${scoreColor(scoreResult.score)}40`,
-                    color: scoreColor(scoreResult.score),
-                    fontSize: 11, fontWeight: 700,
-                  }}>
-                    {scoreResult.severity}
-                  </span>
+                  <Badge tone={SEVERITY_TONE[scoreResult.severity] || 'neutral'}>{scoreResult.severity}</Badge>
                 </div>
               </div>
               <ScoreBar score={scoreResult.score} />
@@ -479,8 +474,8 @@ export default function MLLab() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {[
               { label: 'Layer 1 - Rule Engine', value: '41 rules · 6 typologies', color: 'var(--accent)' },
-              { label: 'Layer 2 - XGBoost', value: metrics ? `AUC ${metrics.auc_xgboost || '-'}` : '-', color: '#818cf8' },
-              { label: 'Layer 3 - Novelty gate', value: metrics ? `AUC ${metrics.auc_isolation_forest || '-'}` : '-', color: '#c084fc' },
+              { label: 'Layer 2 - XGBoost', value: metrics ? `AUC ${metrics.auc_xgboost || '-'}` : '-', color: 'var(--accent)' },
+              { label: 'Layer 3 - Novelty gate', value: metrics ? `AUC ${metrics.auc_isolation_forest || '-'}` : '-', color: 'var(--purple)' },
               { label: 'Layer 4 - Graph / reputation', value: 'recipient DP signal', color: 'var(--yellow)' },
               { label: 'Served AUC', value: metrics ? metrics.auc_ensemble?.toFixed(4) ?? '-' : '-', color: 'var(--green)' },
               { label: 'Decision', value: 'XGB primary · novelty escalation', color: 'var(--text-muted)' },

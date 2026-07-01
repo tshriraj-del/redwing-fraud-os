@@ -12,13 +12,15 @@ function ringColor(score) {
 }
 
 function ScoreRing({ score }) {
+  // Guard against a missing/malformed score so the ring never renders NaN.
+  const s = Number.isFinite(score) ? Math.max(0, Math.min(100, score)) : 0;
   const [dashOffset, setDashOffset] = useState(CIRCUMFERENCE);
   const [displayScore, setDisplayScore] = useState(0);
   const rafRef = useRef(null);
 
   useEffect(() => {
     const delay = setTimeout(() => {
-      setDashOffset(CIRCUMFERENCE * (1 - score / 100));
+      setDashOffset(CIRCUMFERENCE * (1 - s / 100));
 
       const duration = 1200;
       const startTime = performance.now();
@@ -27,7 +29,7 @@ function ScoreRing({ score }) {
         const elapsed = now - startTime;
         const progress = Math.min(elapsed / duration, 1);
         const eased = 1 - Math.pow(1 - progress, 3);
-        setDisplayScore(Math.round(eased * score));
+        setDisplayScore(Math.round(eased * s));
         if (progress < 1) {
           rafRef.current = requestAnimationFrame(tick);
         }
@@ -40,9 +42,9 @@ function ScoreRing({ score }) {
       clearTimeout(delay);
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
-  }, [score]);
+  }, [s]);
 
-  const color = ringColor(score);
+  const color = ringColor(s);
 
   return (
     <div className="relative flex items-center justify-center" style={{ width: RING_SIZE, height: RING_SIZE }}>

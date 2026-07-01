@@ -42,9 +42,9 @@ export default function ClassificationPanel({ classification = {}, order = 4 }) 
       className={`panel ${PANEL_ANIM[order]} overflow-hidden p-5`}
       aria-label="Classification"
     >
-      <span className={`edge ${BORDER_ANIM[order]} bg-[color:var(--accent-cyan)]`} />
+      <span className={`edge ${BORDER_ANIM[order]} bg-[color:var(--accent)]`} />
 
-      <PanelHead icon={Tag} title="Classification" accent="var(--accent-cyan)" />
+      <PanelHead icon={Tag} title="Classification" accent="var(--accent)" />
 
       <h2
         className={`text-2xl font-bold leading-tight text-[color:var(--text-primary)] ${
@@ -55,7 +55,7 @@ export default function ClassificationPanel({ classification = {}, order = 4 }) 
       </h2>
 
       {secondary_type && (
-        <span className="mt-2 inline-block rounded-lg border border-[color:var(--border-active)] bg-[color:var(--bg-elevated)] px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.08em] text-[color:var(--text-secondary)]">
+        <span className="mt-2 inline-block rounded-lg border border-[color:var(--border-active)] bg-[color:var(--bg-elevated)] px-2 py-0.5 text-[10px] uppercase tracking-[0.08em] text-[color:var(--text-secondary)]">
           + {secondary_type}
         </span>
       )}
@@ -65,7 +65,7 @@ export default function ClassificationPanel({ classification = {}, order = 4 }) 
       </div>
 
       {reasoning && (
-        <p className="mt-4 font-mono text-[12px] leading-[1.7] text-[color:var(--text-secondary)]">
+        <p className="mt-4 text-[12px] leading-[1.7] text-[color:var(--text-secondary)]">
           {reasoning}
         </p>
       )}

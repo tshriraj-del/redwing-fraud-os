@@ -15,9 +15,9 @@ export default function RcaPanel({ rca = {}, order = 5 }) {
       className={`panel ${PANEL_ANIM[order]} overflow-hidden p-5`}
       aria-label="Root cause analysis"
     >
-      <span className={`edge ${BORDER_ANIM[order]} bg-[color:var(--accent-cyan)]`} />
+      <span className={`edge ${BORDER_ANIM[order]} bg-[color:var(--accent)]`} />
 
-      <PanelHead icon={GitBranch} title="Root Cause Analysis" accent="var(--accent-cyan)" />
+      <PanelHead icon={GitBranch} title="Root Cause Analysis" accent="var(--accent)" />
 
       <div className="divide-y divide-[color:var(--border)]">
         {SECTIONS.map(({ key, label, accent }) => (
@@ -32,7 +32,7 @@ export default function RcaPanel({ rca = {}, order = 5 }) {
             >
               {label}
             </h4>
-            <p className="font-mono text-[12px] leading-[1.7] text-[color:var(--text-secondary)]">
+            <p className="text-[12px] leading-[1.7] text-[color:var(--text-secondary)]">
               {rca[key] ?? '-'}
             </p>
           </div>

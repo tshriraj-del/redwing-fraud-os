@@ -128,7 +128,7 @@ export function ImageIcon({ className = 'w-4 h-4' }) {
 }
 
 // Mobile-style 3-bar signal strength meter. `bars` = how many to fill (1–3).
-export function SignalBars({ bars = 0, color = 'var(--accent-cyan)', className = 'w-5 h-5' }) {
+export function SignalBars({ bars = 0, color = 'var(--accent)', className = 'w-5 h-5' }) {
   const heights = [5, 9, 13];
   return (
     <svg viewBox="0 0 18 16" className={className} aria-hidden="true">
@@ -156,14 +156,14 @@ export function CircuitTexture({ className = '' }) {
       height="420"
       viewBox="0 0 420 420"
       fill="none"
-      stroke="var(--accent-cyan)"
+      stroke="var(--accent)"
       strokeWidth="1"
       aria-hidden="true"
     >
       <defs>
         <pattern id="hex" width="56" height="48" patternUnits="userSpaceOnUse">
           <path d="M14 0 42 0 56 24 42 48 14 48 0 24Z" />
-          <circle cx="28" cy="24" r="2" fill="var(--accent-cyan)" stroke="none" />
+          <circle cx="28" cy="24" r="2" fill="var(--accent)" stroke="none" />
         </pattern>
       </defs>
       <rect width="420" height="420" fill="url(#hex)" />

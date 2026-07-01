@@ -125,7 +125,7 @@ export default function FraudSense() {
 
         {/* Suite-style header bar */}
         <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 10, padding: '14px 18px', display: 'flex', alignItems: 'center', gap: 12 }}>
-          <div style={{ width: 28, height: 28, background: 'linear-gradient(135deg,#a78bfa,#c084fc)', borderRadius: 7, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+          <div style={{ width: 28, height: 28, background: 'var(--accent)', borderRadius: 7, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
             <Sparkles size={15} color="#fff" />
           </div>
           <div>
@@ -156,7 +156,7 @@ export default function FraudSense() {
         {error && !loading && (
           <div
             role="alert"
-            className="mx-auto mt-6 flex max-w-[720px] items-start gap-3 rounded-lg border px-4 py-3.5 font-mono text-[12px]"
+            className="mx-auto mt-6 flex max-w-[720px] items-start gap-3 rounded-lg border px-4 py-3.5 text-[12px]"
             style={{ borderColor: 'var(--accent-red)', background: 'var(--accent-red-dim)', color: 'var(--text-primary)' }}
           >
             <div className="mt-0.5 h-5 w-5 shrink-0 flex items-center justify-center">⚠</div>
@@ -169,7 +169,7 @@ export default function FraudSense() {
             <button
               type="button"
               onClick={runInvestigation}
-              className="shrink-0 rounded-lg border px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.08em] transition-colors"
+              className="shrink-0 rounded-lg border px-3 py-1.5 text-[11px] uppercase tracking-[0.08em] transition-colors"
               style={{ borderColor: 'var(--accent-red)', color: 'var(--accent-red)' }}
             >
               Retry

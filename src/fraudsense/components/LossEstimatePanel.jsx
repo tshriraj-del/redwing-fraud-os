@@ -17,7 +17,7 @@ export default function LossEstimatePanel({ lossEstimate = {}, order = 2 }) {
 
       <div className="grid grid-cols-2 gap-3">
         <div className="rounded-lg border border-[color:var(--border)] bg-[color:var(--bg-base)] p-3">
-          <div className="font-mono text-[10px] uppercase tracking-[0.05em] text-[color:var(--text-dim)]">
+          <div className="text-[10px] uppercase tracking-[0.05em] text-[color:var(--text-dim)]">
             Confirmed
           </div>
           <div className="mt-1 font-mono text-lg font-bold text-[color:var(--text-primary)]">
@@ -25,7 +25,7 @@ export default function LossEstimatePanel({ lossEstimate = {}, order = 2 }) {
           </div>
         </div>
         <div className="rounded-lg border border-[color:var(--border)] bg-[color:var(--accent-amber-dim)] p-3">
-          <div className="font-mono text-[10px] uppercase tracking-[0.05em] text-[color:var(--text-dim)]">
+          <div className="text-[10px] uppercase tracking-[0.05em] text-[color:var(--text-dim)]">
             Likely exposure
           </div>
           <div className="mt-1 font-mono text-lg font-bold text-[color:var(--accent-amber)]">
@@ -35,7 +35,7 @@ export default function LossEstimatePanel({ lossEstimate = {}, order = 2 }) {
       </div>
 
       {basis && (
-        <p className="mt-3 font-mono text-[11px] leading-[1.7] text-[color:var(--text-secondary)]">
+        <p className="mt-3 text-[11px] leading-[1.7] text-[color:var(--text-secondary)]">
           <span className="text-[color:var(--text-dim)]">Basis: </span>
           {basis}
         </p>

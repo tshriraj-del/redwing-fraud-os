@@ -174,7 +174,7 @@ html, body, #root {
   display: inline-block;
   width: 0.5ch; height: 1em;
   margin-left: 2px;
-  background: var(--accent-cyan);
+  background: var(--accent);
   transform: translateY(0.12em);
   animation: pulseDot 1s steps(1) infinite;
 }

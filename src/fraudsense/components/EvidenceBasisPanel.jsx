@@ -42,18 +42,18 @@ export default function EvidenceBasisPanel({ factAssessment = {}, order = 6 }) {
                 <h4 className="font-display text-[10px] uppercase tracking-[0.12em]" style={{ color }}>
                   {label}
                 </h4>
-                <span className="font-mono text-[9px] uppercase tracking-[0.06em] text-[color:var(--text-dim)]">
+                <span className="text-[9px] uppercase tracking-[0.06em] text-[color:var(--text-dim)]">
                   {note}
                 </span>
               </div>
               {items.length === 0 ? (
-                <p className="mt-1 font-mono text-[11px] text-[color:var(--text-dim)]">-</p>
+                <p className="mt-1 text-[11px] text-[color:var(--text-dim)]">-</p>
               ) : (
                 <ul className="mt-1.5 space-y-1">
                   {items.map((it, i) => (
                     <li
                       key={i}
-                      className="flex gap-2 font-mono text-[11px] leading-[1.6] text-[color:var(--text-secondary)]"
+                      className="flex gap-2 text-[11px] leading-[1.6] text-[color:var(--text-secondary)]"
                     >
                       <span style={{ color }}>›</span>
                       <span>{it}</span>

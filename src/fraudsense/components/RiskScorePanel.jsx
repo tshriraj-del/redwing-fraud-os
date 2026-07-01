@@ -50,7 +50,7 @@ export default function RiskScorePanel({ riskScore = {}, order = 1 }) {
         accent={style.color}
         right={
           <span
-            className="rounded-md px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-[0.06em]"
+            className="rounded-md px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.06em]"
             style={{ color: style.color, background: style.dim, border: '1px solid var(--border)' }}
           >
             {severity}
@@ -78,7 +78,7 @@ export default function RiskScorePanel({ riskScore = {}, order = 1 }) {
         <div className="mt-4 space-y-2">
           {factors.map((f, i) => (
             <div key={i} className="flex items-center gap-3">
-              <span className="min-w-0 flex-1 truncate font-mono text-[11px] text-[color:var(--text-secondary)]">
+              <span className="min-w-0 flex-1 truncate text-[11px] text-[color:var(--text-secondary)]">
                 {f.name}
               </span>
               <span className="h-1 w-20 overflow-hidden rounded-[1px] bg-[color:var(--bg-base)]">
@@ -87,7 +87,7 @@ export default function RiskScorePanel({ riskScore = {}, order = 1 }) {
                   style={{ width: barW ? `${((Number(f.weight) || 0) / maxWeight) * 100}%` : '0%', backgroundColor: style.color }}
                 />
               </span>
-              <span className="w-6 text-right font-mono text-[11px] text-[color:var(--text-dim)]">
+              <span className="w-6 text-right text-[11px] text-[color:var(--text-dim)]">
                 {Number(f.weight) || 0}
               </span>
             </div>

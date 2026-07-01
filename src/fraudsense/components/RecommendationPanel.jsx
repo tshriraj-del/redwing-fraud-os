@@ -39,7 +39,7 @@ export default function RecommendationPanel({ recommendation = {}, order = 7 }) 
       </div>
 
       {reasoning && (
-        <p className="mt-4 max-w-[640px] font-mono text-[12px] leading-[1.7] text-[color:var(--text-secondary)]">
+        <p className="mt-4 max-w-[640px] text-[12px] leading-[1.7] text-[color:var(--text-secondary)]">
           {reasoning}
         </p>
       )}
@@ -53,7 +53,7 @@ export default function RecommendationPanel({ recommendation = {}, order = 7 }) 
             {decision_logic.map((step, i) => (
               <li
                 key={i}
-                className="flex gap-2 font-mono text-[12px] leading-[1.6] text-[color:var(--text-secondary)]"
+                className="flex gap-2 text-[12px] leading-[1.6] text-[color:var(--text-secondary)]"
               >
                 <span style={{ color: style.color }}>→</span>
                 <span>{step}</span>
@@ -78,14 +78,14 @@ export default function RecommendationPanel({ recommendation = {}, order = 7 }) 
                 <span
                   className="font-display flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] font-bold"
                   style={{
-                    color: 'var(--accent-cyan)',
-                    border: '1px solid var(--accent-cyan)',
-                    background: 'var(--accent-cyan-dim)',
+                    color: 'var(--accent)',
+                    border: '1px solid var(--accent)',
+                    background: 'var(--accent-dim)',
                   }}
                 >
                   {i + 1}
                 </span>
-                <span className="font-mono text-[12px] leading-relaxed text-[color:var(--text-primary)]">
+                <span className="text-[12px] leading-relaxed text-[color:var(--text-primary)]">
                   {step}
                 </span>
               </li>
@@ -99,7 +99,7 @@ export default function RecommendationPanel({ recommendation = {}, order = 7 }) 
           <div className="font-display mb-1.5 text-[10px] uppercase tracking-[0.12em] text-[color:var(--text-dim)]">
             ↗ Escalation Path
           </div>
-          <p className="font-mono text-[12px] leading-[1.7] text-[color:var(--text-secondary)]">
+          <p className="text-[12px] leading-[1.7] text-[color:var(--text-secondary)]">
             {escalation_path}
           </p>
         </div>

@@ -14,7 +14,7 @@ export default function ConfidenceMeter({ confidence, delay = 0 }) {
 
   return (
     <div>
-      <div className="mb-1.5 flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.12em] text-[color:var(--text-dim)]">
+      <div className="mb-1.5 flex items-center justify-between text-[10px] uppercase tracking-[0.12em] text-[color:var(--text-dim)]">
         <span>Confidence</span>
         <span style={{ color: meta.color }}>{confidence ?? '-'}</span>
       </div>

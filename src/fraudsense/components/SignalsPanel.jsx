@@ -11,16 +11,16 @@ export default function SignalsPanel({ signals = [], order = 3 }) {
       className={`panel ${PANEL_ANIM[order]} overflow-hidden p-5`}
       aria-label="Signals detected"
     >
-      <span className={`edge ${BORDER_ANIM[order]} bg-[color:var(--accent-cyan)]`} />
+      <span className={`edge ${BORDER_ANIM[order]} bg-[color:var(--accent)]`} />
 
       <PanelHead
         icon={Activity}
         title="Signals Detected"
-        accent="var(--accent-cyan)"
+        accent="var(--accent)"
         right={
           <span
-            className="rounded-md px-2 py-0.5 font-mono text-[11px] font-medium"
-            style={{ color: 'var(--accent-cyan)', background: 'var(--accent-cyan-dim)', border: '1px solid var(--border)' }}
+            className="rounded-md px-2 py-0.5 text-[11px] font-medium"
+            style={{ color: 'var(--accent)', background: 'var(--accent-dim)', border: '1px solid var(--border)' }}
           >
             {count}
           </span>
@@ -28,7 +28,7 @@ export default function SignalsPanel({ signals = [], order = 3 }) {
       />
 
       {signals.length === 0 ? (
-        <p className="font-mono text-[12px] text-[color:var(--text-secondary)]">
+        <p className="text-[12px] text-[color:var(--text-secondary)]">
           No discrete signals extracted.
         </p>
       ) : (
@@ -47,22 +47,22 @@ export default function SignalsPanel({ signals = [], order = 3 }) {
                 style={{ animation: 'fadeUp 0.3s ease-out both', animationDelay: `${500 + i * 50}ms` }}
               >
                 {/* hover left edge */}
-                <span className="absolute left-0 top-1 bottom-1 w-0.5 origin-top scale-y-0 bg-[color:var(--accent-cyan)] transition-transform duration-150 group-hover:scale-y-100" />
+                <span className="absolute left-0 top-1 bottom-1 w-0.5 origin-top scale-y-0 bg-[color:var(--accent)] transition-transform duration-150 group-hover:scale-y-100" />
                 <SignalBars bars={meta.bars} color={meta.color} className="mt-0.5 h-4 w-5 shrink-0" />
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="font-mono text-[13px] text-[color:var(--text-primary)]">
+                    <span className="text-[13px] text-[color:var(--text-primary)]">
                       {s.name}
                     </span>
                     <span
-                      className="rounded-lg px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-[0.08em]"
+                      className="rounded-lg px-1.5 py-0.5 text-[9px] uppercase tracking-[0.08em]"
                       style={{ color: cat.color, background: cat.dim, border: '1px solid var(--border)' }}
                     >
                       {s.category}
                     </span>
                     {basis && (
                       <span
-                        className="rounded-lg px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-[0.08em]"
+                        className="rounded-lg px-1.5 py-0.5 text-[9px] uppercase tracking-[0.08em]"
                         style={{ color: basis.color, background: basis.dim, border: '1px solid var(--border)' }}
                         title={s.basis === 'Observed' ? 'Stated in the case material' : 'Analyst inference'}
                       >
@@ -70,7 +70,7 @@ export default function SignalsPanel({ signals = [], order = 3 }) {
                       </span>
                     )}
                   </div>
-                  <p className="mt-1 font-mono text-[11px] leading-relaxed text-[color:var(--text-secondary)]">
+                  <p className="mt-1 text-[11px] leading-relaxed text-[color:var(--text-secondary)]">
                     {s.reason}
                   </p>
                 </div>

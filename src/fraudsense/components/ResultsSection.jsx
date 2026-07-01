@@ -35,7 +35,7 @@ export default function ResultsSection({ analysis, caseMeta, onReset }) {
     <div className="relative mx-auto max-w-[1100px]">
       {/* (1) cyan scan line sweeps top → bottom over the results area, then gone */}
       <span
-        className="pointer-events-none absolute inset-x-0 z-10 h-px bg-[color:var(--accent-cyan)] shadow-[0_0_12px_var(--accent-cyan)]"
+        className="pointer-events-none absolute inset-x-0 z-10 h-px bg-[color:var(--accent)] shadow-[0_0_12px_var(--accent)]"
         style={{ animation: 'resultsScan 0.6s ease-out forwards' }}
       />
 
@@ -58,9 +58,9 @@ export default function ResultsSection({ analysis, caseMeta, onReset }) {
           onClick={copyReport}
           className="rounded-lg border px-3.5 py-2 text-[12px] font-semibold transition-all duration-150"
           style={{
-            borderColor: flash ? 'var(--accent-cyan)' : 'var(--border)',
-            background: flash ? 'var(--accent-cyan-dim)' : 'var(--bg-surface)',
-            color: flash ? 'var(--accent-cyan)' : 'var(--text-secondary)',
+            borderColor: flash ? 'var(--accent)' : 'var(--border)',
+            background: flash ? 'var(--accent-dim)' : 'var(--bg-surface)',
+            color: flash ? 'var(--accent)' : 'var(--text-secondary)',
           }}
         >
           {copied ? 'Copied to clipboard ✓' : 'Copy report'}

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Copy, Check, ExternalLink, Circle } from 'lucide-react';
+import Badge from '../components/Badge.jsx';
 
 const SYSTEMS = [
   {
@@ -52,7 +53,7 @@ const SYSTEMS = [
     version: 'v1.2.0',
     port: 5175,
     baseUrl: 'http://localhost:5175',
-    color: '#38bdf8',
+    color: 'var(--blue)',
     colorDim: 'rgba(56,189,248,0.1)',
     description: 'LLM-powered fraud investigation copilot. 4-stage pipeline: signal extraction, risk scoring, classification, enforcement recommendation.',
     auth: 'VITE_ANTHROPIC_API_KEY in fraudsense/.env',
@@ -68,7 +69,7 @@ const SYSTEMS = [
     version: 'v1.1.0',
     port: 5173,
     baseUrl: 'http://localhost:5173',
-    color: '#a5b4fc',
+    color: 'var(--accent-bright)',
     colorDim: 'rgba(165,180,252,0.1)',
     description: 'Adversarial rule stress-tester + live vector-to-rule synthesis. Two modes: stress-test a rule, or generate rules from raw flagged transaction data.',
     auth: 'VITE_ANTHROPIC_API_KEY in rulebreaker/.env',
@@ -85,7 +86,7 @@ const SYSTEMS = [
     version: 'v2.0.0',
     port: 8000,
     baseUrl: 'http://localhost:8000',
-    color: '#c084fc',
+    color: 'var(--purple)',
     colorDim: 'rgba(192,132,252,0.1)',
     description: 'Autonomous AI fraud detection agent - integrated into the Operator backend. Runs 24/7, classifies 7 AI-driven threat types, makes block/flag/allow decisions backed by real XGBoost inference. Self-learning via Rule Factory.',
     auth: 'Served by Operator - no separate auth',
@@ -102,9 +103,9 @@ const SYSTEMS = [
 ];
 
 const METHOD_STYLES = {
-  GET:  { color: '#4ade80', bg: 'rgba(74,222,128,0.1)'  },
-  POST: { color: '#f59e0b', bg: 'rgba(245,158,11,0.1)'  },
-  UI:   { color: '#a5b4fc', bg: 'rgba(165,180,252,0.1)' },
+  GET:  { color: '#4ade80' },
+  POST: { color: 'var(--yellow)' },
+  UI:   { color: 'var(--accent-bright)' },
 };
 
 function CopyButton({ text }) {
@@ -118,7 +119,7 @@ function CopyButton({ text }) {
   return (
     <button
       onClick={copy}
-      style={{ background: 'none', border: 'none', cursor: 'pointer', color: copied ? '#4ade80' : 'var(--text-muted)', padding: '2px 4px', borderRadius: 4, display: 'flex', alignItems: 'center' }}
+      style={{ background: 'none', border: 'none', cursor: 'pointer', color: copied ? 'var(--green)' : 'var(--text-muted)', padding: '2px 4px', borderRadius: 4, display: 'flex', alignItems: 'center' }}
     >
       {copied ? <Check size={11} /> : <Copy size={11} />}
     </button>
@@ -130,9 +131,9 @@ function EndpointRow({ ep, baseUrl }) {
   const full = ep.method !== 'UI' ? `${baseUrl}${ep.path}` : null;
   return (
     <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '8px 0', borderBottom: '1px solid var(--border)' }}>
-      <span style={{ fontSize: 9, fontWeight: 700, fontFamily: 'JetBrains Mono, monospace', padding: '2px 6px', borderRadius: 4, background: style.bg, color: style.color, flexShrink: 0, marginTop: 2, minWidth: 34, textAlign: 'center' }}>
-        {ep.method}
-      </span>
+      <div style={{ flexShrink: 0, marginTop: 1 }}>
+        <Badge color={style.color}>{ep.method}</Badge>
+      </div>
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
           <code style={{ fontSize: 11, color: 'var(--text)', fontFamily: 'JetBrains Mono, monospace' }}>{ep.path}</code>

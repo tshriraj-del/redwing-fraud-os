@@ -1,14 +1,17 @@
 import { useState, useEffect } from 'react';
 import { ShieldCheck, FileText, BarChart3, ChevronDown, ChevronUp, RefreshCw, AlertTriangle, CheckCircle, Clock } from 'lucide-react';
+import Badge from '../components/Badge.jsx';
 
 const API = 'http://localhost:8000';
 
 const VERDICT_STYLE = {
-  CRITICAL: { color: '#f85149', bg: 'rgba(248,81,73,0.10)', border: 'rgba(248,81,73,0.3)'  },
-  HIGH:     { color: '#f0b429', bg: 'rgba(240,180,41,0.10)', border: 'rgba(240,180,41,0.3)' },
-  MEDIUM:   { color: '#388bfd', bg: 'rgba(56,139,253,0.10)', border: 'rgba(56,139,253,0.3)' },
-  LOW:      { color: '#3fb950', bg: 'rgba(63,185,80,0.10)',  border: 'rgba(63,185,80,0.3)'  },
+  CRITICAL: { color: 'var(--red)',    bg: 'var(--red-dim)',    border: 'rgba(239,68,68,0.3)'  },
+  HIGH:     { color: 'var(--orange)', bg: 'var(--orange-dim)', border: 'rgba(249,115,22,0.3)' },
+  MEDIUM:   { color: 'var(--yellow)', bg: 'var(--yellow-dim)', border: 'rgba(245,158,11,0.3)' },
+  LOW:      { color: 'var(--green)',  bg: 'var(--green-dim)',  border: 'rgba(34,197,94,0.3)'  },
 };
+
+const VERDICT_TONE = { CRITICAL: 'danger', HIGH: 'orange', MEDIUM: 'warning', LOW: 'success' };
 
 const TABS = ['Decision Log', 'Model Card', 'Governance'];
 
@@ -37,32 +40,11 @@ function SectionLabel({ children }) {
 }
 
 function VerdictBadge({ verdict }) {
-  const s = VERDICT_STYLE[verdict] || VERDICT_STYLE.LOW;
-  return (
-    <span style={{
-      fontSize: 10, fontWeight: 700, letterSpacing: '0.08em',
-      color: s.color, background: s.bg, border: `1px solid ${s.border}`,
-      padding: '2px 8px', borderRadius: 4,
-    }}>
-      {verdict}
-    </span>
-  );
+  return <Badge tone={VERDICT_TONE[verdict] || 'neutral'}>{verdict}</Badge>;
 }
 
 function StatusPill({ ok, label }) {
-  return (
-    <span style={{
-      display: 'inline-flex', alignItems: 'center', gap: 5,
-      fontSize: 11, fontWeight: 500,
-      color: ok ? '#3fb950' : '#f0b429',
-      background: ok ? 'rgba(63,185,80,0.08)' : 'rgba(240,180,41,0.08)',
-      border: `1px solid ${ok ? 'rgba(63,185,80,0.25)' : 'rgba(240,180,41,0.25)'}`,
-      padding: '3px 10px', borderRadius: 20,
-    }}>
-      <span style={{ width: 6, height: 6, borderRadius: '50%', background: ok ? '#3fb950' : '#f0b429', display: 'inline-block' }} />
-      {label}
-    </span>
-  );
+  return <Badge tone={ok ? 'success' : 'warning'}>{label}</Badge>;
 }
 
 // ── Contribution bar chart ────────────────────────────────────────────────────
@@ -72,7 +54,7 @@ function ContributionBar({ factor }) {
   const pct = Math.min(Math.abs(factor.contribution) * 300, 1); // normalize
   const width = Math.round(pct * maxWidth);
   const isRisk = factor.direction === 'increases_risk';
-  const color = isRisk ? '#f85149' : '#3fb950';
+  const color = isRisk ? 'var(--red)' : 'var(--green)';
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
@@ -140,12 +122,8 @@ function ExplanationDetail({ record, onClose }) {
             ML: {Math.round(record.ml_score * 100)} · Combined: {Math.round(record.combined_score * 100)}
           </div>
           {record.pattern_match?.pattern_name && (
-            <div style={{
-              marginTop: 10, fontSize: 10, color: '#388bfd',
-              background: 'rgba(56,139,253,0.08)', border: '1px solid rgba(56,139,253,0.2)',
-              borderRadius: 4, padding: '3px 7px', display: 'inline-block',
-            }}>
-              {record.pattern_match.pattern_name} · {Math.round((record.pattern_match.confidence || 0) * 100)}%
+            <div style={{ marginTop: 10, display: 'inline-block' }}>
+              <Badge tone="info">{record.pattern_match.pattern_name} · {Math.round((record.pattern_match.confidence || 0) * 100)}%</Badge>
             </div>
           )}
         </div>
@@ -165,8 +143,8 @@ function ExplanationDetail({ record, onClose }) {
       {record.human_review_required && (
         <div style={{
           marginTop: 16, display: 'flex', alignItems: 'center', gap: 8,
-          fontSize: 11, color: '#f85149',
-          background: 'rgba(248,81,73,0.06)', border: '1px solid rgba(248,81,73,0.2)',
+          fontSize: 11, color: 'var(--red)',
+          background: 'var(--red-dim)', border: '1px solid rgba(239,68,68,0.2)',
           borderRadius: 6, padding: '8px 12px',
         }}>
           <AlertTriangle size={14} />
@@ -262,7 +240,7 @@ function DecisionLog({ records, loading, onRefresh }) {
                     {r.transaction_id}
                   </span>
                   {r.pattern_match?.pattern_name && (
-                    <span style={{ fontSize: 10, color: '#388bfd' }}>
+                    <span style={{ fontSize: 10, color: 'var(--blue)' }}>
                       · {r.pattern_match.pattern_name}
                     </span>
                   )}
@@ -344,7 +322,7 @@ function ModelCard({ card, loading }) {
         ].map(([k, v, ok]) => (
           <div key={k} style={{ display: 'flex', gap: 10, marginBottom: 8, fontSize: 12 }}>
             <span style={{ color: 'var(--text-muted)', width: 160, flexShrink: 0 }}>{k}</span>
-            <span style={{ color: ok === true ? '#3fb950' : ok === false ? '#f0b429' : 'var(--text)' }}>{v || '-'}</span>
+            <span style={{ color: ok === true ? 'var(--green)' : ok === false ? 'var(--yellow)' : 'var(--text)' }}>{v || '-'}</span>
           </div>
         ))}
       </Card>
@@ -442,7 +420,7 @@ function GovernancePanel({ metrics, loading }) {
           {hist.map((count, i) => {
             const maxH = Math.max(...hist, 1);
             const h = Math.round((count / maxH) * 56);
-            const color = i >= 9 ? '#f85149' : i >= 7 ? '#f0b429' : i >= 4 ? '#388bfd' : '#3fb950';
+            const color = i >= 9 ? 'var(--red)' : i >= 7 ? 'var(--orange)' : i >= 4 ? 'var(--yellow)' : 'var(--green)';
             return (
               <div key={i} title={`${i * 10}–${i * 10 + 10}: ${count}`} style={{ flex: 1, height: `${Math.max(h, 2)}px`, background: color, borderRadius: 2 }} />
             );
@@ -485,7 +463,7 @@ function GovernancePanel({ metrics, loading }) {
             [false, 'Challenger model deployed'],
             [false, 'EU AI Act registration filed'],
           ].map(([ok, label], i) => (
-            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 11, color: ok ? '#3fb950' : 'var(--text-muted)' }}>
+            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 11, color: ok ? 'var(--green)' : 'var(--text-muted)' }}>
               {ok ? <CheckCircle size={13} /> : <Clock size={13} />}
               {label}
             </div>

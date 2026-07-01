@@ -1,48 +1,59 @@
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import {
-  ShieldCheck, FlaskConical, BrainCircuit,
-  TrendingUp, ArrowRight, Zap, Clock, Sparkles, Swords, FileText,
+  ShieldCheck, ShieldAlert, Radar, Gauge, Network,
+  TrendingUp, ArrowRight, Zap, Clock, Sparkles,
 } from 'lucide-react';
 import { fetchMLMetrics } from '../api.js';
 
+// The home is a MAP of the five jobs, mirroring the sidebar — so a first-time user
+// learns the workflow instead of guessing at a grab-bag of tools. Each card opens
+// the primary page for that job; the deeper tools live inside it.
 const TOOLS = [
   {
-    id: 'fraudsense',
-    name: 'FraudSense',
-    desc: 'LLM-powered fraud investigation copilot',
-    icon: ShieldCheck,
-    color: '#38bdf8',
+    id: 'detect',
+    name: 'Detect',
+    desc: 'Score transactions in real time — the live 3-tier ML + graph engine.',
+    icon: Radar,
+    color: 'var(--blue)',
     colorDim: 'rgba(56,189,248,0.1)',
-    link: '/fraudsense',
+    link: '/operator',
   },
   {
-    id: 'rulebreaker',
-    name: 'RuleBreaker',
-    desc: 'Adversarial rule stress-testing & gap discovery',
-    icon: Swords,
-    color: '#f97316',
-    colorDim: 'rgba(249,115,22,0.1)',
-    link: '/rulebreaker',
-  },
-  {
-    id: 'xai',
-    name: 'XAI Lab',
-    desc: 'Explainable AI · SHAP · EU AI Act compliance',
-    icon: BrainCircuit,
-    color: '#818cf8',
+    id: 'investigate',
+    name: 'Investigate',
+    desc: 'Work a case to a decision — evidence, the FraudSense copilot, and SAR filing.',
+    icon: ShieldAlert,
+    color: 'var(--accent)',
     colorDim: 'rgba(129,140,248,0.1)',
-    link: '/xai',
-    badge: 'NEW',
+    link: '/investigate',
   },
   {
-    id: 'sar',
-    name: 'SAR Writer',
-    desc: 'AI-assisted Suspicious Activity Reports · FinCEN / OFAC',
-    icon: FileText,
-    color: '#4ade80',
-    colorDim: 'rgba(74,222,128,0.1)',
-    link: '/sar',
+    id: 'assurance',
+    name: 'Assurance',
+    desc: 'Trust & measure the model — drift, red-team, agent evals, explainability.',
+    icon: Gauge,
+    color: 'var(--green)',
+    colorDim: 'rgba(34,197,94,0.1)',
+    link: '/observability',
+  },
+  {
+    id: 'adapt',
+    name: 'Adapt',
+    desc: 'Close the loop — turn confirmed fraud into new detection rules.',
+    icon: Sparkles,
+    color: 'var(--purple)',
+    colorDim: 'rgba(192,132,252,0.1)',
+    link: '/rules',
+  },
+  {
+    id: 'network',
+    name: 'Network & Privacy',
+    desc: 'Cross-bank mule detection, privacy-preserving — the consortium moat.',
+    icon: Network,
+    color: 'var(--orange)',
+    colorDim: 'rgba(249,115,22,0.1)',
+    link: '/consortium',
   },
 ];
 
@@ -89,7 +100,7 @@ function ToolCard({ tool }) {
           <Icon size={16} style={{ color: tool.color }} />
         </div>
         {tool.badge && (
-          <span style={{ fontSize: 9, fontWeight: 700, color: '#22c55e', background: 'rgba(34,197,94,0.12)', border: '1px solid rgba(34,197,94,0.3)', padding: '2px 6px', borderRadius: 4, letterSpacing: '0.04em' }}>
+          <span style={{ fontSize: 9, fontWeight: 700, color: 'var(--green)', background: 'var(--green-dim)', border: '1px solid rgba(34,197,94,0.3)', padding: '2px 6px', borderRadius: 4, letterSpacing: '0.04em' }}>
             {tool.badge}
           </span>
         )}
@@ -133,7 +144,7 @@ export default function Dashboard() {
     { label: 'Model AUC',          value: metrics ? (metrics.auc_redwing || metrics.auc_ensemble || 0).toFixed(4) : '-', delta: metrics?.feature_count === 23 ? '23 features · v2' : '13 features · v1', good: true,  icon: TrendingUp },
     { label: 'Fraud Rate',         value: metrics ? `${(metrics.fraud_rate * 100).toFixed(2)}%` : '-',  delta: `of ${metrics ? metrics.n_transactions?.toLocaleString() : '-'} transactions`, good: true,  icon: ShieldCheck },
     { label: 'Rule Gaps',          value: ruleGaps !== null ? ruleGaps : '-',  delta: 'ML catching what rules miss', good: false, icon: Sparkles },
-    { label: 'Analyst Tools',      value: TOOLS.length, delta: 'All integrated · internal routes', good: true,  icon: Zap },
+    { label: 'Workflow Areas',     value: TOOLS.length, delta: 'Detect → Investigate → Adapt', good: true,  icon: Zap },
   ];
 
   return (
@@ -148,7 +159,7 @@ export default function Dashboard() {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: 20, alignItems: 'start' }}>
         <div>
           <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 12 }}>
-            Analyst Tools
+            Start here · the RedWing workflow
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12 }}>
             {TOOLS.map(t => <ToolCard key={t.id} tool={t} />)}

@@ -1,11 +1,13 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   ShieldAlert, User, CreditCard, FileSearch, Network, Clock, Gavel,
   CheckCircle2, XCircle, AlertTriangle, MinusCircle, Search, RefreshCw, FileText,
-  Sparkles, Quote,
+  Sparkles, Quote, ArrowRight,
 } from 'lucide-react';
 import { fetchCase, fetchAlertQueue, postFeedback } from '../api.js';
 import { investigateStructuredCase } from '../fraudsense/api.js';
+import Badge from '../components/Badge.jsx';
 
 // ── Demo fallback (Vercel / operator-down) - a confirmed card-fraud case ──────
 const FALLBACK = {
@@ -85,9 +87,17 @@ const FALLBACK = {
   _enrichment_note: 'Card-entry, AVS/CVV/3DS, dispute evidence and CDD fields are derived deterministically and kept coherent with ground truth; in production they arrive from the connector hub.',
 };
 
-const SEV = { high: '#ef4444', medium: '#f59e0b', low: '#64748b' };
-const TONE = { danger: '#ef4444', warn: '#f59e0b', ok: '#22c55e' };
-const RATING = { High: '#ef4444', Medium: '#f59e0b', Low: '#22c55e' };
+const SEV = { high: 'var(--red)', medium: 'var(--yellow)', low: 'var(--text-muted)' };
+const SEV_TONE = { high: 'danger', medium: 'warning', low: 'neutral' };
+const RATING = { High: 'var(--red)', Medium: 'var(--yellow)', Low: 'var(--green)' };
+const RATING_TONE = { High: 'danger', Medium: 'warning', Low: 'success' };
+// Disposition button tones - paired text/dim-background/border so the button grid
+// can render a tinted state without concatenating an alpha suffix onto a CSS var.
+const TONE = {
+  danger: { text: 'var(--red)', dim: 'var(--red-dim)', border: 'rgba(239,68,68,0.4)', ring: 'rgba(239,68,68,0.5)' },
+  warn:   { text: 'var(--yellow)', dim: 'var(--yellow-dim)', border: 'rgba(245,158,11,0.4)', ring: 'rgba(245,158,11,0.5)' },
+  ok:     { text: 'var(--green)', dim: 'var(--green-dim)', border: 'rgba(34,197,94,0.4)', ring: 'rgba(34,197,94,0.5)' },
+};
 
 // ── Small building blocks ─────────────────────────────────────────────────────
 function Card({ icon: Icon, title, accent, children, right }) {
@@ -113,18 +123,9 @@ function Field({ label, value, mono, color }) {
   );
 }
 
-function Pill({ text, color }) {
-  return (
-    <span style={{ fontSize: 9.5, fontWeight: 700, color, background: `${color}1f`,
-      border: `1px solid ${color}55`, padding: '2px 7px', borderRadius: 5, letterSpacing: '0.03em', whiteSpace: 'nowrap' }}>
-      {text}
-    </span>
-  );
-}
-
 function EvidenceRow({ label, val }) {
   const pos = val === true, neg = val === false, na = val === null || val === undefined;
-  const c = pos ? '#22c55e' : neg ? '#ef4444' : '#64748b';
+  const c = pos ? 'var(--green)' : neg ? 'var(--red)' : 'var(--text-muted)';
   const Icon = pos ? CheckCircle2 : neg ? XCircle : MinusCircle;
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '4px 0' }}>
@@ -244,6 +245,7 @@ export default function InvestigatorPanel() {
 
   const recId = c.recommended_disposition?.action;
   const chosen = decision || null;
+  const navigate = useNavigate();
   const sarUnlocked = chosen === 'confirm_fraud';
 
   return (
@@ -251,7 +253,7 @@ export default function InvestigatorPanel() {
 
       {/* ── Header / case bar ── */}
       <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 10, padding: '14px 18px', display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
-        <div style={{ width: 30, height: 30, background: 'linear-gradient(135deg,#f87171,#fb923c)', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+        <div style={{ width: 30, height: 30, background: 'var(--red)', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
           <ShieldAlert size={16} color="#fff" />
         </div>
         <div>
@@ -259,9 +261,9 @@ export default function InvestigatorPanel() {
           <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 1 }}>Investigator Workbench · {c.queue} · {c.status}</div>
         </div>
         <div style={{ display: 'flex', gap: 7, marginLeft: 8 }}>
-          <Pill text={c.priority} color={c.priority === 'P1' ? '#ef4444' : c.priority === 'P2' ? '#f59e0b' : '#64748b'} />
-          <Pill text={c.alert?.verdict} color={SEV[c.alert?.verdict === 'CRITICAL' || c.alert?.verdict === 'HIGH' ? 'high' : c.alert?.verdict === 'MEDIUM' ? 'medium' : 'low']} />
-          {c.alert?.fraud_typology && c.alert.fraud_typology !== 'none' && <Pill text={c.alert.fraud_typology} color="#818cf8" />}
+          <Badge tone={c.priority === 'P1' ? 'danger' : c.priority === 'P2' ? 'warning' : 'neutral'}>{c.priority}</Badge>
+          <Badge tone={SEV_TONE[c.alert?.verdict === 'CRITICAL' || c.alert?.verdict === 'HIGH' ? 'high' : c.alert?.verdict === 'MEDIUM' ? 'medium' : 'low']}>{c.alert?.verdict}</Badge>
+          {c.alert?.fraud_typology && c.alert.fraud_typology !== 'none' && <Badge tone="brand">{c.alert.fraud_typology}</Badge>}
         </div>
 
         {/* loader */}
@@ -322,7 +324,7 @@ export default function InvestigatorPanel() {
                   <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
                     <span style={{ fontSize: 10.5, color: 'var(--text-muted)', width: 150, fontFamily: 'JetBrains Mono, monospace' }}>{f.feature}</span>
                     <div style={{ flex: 1, height: 5, background: 'var(--bg-elevated)', borderRadius: 3, overflow: 'hidden' }}>
-                      <div style={{ width: `${Math.min(Math.abs(Number(f.contribution)) * 200, 100)}%`, height: '100%', background: '#818cf8' }} />
+                      <div style={{ width: `${Math.min(Math.abs(Number(f.contribution)) * 200, 100)}%`, height: '100%', background: 'var(--accent)' }} />
                     </div>
                   </div>
                 ))}
@@ -331,7 +333,7 @@ export default function InvestigatorPanel() {
           </Card>
 
           {/* Transaction + instrument */}
-          <Card icon={CreditCard} title="Transaction & payment instrument" accent="#38bdf8">
+          <Card icon={CreditCard} title="Transaction & payment instrument" accent="var(--blue)">
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2px 24px' }}>
               <Field label="Amount" value={`$${Number(c.transaction?.amount).toLocaleString()}`} mono />
               <Field label="Rail" value={c.transaction?.rail} />
@@ -362,7 +364,7 @@ export default function InvestigatorPanel() {
                   <div style={{ flex: 1 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 2 }}>
                       <span style={{ fontSize: 11.5, fontWeight: 600, color: 'var(--text)' }}>{s.label}</span>
-                      <Pill text={s.severity} color={SEV[s.severity]} />
+                      <Badge tone={SEV_TONE[s.severity]}>{s.severity}</Badge>
                     </div>
                     <div style={{ fontSize: 10.5, color: 'var(--text-muted)', lineHeight: 1.5 }}>{s.detail}</div>
                   </div>
@@ -373,7 +375,7 @@ export default function InvestigatorPanel() {
 
           {/* Dispute evidence study */}
           <Card icon={FileSearch} title="Dispute / chargeback evidence study" accent="#a78bfa"
-            right={c.dispute?.active ? <Pill text={`reason ${c.dispute.reason_code}`} color="#a78bfa" /> : null}>
+            right={c.dispute?.active ? <Badge color="#a78bfa">{`reason ${c.dispute.reason_code}`}</Badge> : null}>
             {!c.dispute?.active ? (
               <div style={{ fontSize: 11.5, color: 'var(--text-muted)' }}>No active dispute. {c.dispute?.history_count ?? 0} prior dispute(s) on file.</div>
             ) : (
@@ -410,7 +412,7 @@ export default function InvestigatorPanel() {
           <Card icon={Clock} title="Account activity timeline" accent="#22d3ee">
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               {c.timeline?.map((e, i) => {
-                const lc = e.level === 'flag' ? '#ef4444' : e.level === 'warn' ? '#f59e0b' : '#22c55e';
+                const lc = e.level === 'flag' ? 'var(--red)' : e.level === 'warn' ? 'var(--yellow)' : 'var(--green)';
                 return (
                   <div key={i} style={{ display: 'flex', gap: 10, paddingBottom: i < c.timeline.length - 1 ? 10 : 0 }}>
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -433,7 +435,7 @@ export default function InvestigatorPanel() {
 
           {/* Customer 360 / CDD */}
           <Card icon={User} title="Customer 360 · due diligence" accent="#34d399"
-            right={<Pill text={`${c.customer?.risk_rating} risk`} color={RATING[c.customer?.risk_rating] || '#64748b'} />}>
+            right={<Badge tone={RATING_TONE[c.customer?.risk_rating] || 'neutral'}>{`${c.customer?.risk_rating} risk`}</Badge>}>
             <Field label="Subject" value={c.customer?.name_masked} mono />
             <Field label="KYC" value={c.customer?.kyc_status} color={c.customer?.cip_verified ? 'var(--text)' : SEV.medium} />
             <Field label="ID / nationality" value={`${c.customer?.id_type} · ${c.customer?.nationality}`} />
@@ -450,7 +452,7 @@ export default function InvestigatorPanel() {
               <div style={{ fontSize: 10, color: 'var(--text-muted)', marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Risk drivers</div>
               {c.customer?.risk_drivers?.map((d, i) => (
                 <div key={i} style={{ fontSize: 10.5, color: 'var(--text-muted)', display: 'flex', gap: 6, marginBottom: 3 }}>
-                  <span style={{ color: RATING[c.customer?.risk_rating] || '#64748b' }}>•</span>{d}
+                  <span style={{ color: RATING[c.customer?.risk_rating] || 'var(--text-muted)' }}>•</span>{d}
                 </div>
               ))}
             </div>
@@ -471,8 +473,8 @@ export default function InvestigatorPanel() {
           </Card>
 
           {/* AI second opinion - FraudSense over the full case file */}
-          <Card icon={Sparkles} title="AI second opinion · FraudSense" accent="#c084fc"
-            right={ai.status === 'done' ? <Pill text={ai.source === 'llm' ? 'Claude' : 'heuristic'} color={ai.source === 'llm' ? '#c084fc' : '#64748b'} /> : null}>
+          <Card icon={Sparkles} title="AI second opinion · FraudSense" accent="var(--purple)"
+            right={ai.status === 'done' ? <Badge tone={ai.source === 'llm' ? 'purple' : 'neutral'}>{ai.source === 'llm' ? 'Claude' : 'heuristic'}</Badge> : null}>
             {ai.status === 'idle' && (
               <>
                 <div style={{ fontSize: 10.5, color: 'var(--text-muted)', lineHeight: 1.55, marginBottom: 9 }}>
@@ -480,7 +482,7 @@ export default function InvestigatorPanel() {
                 </div>
                 <button onClick={runFraudSense}
                   style={{ width: '100%', padding: '7px 10px', borderRadius: 7, cursor: 'pointer', fontSize: 11, fontWeight: 600,
-                    color: '#c084fc', background: 'rgba(192,132,252,0.12)', border: '1px solid rgba(192,132,252,0.35)',
+                    color: 'var(--purple)', background: 'var(--purple-dim)', border: '1px solid rgba(192,132,252,0.35)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
                   <Sparkles size={12} /> Run FraudSense on this case
                 </button>
@@ -488,14 +490,15 @@ export default function InvestigatorPanel() {
             )}
             {ai.status === 'loading' && (
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 0' }}>
-                <RefreshCw size={13} style={{ color: '#c084fc', animation: 'spin 0.7s linear infinite' }} />
+                <RefreshCw size={13} style={{ color: 'var(--purple)', animation: 'spin 0.7s linear infinite' }} />
                 <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>FraudSense reading the case file…</span>
               </div>
             )}
             {ai.status === 'done' && ai.result && (() => {
               const r = ai.result;
               const act = r.recommendation?.action;
-              const actColor = act === 'Decline' ? SEV.high : act === 'Escalate' ? SEV.medium : act === 'Monitor' ? '#38bdf8' : '#22c55e';
+              const actColor = act === 'Decline' ? SEV.high : act === 'Escalate' ? SEV.medium : act === 'Monitor' ? 'var(--blue)' : 'var(--green)';
+              const actTone = act === 'Decline' ? 'danger' : act === 'Escalate' ? 'warning' : act === 'Monitor' ? 'info' : 'success';
               const agree = (act === 'Decline' && recId === 'confirm_fraud') ||
                 (act === 'Approve' && recId === 'clear_false_positive') ||
                 (act === 'Escalate' && recId === 'escalate_stepup');
@@ -503,10 +506,10 @@ export default function InvestigatorPanel() {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <span style={{ fontSize: 13, fontWeight: 800, color: actColor }}>{act}</span>
-                    <Pill text={`risk ${r.risk_score?.score}`} color={actColor} />
-                    <Pill text={r.classification?.primary_type} color="#818cf8" />
+                    <Badge tone={actTone}>{`risk ${r.risk_score?.score}`}</Badge>
+                    <Badge tone="brand">{r.classification?.primary_type}</Badge>
                     <span style={{ marginLeft: 'auto' }}>
-                      <Pill text={agree ? 'agrees w/ system ✓' : 'differs from system'} color={agree ? '#22c55e' : '#f59e0b'} />
+                      <Badge tone={agree ? 'success' : 'warning'}>{agree ? 'agrees w/ system ✓' : 'differs from system'}</Badge>
                     </span>
                   </div>
                   <div style={{ fontSize: 10.5, color: 'var(--text)', lineHeight: 1.55 }}>{r.recommendation?.reasoning}</div>
@@ -515,7 +518,7 @@ export default function InvestigatorPanel() {
                       <div style={{ fontSize: 9.5, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 5 }}>Evidence cited</div>
                       {r.recommendation.decision_logic.map((s, i) => (
                         <div key={i} style={{ display: 'flex', gap: 6, marginBottom: 5 }}>
-                          <Quote size={11} style={{ color: '#c084fc', flexShrink: 0, marginTop: 2 }} />
+                          <Quote size={11} style={{ color: 'var(--purple)', flexShrink: 0, marginTop: 2 }} />
                           <span style={{ fontSize: 10.5, color: 'var(--text-muted)', lineHeight: 1.5 }}>{s}</span>
                         </div>
                       ))}
@@ -544,37 +547,47 @@ export default function InvestigatorPanel() {
               <div style={{ marginTop: 4, color: 'var(--text-muted)' }}>{c.recommended_disposition?.rationale}</div>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
-              {c.disposition_options?.map(o => (
-                <button key={o.id} onClick={() => submitDecision(o.id)}
-                  style={{ fontSize: 10.5, fontWeight: 600, padding: '7px 8px', borderRadius: 7, cursor: 'pointer',
-                    textAlign: 'left', color: chosen === o.id ? '#fff' : TONE[o.tone],
-                    background: chosen === o.id ? TONE[o.tone] : `${TONE[o.tone]}14`,
-                    border: `1px solid ${TONE[o.tone]}${chosen === o.id ? '' : '44'}`,
-                    boxShadow: o.id === recId && chosen !== o.id ? `0 0 0 1px ${TONE[o.tone]}66` : 'none' }}>
-                  {o.label}{o.id === recId ? ' ★' : ''}
-                </button>
-              ))}
+              {c.disposition_options?.map(o => {
+                const t = TONE[o.tone];
+                const isChosen = chosen === o.id;
+                return (
+                  <button key={o.id} onClick={() => submitDecision(o.id)}
+                    style={{ fontSize: 10.5, fontWeight: 600, padding: '7px 8px', borderRadius: 7, cursor: 'pointer',
+                      textAlign: 'left', color: isChosen ? '#fff' : t.text,
+                      background: isChosen ? t.text : t.dim,
+                      border: `1px solid ${isChosen ? t.text : t.border}`,
+                      boxShadow: o.id === recId && !isChosen ? `0 0 0 1px ${t.ring}` : 'none' }}>
+                    {o.label}{o.id === recId ? ' ★' : ''}
+                  </button>
+                );
+              })}
             </div>
             {loopMsg && (
-              <div style={{ marginTop: 8, fontSize: 10, color: 'var(--green)', background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.25)', borderRadius: 7, padding: '7px 9px', lineHeight: 1.5 }}>
+              <div style={{ marginTop: 8, fontSize: 10, color: 'var(--green)', background: 'var(--green-dim)', border: '1px solid rgba(34,197,94,0.25)', borderRadius: 7, padding: '7px 9px', lineHeight: 1.5 }}>
                 {loopMsg}
               </div>
             )}
             <textarea value={note} onChange={e => setNote(e.target.value)} placeholder="Investigator notes (audited)…"
               style={{ width: '100%', marginTop: 10, minHeight: 48, background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: 7, padding: '7px 9px', color: 'var(--text)', fontSize: 11, resize: 'vertical', fontFamily: 'inherit', boxSizing: 'border-box' }} />
 
-            {/* SAR gate - only after confirm fraud */}
-            <div style={{ marginTop: 10, padding: '9px 11px', borderRadius: 8,
-              background: sarUnlocked ? 'rgba(34,197,94,0.08)' : 'var(--bg-elevated)',
-              border: `1px solid ${sarUnlocked ? 'rgba(34,197,94,0.3)' : 'var(--border)'}` }}>
+            {/* SAR gate - only after confirm fraud; unlocked, it opens the SAR Writer */}
+            <div
+              onClick={sarUnlocked ? () => navigate('/sar') : undefined}
+              role={sarUnlocked ? 'button' : undefined}
+              style={{ marginTop: 10, padding: '9px 11px', borderRadius: 8,
+                cursor: sarUnlocked ? 'pointer' : 'default',
+                background: sarUnlocked ? 'var(--green-dim)' : 'var(--bg-elevated)',
+                border: `1px solid ${sarUnlocked ? 'rgba(34,197,94,0.3)' : 'var(--border)'}` }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-                <FileText size={13} style={{ color: sarUnlocked ? '#22c55e' : 'var(--text-muted)' }} />
-                <span style={{ fontSize: 11.5, fontWeight: 600, color: sarUnlocked ? '#22c55e' : 'var(--text-muted)' }}>File SAR</span>
-                <span style={{ marginLeft: 'auto', fontSize: 9.5, color: 'var(--text-muted)' }}>final step</span>
+                <FileText size={13} style={{ color: sarUnlocked ? 'var(--green)' : 'var(--text-muted)' }} />
+                <span style={{ fontSize: 11.5, fontWeight: 600, color: sarUnlocked ? 'var(--green)' : 'var(--text-muted)' }}>File SAR</span>
+                <span style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 4, fontSize: 9.5, color: 'var(--text-muted)' }}>
+                  final step {sarUnlocked && <ArrowRight size={11} style={{ color: 'var(--green)' }} />}
+                </span>
               </div>
               <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 5, lineHeight: 1.5 }}>
                 {sarUnlocked
-                  ? 'Fraud confirmed → SAR can now be drafted in the SAR Writer. Reporting is the last action, after the decision is made.'
+                  ? 'Fraud confirmed → open the SAR Writer to draft the filing. Reporting is the last action, after the decision is made.'
                   : 'Locked. SAR is downstream of a confirm-fraud disposition + reporting threshold - not where investigation starts.'}
               </div>
             </div>

@@ -272,7 +272,7 @@ export default function SARWriter() {
           </FormCard>
 
           {error && (
-            <div style={{ background: 'rgba(248,81,73,0.08)', border: '1px solid rgba(248,81,73,0.25)', borderRadius: 10, padding: '12px 14px', fontSize: 13, color: '#f85149', display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+            <div style={{ background: 'var(--red-dim)', border: '1px solid rgba(239,68,68,0.25)', borderRadius: 10, padding: '12px 14px', fontSize: 13, color: 'var(--red)', display: 'flex', alignItems: 'flex-start', gap: 8 }}>
               <ShieldAlert size={14} style={{ flexShrink: 0, marginTop: 2 }} />
               <span>{error}</span>
             </div>
@@ -283,20 +283,20 @@ export default function SARWriter() {
             disabled={loading}
             style={{
               width: '100%', padding: '13px 20px',
-              background: loading ? 'rgba(240,180,41,0.08)' : 'rgba(240,180,41,0.12)',
-              border: '1px solid rgba(240,180,41,0.4)',
-              borderRadius: 10, color: '#f0b429',
+              background: loading ? 'rgba(245,158,11,0.08)' : 'var(--yellow-dim)',
+              border: '1px solid rgba(245,158,11,0.4)',
+              borderRadius: 10, color: 'var(--yellow)',
               fontSize: 14, fontWeight: 700,
               cursor: loading ? 'wait' : 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
               transition: 'all 0.15s ease',
             }}
-            onMouseEnter={e => { if (!loading) e.currentTarget.style.background = 'rgba(240,180,41,0.2)' }}
-            onMouseLeave={e => { e.currentTarget.style.background = loading ? 'rgba(240,180,41,0.08)' : 'rgba(240,180,41,0.12)' }}
+            onMouseEnter={e => { if (!loading) e.currentTarget.style.background = 'rgba(245,158,11,0.2)' }}
+            onMouseLeave={e => { e.currentTarget.style.background = loading ? 'rgba(245,158,11,0.08)' : 'var(--yellow-dim)' }}
           >
             {loading ? (
               <>
-                <div style={{ width: 14, height: 14, border: '2px solid rgba(240,180,41,0.3)', borderTopColor: '#f0b429', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />
+                <div style={{ width: 14, height: 14, border: '2px solid rgba(245,158,11,0.3)', borderTopColor: 'var(--yellow)', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />
                 Generating SAR…
               </>
             ) : (
@@ -501,8 +501,8 @@ function EmptyState() {
       minHeight: 480, gap: 18,
       border: '1px dashed var(--border)', borderRadius: 14, padding: 40,
     }}>
-      <div style={{ width: 68, height: 68, borderRadius: '50%', background: 'rgba(240,180,41,0.07)', border: '1px solid rgba(240,180,41,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <FileText size={28} color="#f0b429" strokeWidth={1.4} />
+      <div style={{ width: 68, height: 68, borderRadius: '50%', background: 'rgba(245,158,11,0.07)', border: '1px solid rgba(245,158,11,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <FileText size={28} color="var(--yellow)" strokeWidth={1.4} />
       </div>
       <div style={{ textAlign: 'center', maxWidth: 360 }}>
         <h3 style={{ fontSize: 16, fontWeight: 600, marginBottom: 10 }}>SAR narrative ready to generate</h3>

@@ -5,9 +5,9 @@ import {
 import { Swords, Play, ShieldX, ShieldCheck, ShieldAlert } from 'lucide-react';
 import { simulateAdversary } from '../api.js';
 
-const CHEAP = '#f59e0b';   // free to the adversary
-const COSTLY = '#60a5fa';  // requires real resources
-const ROSE = '#f43f5e';
+const CHEAP = 'var(--yellow)';   // free to the adversary
+const COSTLY = 'var(--blue)';  // requires real resources
+const ROSE = 'var(--red)';
 
 const SEEDS = [
   { id: 'txn_001819', typ: 'APP scam' },
@@ -48,15 +48,15 @@ const FALLBACK = {
 };
 
 const VERDICT_STYLE = {
-  FRAGILE:   { color: '#ef4444', icon: ShieldX,     note: 'cheap moves alone defeat detection' },
-  RESILIENT: { color: '#22c55e', icon: ShieldCheck, note: 'only costly, provenance-backed moves evade' },
-  PARTIAL:   { color: '#f59e0b', icon: ShieldAlert, note: 'leans on cheap signals but survives near the line' },
+  FRAGILE:   { color: 'var(--red)', icon: ShieldX,     note: 'cheap moves alone defeat detection' },
+  RESILIENT: { color: 'var(--green)', icon: ShieldCheck, note: 'only costly, provenance-backed moves evade' },
+  PARTIAL:   { color: 'var(--yellow)', icon: ShieldAlert, note: 'leans on cheap signals but survives near the line' },
 };
 
 function CostDot(props) {
   const { cx, cy, payload } = props;
   if (cx == null) return null;
-  const c = payload.cost === 'cheap' ? CHEAP : payload.cost === 'costly' ? COSTLY : '#64748b';
+  const c = payload.cost === 'cheap' ? CHEAP : payload.cost === 'costly' ? COSTLY : 'var(--text-muted)';
   return <Dot cx={cx} cy={cy} r={4} fill={c} stroke="var(--bg-surface)" strokeWidth={1.5} />;
 }
 
@@ -97,7 +97,7 @@ export default function Adversary() {
 
       {/* header */}
       <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 10, padding: '14px 18px', display: 'flex', alignItems: 'center', gap: 12 }}>
-        <div style={{ width: 30, height: 30, background: `linear-gradient(135deg,${ROSE},#b91c1c)`, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+        <div style={{ width: 30, height: 30, background: 'var(--accent)', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
           <Swords size={16} color="#fff" />
         </div>
         <div>
@@ -115,14 +115,14 @@ export default function Adversary() {
         <span style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Seed fraud</span>
         {SEEDS.map(s => (
           <button key={s.id} onClick={() => run(s.id)} disabled={loading}
-            style={{ fontSize: 11, fontWeight: 600, color: seed === s.id ? ROSE : 'var(--text-muted)', background: seed === s.id ? `${ROSE}14` : 'var(--bg-surface)', border: `1px solid ${seed === s.id ? ROSE + '55' : 'var(--border)'}`, borderRadius: 7, padding: '5px 11px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5 }}>
+            style={{ fontSize: 11, fontWeight: 600, color: seed === s.id ? 'var(--accent)' : 'var(--text-muted)', background: seed === s.id ? 'var(--accent-dim)' : 'var(--bg-surface)', border: seed === s.id ? '1px solid var(--accent)' : '1px solid var(--border)', borderRadius: 7, padding: '5px 11px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5 }}>
             {seed === s.id && loading ? <Play size={11} className="spin" /> : null}{s.typ}
           </button>
         ))}
       </div>
 
       {/* verdict banner */}
-      <div style={{ background: 'var(--bg-surface)', border: `1px solid ${vs.color}40`, borderRadius: 10, padding: '16px 18px', display: 'flex', alignItems: 'center', gap: 18 }}>
+      <div style={{ background: 'var(--bg-surface)', border: `1px solid ${vs.color}`, borderRadius: 10, padding: '16px 18px', display: 'flex', alignItems: 'center', gap: 18 }}>
         <div style={{ textAlign: 'center', flexShrink: 0 }}>
           <VIcon size={26} style={{ color: vs.color }} />
           <div style={{ fontSize: 13, fontWeight: 800, color: vs.color, marginTop: 4, letterSpacing: '0.02em' }}>{d.verdict}</div>
@@ -131,7 +131,7 @@ export default function Adversary() {
           <div style={{ fontSize: 12.5, color: 'var(--text)', lineHeight: 1.6 }}>{d.headline}</div>
           <div style={{ display: 'flex', gap: 18, marginTop: 9, flexWrap: 'wrap' }}>
             <span style={{ fontSize: 10.5, color: 'var(--text-muted)' }}>baseline <b style={{ color: 'var(--text)', fontFamily: 'JetBrains Mono, monospace' }}>{d.baseline_score}</b></span>
-            <span style={{ fontSize: 10.5, color: 'var(--text-muted)' }}>after free moves <b style={{ color: d.cheap_only_score < d.action_threshold ? '#ef4444' : 'var(--text)', fontFamily: 'JetBrains Mono, monospace' }}>{d.cheap_only_score}</b></span>
+            <span style={{ fontSize: 10.5, color: 'var(--text-muted)' }}>after free moves <b style={{ color: d.cheap_only_score < d.action_threshold ? 'var(--red)' : 'var(--text)', fontFamily: 'JetBrains Mono, monospace' }}>{d.cheap_only_score}</b></span>
             <span style={{ fontSize: 10.5, color: 'var(--text-muted)' }}>lost to free moves <b style={{ color: CHEAP, fontFamily: 'JetBrains Mono, monospace' }}>{(d.share_lost_to_cheap * 100).toFixed(0)}%</b></span>
             {d.crossed_at && <span style={{ fontSize: 10.5, color: 'var(--text-muted)' }}>evaded at <b style={{ color: d.crossed_at.cost === 'cheap' ? CHEAP : COSTLY }}>{d.crossed_at.move} ({d.crossed_at.cost})</b></span>}
           </div>
@@ -152,7 +152,7 @@ export default function Adversary() {
               <XAxis dataKey="step" tick={{ fill: 'var(--text-muted)', fontSize: 9 }} tickLine={false} axisLine={false} />
               <YAxis domain={[0, 100]} tick={{ fill: 'var(--text-muted)', fontSize: 9 }} tickLine={false} axisLine={false} />
               <Tooltip content={<CurveTip />} />
-              <ReferenceLine y={d.action_threshold} stroke="#64748b" strokeDasharray="5 4" label={{ value: 'threshold', position: 'insideTopRight', fill: 'var(--text-muted)', fontSize: 9 }} />
+              <ReferenceLine y={d.action_threshold} stroke="var(--text-muted)" strokeDasharray="5 4" label={{ value: 'threshold', position: 'insideTopRight', fill: 'var(--text-muted)', fontSize: 9 }} />
               <Line type="monotone" dataKey="score" stroke={ROSE} strokeWidth={2} dot={<CostDot />} />
             </LineChart>
           </ResponsiveContainer>

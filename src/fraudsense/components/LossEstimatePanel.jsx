@@ -24,7 +24,7 @@ export default function LossEstimatePanel({ lossEstimate = {}, order = 2 }) {
             {confirmed ?? '-'}
           </div>
         </div>
-        <div className="rounded-lg border border-[color:var(--accent-amber)]/40 bg-[color:var(--accent-amber-dim)] p-3">
+        <div className="rounded-lg border border-[color:var(--border)] bg-[color:var(--accent-amber-dim)] p-3">
           <div className="font-mono text-[10px] uppercase tracking-[0.05em] text-[color:var(--text-dim)]">
             Likely exposure
           </div>

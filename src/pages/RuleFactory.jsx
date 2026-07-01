@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Cpu, Play, CheckCircle2, XCircle, Eye, AlertTriangle,
   ChevronDown, ChevronRight, RefreshCw, Zap, Archive,
@@ -187,7 +188,7 @@ function GapCard({ gap }) {
   );
 }
 
-function RuleCard({ rule, onDeploy, onRetire }) {
+function RuleCard({ rule, onDeploy, onRetire, onStressTest }) {
   const [expanded, setExpanded] = useState(false);
   const bt = rule.backtest || {};
   const statusMeta = STATUS_META[rule.status] || STATUS_META.shadow;
@@ -296,26 +297,38 @@ function RuleCard({ rule, onDeploy, onRetire }) {
               </div>
             )}
 
-            {/* Actions */}
-            {rule.status !== 'retired' && (
-              <div style={{ display: 'flex', gap: 8 }}>
-                {rule.status === 'shadow' && (
-                  <button
-                    onClick={() => onDeploy(rule.id)}
-                    style={{
-                      flex: 1, padding: '7px 12px', borderRadius: 7,
-                      background: 'rgba(34,197,94,0.12)', border: '1px solid rgba(34,197,94,0.3)',
-                      color: 'var(--green)', fontSize: 11, fontWeight: 600, cursor: 'pointer',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
-                    }}
-                  >
-                    <CheckCircle2 size={12} /> Deploy Rule
-                  </button>
-                )}
+            {/* Actions — Stress-test hands this candidate straight to RuleBreaker */}
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button
+                onClick={() => onStressTest(rule)}
+                title="Red-team this rule in RuleBreaker — see how it's evaded, then harden it"
+                style={{
+                  flex: 1, padding: '7px 12px', borderRadius: 7,
+                  background: 'var(--accent-dim)', border: '1px solid var(--accent)',
+                  color: 'var(--accent-bright)', fontSize: 11, fontWeight: 600, cursor: 'pointer',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
+                }}
+              >
+                <ShieldAlert size={12} /> Stress-test →
+              </button>
+              {rule.status === 'shadow' && (
+                <button
+                  onClick={() => onDeploy(rule.id)}
+                  style={{
+                    flex: 1, padding: '7px 12px', borderRadius: 7,
+                    background: 'rgba(34,197,94,0.12)', border: '1px solid rgba(34,197,94,0.3)',
+                    color: 'var(--green)', fontSize: 11, fontWeight: 600, cursor: 'pointer',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
+                  }}
+                >
+                  <CheckCircle2 size={12} /> Deploy Rule
+                </button>
+              )}
+              {rule.status !== 'retired' && (
                 <button
                   onClick={() => onRetire(rule.id)}
                   style={{
-                    flex: rule.status === 'deployed' ? 1 : 0, padding: '7px 12px', borderRadius: 7,
+                    flex: 0, padding: '7px 12px', borderRadius: 7,
                     background: 'rgba(100,116,139,0.08)', border: '1px solid var(--border)',
                     color: 'var(--text-muted)', fontSize: 11, fontWeight: 600, cursor: 'pointer',
                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
@@ -323,8 +336,8 @@ function RuleCard({ rule, onDeploy, onRetire }) {
                 >
                   <Archive size={12} /> Retire
                 </button>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
       )}
@@ -335,6 +348,7 @@ function RuleCard({ rule, onDeploy, onRetire }) {
 // ── Main Page ─────────────────────────────────────────────────────────────────
 
 export default function RuleFactory() {
+  const navigate = useNavigate();
   const [backendOnline, setBackendOnline] = useState(null);
   const [gapData,  setGapData]  = useState(null);
   const [rules,    setRules]    = useState(null);
@@ -414,6 +428,14 @@ export default function RuleFactory() {
     fetchAll();
   }, [fetchAll]);
 
+  // Hand a candidate rule to the Stress-test tab and auto-run the adversarial analysis.
+  const handleStressTest = useCallback((rule) => {
+    const header = [rule.name, rule.reason].filter(Boolean).join(' — ');
+    const preloadRule = rule.fn_code ? `${header}\n\n${rule.fn_code}` : header;
+    const preloadCategory = (rule.typology || 'Account Abuse').replace(/_/g, ' ');
+    navigate('/rulebreaker', { state: { preloadRule, preloadCategory } });
+  }, [navigate]);
+
   const deployed = rules?.rules?.filter(r => r.status === 'deployed').length ?? 0;
   const shadow   = rules?.rules?.filter(r => r.status === 'shadow').length ?? 0;
   const gapCount = gapData?.count ?? 0;
@@ -465,7 +487,7 @@ export default function RuleFactory() {
             disabled={running || (IS_LOCAL && !backendOnline)}
             style={{
               padding: '6px 16px', borderRadius: 7,
-              background: running ? 'var(--bg-elevated)' : 'linear-gradient(135deg,#818cf8,#c084fc)',
+              background: running ? 'var(--bg-elevated)' : 'var(--accent)',
               border: 'none',
               color: running ? 'var(--text-muted)' : '#fff',
               fontSize: 11, fontWeight: 700, cursor: running || (IS_LOCAL && !backendOnline) ? 'default' : 'pointer',
@@ -599,6 +621,7 @@ export default function RuleFactory() {
                 rule={rule}
                 onDeploy={handleDeploy}
                 onRetire={handleRetire}
+                onStressTest={handleStressTest}
               />
             ))}
           </div>

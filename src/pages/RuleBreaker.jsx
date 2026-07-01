@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import TabBar from '../rulebreaker/components/TabBar.jsx';
 import InputSection from '../rulebreaker/components/InputSection.jsx';
 import VectorInputSection from '../rulebreaker/components/VectorInputSection.jsx';
@@ -33,11 +34,18 @@ const DEMO_RESULTS = {
     { name: 'Aged mule account seeding', description: 'Pre-age a mule account with low-value legitimate transactions for 31 days before executing the fraud. Account age check passes; recipient is still fraudulent.', difficulty: 'Medium', detectability: 'Medium' },
     { name: 'Recipient rotation with delay', description: 'Establish a new "recipient" with a small $5 transfer 7 days prior. On day 8, the large transfer goes to an established (non-first-time) recipient that is actually a mule.', difficulty: 'Hard', detectability: 'Low' },
   ],
-  resilience_score: 28,
+  resilience_score: {
+    overall: 28,
+    coverage: 42,
+    precision: 55,
+    evasion_resistance: 18,
+    signal_stability: 30,
+    verdict: 'The rule reliably catches naive, high-amount first-time-recipient fraud on a single transaction. Its critical weakness is that every signal it checks is attacker-controllable — amount, recipient novelty, and account age can all be shaped cheaply to pass, so a competent adversary evades it at little cost.',
+  },
   hardening_recommendations: [
-    { title: 'Add velocity window', description: 'Track cumulative transfers to any recipient cluster over a 72-hour window. Flag when aggregate > $500 even if individual transfers are below threshold.', priority: 'High' },
-    { title: 'Recipient trust score', description: 'Replace binary new/known recipient with a trust score based on transaction history, age of relationship, and shared device fingerprints with known bad actors.', priority: 'High' },
-    { title: 'Network graph check', description: 'Before approving, check if the recipient is connected within 2 hops to any blocked or flagged account in the fraud ring graph.', priority: 'Medium' },
+    { recommendation: 'Add a 72-hour cumulative velocity window per recipient cluster', rationale: 'Catches amount fragmentation — flags aggregate > $500 even when each transfer is individually below threshold.', tradeoff: 'Requires stateful aggregation and may add latency; watch false positives on legitimate recurring transfers.' },
+    { recommendation: 'Replace the binary new/known recipient flag with a recipient trust score', rationale: 'Defeats recipient-rotation seeding by weighting relationship age, history, and shared-device links rather than a single first-time flag.', tradeoff: 'Needs a maintained reputation store; cold-start recipients score low and may over-trigger step-up.' },
+    { recommendation: 'Add a 2-hop graph check against the fraud-ring network before approval', rationale: 'Catches aged-mule seeding — a mule connected to known bad actors is caught even after the account-age check passes.', tradeoff: 'Graph lookups add cost on the hot path and require an up-to-date ring graph.' },
   ],
 };
 
@@ -58,10 +66,33 @@ export default function RuleBreaker() {
   const [patternData, setPatternData]       = useState(null);
   const [ruleResults, setRuleResults]       = useState([]);
 
+  const location = useLocation();
+
   useEffect(() => {
     fetch('http://localhost:8000/health', { signal: AbortSignal.timeout(2500) })
       .catch(() => setResults(DEMO_RESULTS));
   }, []);
+
+  // Handoff from Rule Studio's Author tab: a candidate rule arrives via route state.
+  // Preload it into the stress-test tab and run the adversarial analysis automatically,
+  // so authoring → stress-testing is one continuous flow, not a copy-paste across tools.
+  useEffect(() => {
+    const pre = location.state?.preloadRule;
+    if (!pre) return;
+    const cat = location.state.preloadCategory || category;
+    setActiveTab('stress-test');
+    setRule(pre);
+    setCategory(cat);
+    setValidationError('');
+    setError(null);
+    setResults(null);
+    setIsLoading(true);
+    analyzeRule(pre.trim(), cat)
+      .then(setResults)
+      .catch(() => setResults(DEMO_RESULTS))   // stay graceful offline, like the rest of the page
+      .finally(() => setIsLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.key]);
 
   const handleSubmit = async () => {
     if (rule.trim().length < 15) {

@@ -57,8 +57,8 @@ export default function Observability() {
   }, []);
 
   const CATCH = [
-    { stage: 'Before - skew', value: data.field_catch_before_pct, fill: '#ef4444' },
-    { stage: 'After - fixed', value: data.field_catch_after_pct, fill: '#22c55e' },
+    { stage: 'Before - skew', value: data.field_catch_before_pct, fill: 'var(--red)' },
+    { stage: 'After - fixed', value: data.field_catch_after_pct, fill: 'var(--green)' },
   ];
 
   return (
@@ -66,7 +66,7 @@ export default function Observability() {
 
       {/* Header */}
       <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 10, padding: '14px 18px', display: 'flex', alignItems: 'center', gap: 12 }}>
-        <div style={{ width: 28, height: 28, background: 'linear-gradient(135deg,#818cf8,#c084fc)', borderRadius: 7, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+        <div style={{ width: 28, height: 28, background: 'var(--accent)', borderRadius: 7, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
           <Gauge size={15} color="#fff" />
         </div>
         <div>
@@ -102,7 +102,7 @@ export default function Observability() {
         <MetricCard label="Offline AUC" value={data.offline_auc.toFixed(3)} sub="What the dashboard reported" />
         <MetricCard label="Field catch - skew" value={`${data.field_catch_before_pct}%`} sub="Live path, before the fix" accent="var(--red)" />
         <MetricCard label="Field catch - fixed" value={`${data.field_catch_after_pct}%`} sub="After feature-consistency rebuild" accent="var(--green)" />
-        <MetricCard label="Features restored" value={`${data.feature_count}/${data.feature_count}`} sub="No silent zero-fill" accent="#818cf8" />
+        <MetricCard label="Features restored" value={`${data.feature_count}/${data.feature_count}`} sub="No silent zero-fill" accent="var(--accent)" />
       </div>
 
       {/* Chart + root cause / fix */}

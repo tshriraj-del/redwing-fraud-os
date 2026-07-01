@@ -316,7 +316,7 @@ export default function Network() {
             <StatChip label="Edges"    value={stats.total_edges}     />
             <StatChip label="Fraud"    value={stats.fraud_edges}     color="var(--red)" />
             <StatChip label="Shared Devices" value={stats.shared_devices} color="var(--yellow)" />
-            <StatChip label="Mule Accounts"  value={stats.mule_accounts}  color="#f85149" />
+            <StatChip label="Mule Accounts"  value={stats.mule_accounts}  color="var(--red)" />
           </div>
         )}
 
@@ -384,8 +384,8 @@ export default function Network() {
           )}
           {error && (
             <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <div style={{ background: 'rgba(248,81,73,0.08)', border: '1px solid rgba(248,81,73,0.3)', borderRadius: 10, padding: '20px 28px', textAlign: 'center' }}>
-                <div style={{ fontSize: 13, color: '#f85149', marginBottom: 8 }}>{error}</div>
+              <div style={{ background: 'var(--red-dim)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: 10, padding: '20px 28px', textAlign: 'center' }}>
+                <div style={{ fontSize: 13, color: 'var(--red)', marginBottom: 8 }}>{error}</div>
                 <button onClick={load} style={{ fontSize: 12, color: 'var(--text-muted)', background: 'none', border: '1px solid var(--border)', borderRadius: 6, padding: '5px 14px', cursor: 'pointer' }}>Retry</button>
               </div>
             </div>

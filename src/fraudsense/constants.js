@@ -2,39 +2,41 @@
 
 export const MIN_INPUT_LENGTH = 30;
 
+// Financial-crime typologies — RedWing is a banking/payments platform, so the
+// taxonomy is payment/identity/laundering fraud, not marketplace trust & safety.
 export const CASE_TYPES = [
   'Payment Fraud',
   'Account Takeover',
-  'Seller Abuse',
-  'Buyer Abuse',
+  'Authorized Push Payment Scam',
   'Identity Fraud',
-  'Returns Abuse',
+  'Money Mule / Laundering',
+  'First-Party / Dispute Fraud',
   'Other',
 ];
 
 export const CONTEXT_FLAGS = [
-  'First-time buyer',
-  'High-value order',
-  'International transaction',
-  'New seller account',
-  'Previous flags on this account',
+  'New account (< 90 days)',
+  'High-value transfer',
+  'Cross-border / international',
+  'New payee / recipient',
+  'Prior fraud flags on account',
 ];
 
 export const EXAMPLE_CASES = [
   {
-    label: 'New account, prepaid card, geo mismatch',
+    label: 'Card testing micro-auths',
     caseType: 'Payment Fraud',
-    text: 'New account registered 2 hours ago, placed $847 order, shipping to a different state than billing, used a prepaid Visa, email domain is 10 minutes old.',
+    text: 'Card ending 4417 ran 34 authorizations of $0.50–$2.00 across 34 unique merchants in 8 minutes, all card-not-present, from a single IP. Cardholder is unaware and there is no prior activity on this card from this device.',
   },
   {
-    label: 'Seller review ring',
-    caseType: 'Seller Abuse',
-    text: 'Seller account with 200+ listings suddenly receiving 5-star reviews from 12 accounts all created within the same week, all buyers have zero purchase history.',
+    label: 'Mule fan-out after inbound credit',
+    caseType: 'Money Mule / Laundering',
+    text: 'Account opened 41 days ago received a $9,400 inbound transfer, then within 20 minutes sent six outbound Zelle transfers of $1,500–$1,600 each to newly-added recipients across three different banks. The device was previously seen on two other flagged accounts.',
   },
   {
-    label: 'ATO + gift card cash-out',
+    label: 'ATO + wire to new payee',
     caseType: 'Account Takeover',
-    text: "User's account was accessed from a new device in Vietnam at 3am, immediately changed email and password, then initiated 3 high-value gift card purchases.",
+    text: "User's account was accessed from a new device in a foreign geo at 3am; email and password were changed immediately, the MFA device was swapped, then a $7,500 wire was initiated to a first-time payee.",
   },
 ];
 
